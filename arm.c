@@ -33,7 +33,7 @@ bool GPS_locked;
 static int upright = 0;
 
 int about(double a, double b){
-	return abs(a-b) < ACCEL_NOISE_BOUND;
+	return fabs(a-b) < ACCEL_NOISE_BOUND;
 }
 
 void arm_receive_imu(ADISMessage * data){
