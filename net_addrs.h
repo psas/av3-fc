@@ -46,8 +46,8 @@
 #define ROLL_RX_PORT_S "35004"
 
 // ROLL TEATHER SIGNAL
-#define TEATHER_PORT 0
-#define TEATHER_PORT_S ""
+#define TEATHER_PORT 35004
+#define TEATHER_PORT_S "35004"
 
 // ARM SIGNAL
 #define ARM_IP "127.0.0.1"
