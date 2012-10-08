@@ -1,0 +1,9 @@
+# Compiler flag detection based on similar logic in Kbuild
+try-run = $(shell if ($(1)) >/dev/null 2>&1; then echo '$(2)'; else echo '$(3)'; fi)
+cc-option = $(call try-run,$(CC) $(1) -S -xc /dev/null -o /dev/null,$(1),$(2))
+
+OPTS := -O3 -ffast-math $(call cc-option,-flto -fwhole-program)
+WARNINGS := -Werror -Wall -Wextra -Wmissing-prototypes -Wwrite-strings
+CFLAGS := -g -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing
+
+
