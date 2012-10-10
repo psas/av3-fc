@@ -4,7 +4,8 @@ the (probably fake) flight comptuer and read
 the data as a smoke test"""
 
 import socket
-import struct
+
+from fc_proto import packet_header, tag_header
 
 # UDP packets on localhost
 UDP_IP   = ""
@@ -18,4 +19,17 @@ sock.bind((UDP_IP, UDP_PORT))
 # Listen
 while 1:
     message = sock.recv(4096)
-    print struct.unpack('L4sQHHHH', message)
+    sequence_number, = packet_header.unpack(message[:packet_header.size])
+    message = message[packet_header.size:]
+
+    print "packet sequence", sequence_number
+
+    while len(message) > 0:
+        fourcc, length, timestamp_hi, timestamp_lo = tag_header.unpack(message[:tag_header.size])
+        message = message[tag_header.size:]
+
+        body = message[:length]
+        message = message[length:]
+
+        timestamp = timestamp_hi << 32 | timestamp_lo
+        print timestamp, fourcc, repr(body)

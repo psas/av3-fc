@@ -9,6 +9,8 @@ import time
 import datetime
 import random
 
+from fc_proto import packet_header, tag_header
+
 # UDP packets on localhost
 UDP_IP   = "127.0.0.1"
 UDP_PORT = 5005
@@ -21,6 +23,8 @@ sock.connect((UDP_IP, UDP_PORT))
 # Make timestamp nanoseconds from midnight
 today = datetime.datetime.utcnow()
 today = datetime.datetime(today.year, today.month, today.day, 0,0,0)
+
+accel_body = struct.Struct(">HHH")
 
 # Write some random packets in a loop
 sequence_num = 0
@@ -36,12 +40,7 @@ for i in range(5):
     ay = random.randint(0,65535)
     az = random.randint(0,65535)
 
-    packet = struct.pack('L4sQHHHH', 
-                         sequence_num,
-                         packet_type,
-                         timestamp,
-                         packet_length,
-                         ax, ay, az)
+    packet = packet_header.pack(sequence_num) + tag_header.pack(packet_type, accel_body.size, (timestamp >> 32) & 0xFFFF, timestamp & 0xFFFFFFFF) + accel_body.pack(ax, ay, az)
 
     sock.send(packet)
 
