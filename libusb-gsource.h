@@ -7,6 +7,9 @@
 
 #ifndef LIBUSB_GSOURCE_H_
 #define LIBUSB_GSOURCE_H_
+#include <libusb.h>
+#include <glib.h>
+
 
 typedef void (*libusbSourceErrorCallback)(int, int, GMainLoop *);
 typedef gboolean (*is_device)(libusb_device * device);

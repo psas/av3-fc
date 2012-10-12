@@ -27,6 +27,7 @@
 #include <glib.h>
 
 #include "libusb-gsource.h"
+#include "theo-imu.h"
 
 #define FOURCC(a,b,c,d) htonl(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
@@ -45,22 +46,12 @@
 #define WIFI_POWER_PIN 9
 #define RC_TETHER 15
 
-#define MAX_PACKET_SIZE         64
-
-#define CTRL_IN_EP              0x80
-#define CTRL_OUT_EP             0x00
-#define INTR_IN_EP              0x81
-#define INTR_OUT_EP             0x01
-#define BULK_IN_EP              0x82
-#define BULK_OUT_EP             0x02
-#define ISOC_IN_EP              0x83
-#define ISOC_OUT_EP             0x03
 
 
 static FILE *logfile;
 static int net_fd;
 libusb_device_handle * aps_handle = NULL;
-libusb_device_handle * imu_handle = NULL;
+
 GMainLoop * fc_main = NULL;
 
 static struct timespec starttime;
@@ -145,62 +136,6 @@ static gboolean is_aps(libusb_device * device){
     return FALSE;
 }
 
-#if 0
-static bool is_imu(libusb_device * device){
-    struct libusb_device_descriptor descr;
-    int retErr = libusb_get_device_descriptor(device, &descr);
-    if(retErr){
-        print_libusb_error(retErr,"is_imu libusb_get_device_descriptor");
-        return false;
-    }
-    if(descr.idVendor == 0xFFFF && descr.idProduct == 0x0005){
-        //todo: more ID methods
-        return true;
-    }
-    return false;
-}
-
-static void imu_cb(struct libusb_transfer *transfer){
-    unsigned char *buf = transfer->buffer;
-
-    int retErr;
-    int i;
-    int bytes_written;
-
-    switch(transfer->status){
-    case LIBUSB_TRANSFER_COMPLETED:
-        //write data to socket
-        switch(sensor){
-        case accel:
-            write_tagged_message(FOURCC('A', 'C', 'C', '1'));
-            break;
-        case gyro:
-            write_tagged_message(FOURCC('G', 'Y', 'R', 'O'));
-            break;
-        case magn:
-            write_tagged_message(FOURCC('M', 'A', 'G', 'N'));
-            break;
-        case macc:
-            write_tagged_message(FOURCC('A', 'C', 'C', '2'));
-            break;
-        default:
-            write_tagged_message(FOURCC('E', 'R', 'R', 'O'), "Unknown theo-imu sensor id", sizeof("Unknown theo-imu sensor id") - 1);
-            break;
-        }
-
-        retErr = libusb_submit_transfer(transfer);
-        break;
-    case LIBUSB_TRANSFER_CANCELLED:
-        //do nothing.
-        break;
-    default:
-        print_libusb_transfer_error(transfer->status, "bulk_in_cb");
-        printf("quit bulk_in\n");
-        g_main_loop_quit(fc_main);
-        break;
-    }
-}
-#endif
 static void libusb_mainloop_error_cb(int timeout, int handle_events, GMainLoop * loop){
     if(timeout)
         print_libusb_error(timeout, "libusb timeout");
@@ -257,8 +192,6 @@ int main(int argc, char **argv)
 	int usbErr;
 	int iface_nums[1] = {0};
 	libusbSource * usb_source = NULL;
-//	struct libusb_transfer * imu_transfer = NULL;
-//	unsigned char * imu_buf  = calloc(MAX_PACKET_SIZE, sizeof(unsigned char));
 
     usbErr = libusb_init(NULL);
     if(usbErr){
@@ -281,20 +214,10 @@ int main(int argc, char **argv)
     if(aps_handle == NULL){
         exit(1);
     }
-//    imu_handle = open_usb_device_handle(NULL, is_imu, iface_nums, 1);
+
 
     set_port(0, (1<<ATV_SPS_PIN) | (1<<RC_POWER_PIN) | (1<<WIFI_POWER_PIN));
-#if 0
-    imu_transfer = libusb_alloc_transfer(0);
-    libusb_fill_bulk_transfer(imu_transfer,
-                              imu_handle,
-                              BULK_IN_EP,
-                              imu_buf,
-                              MAX_PACKET_SIZE,
-                              imu_cb,
-                              NULL,
-                              0);
-#endif
+
 
 	logfile = fopen("log", "w");
 	if (logfile == NULL)
@@ -314,13 +237,13 @@ int main(int argc, char **argv)
 
 	write_tagged_message(FOURCC('L', 'O', 'G', 'S'), "initialized", sizeof("initialized") - 1);
 	flush_buffers();
-
+	init_theo_imu();
 	g_main_loop_run(fc_main);
 
 	g_source_destroy((GSource*) usb_source);
 	g_main_loop_unref(fc_main);
 
-	libusb_close(imu_handle);
+	;
 	libusb_exit(NULL);
 	return 0;
 }
