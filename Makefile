@@ -7,3 +7,6 @@ WARNINGS := -Werror -Wall -Wextra -Wmissing-prototypes -Wwrite-strings -Wno-miss
 CFLAGS := -g -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(shell pkg-config --cflags libusb-1.0)
 LDLIBS := -lrt $(shell pkg-config --libs libusb-1.0)
 
+all: fc
+
+fc: libusb-util.o

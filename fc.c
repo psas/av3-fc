@@ -34,8 +34,18 @@
 #define UDP_HEADER_SIZE 8
 #define IPv4_MAX_HEADER_SIZE 60
 
+#define IOUT_PIN 23
+#define ACOK_PIN 11
+#define FC_SPS_PIN 5
+#define ATV_SPS_PIN 6
+#define RC_POWER_PIN 7
+#define ROCKET_READY_PIN 8
+#define WIFI_POWER_PIN 9
+#define RC_TETHER 15
+
 static FILE *logfile;
 static int net_fd;
+libusb_device_handle * aps_handle = NULL;
 
 static struct timespec starttime;
 
@@ -118,7 +128,7 @@ static bool is_aps(libusb_device * device){
     }
     return false;
 }
-
+#if 0
 static bool is_imu(libusb_device * device){
     struct libusb_device_descriptor descr;
     int retErr = libusb_get_device_descriptor(device, &descr);
@@ -132,13 +142,51 @@ static bool is_imu(libusb_device * device){
     }
     return false;
 }
-
+#endif
+static void set_port(int port, uint32_t val){
+    int setport = 0x80;
+    unsigned char data[64];
+    int usb_err;
+    data[0] = (val & 0xFF<<0)>>0;
+    data[1] = (val & 0xFF<<8)>>8;
+    data[2] = (val & 0xFF<<16)>>16;
+    data[3] = (val & 0xFF<<24)>>24;
+    usb_err = libusb_control_transfer(aps_handle,
+            LIBUSB_RECIPIENT_OTHER | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT,
+            setport | port, 0, 0, data, 4, 2000);
+    if(usb_err < 0){
+        print_libusb_error(usb_err, "set_port");
+    }
+    if(usb_err != 4){
+        printf("set_port: Didn't send correct number of bytes");
+    }
+}
+#if 0
+static void clear_port(int port, uint32_t val){
+    int clearport = 0x40;
+    unsigned char data[64];
+    int usb_err;
+    data[0] = (val & 0xFF<<0)>>0;
+    data[1] = (val & 0xFF<<8)>>8;
+    data[2] = (val & 0xFF<<16)>>16;
+    data[3] = (val & 0xFF<<24)>>24;
+    usb_err = libusb_control_transfer(aps_handle,
+            LIBUSB_RECIPIENT_OTHER | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT,
+            clearport | port, 0, 0, data, 4, 2000);
+    if(usb_err < 0){
+        print_libusb_error(usb_err, "set_port");
+    }
+    if(usb_err != 4){
+        printf("set_port: Didn't send correct number of bytes");
+    }
+}
+#endif
 int main(int argc, char **argv)
 {
 	int i, usbErr;
+	int iface_nums[1] = {0};
 	libusb_context * usb_ctx = NULL;
-	libusb_device_handle * aps_handle = NULL;
-	libusb_device_handle * imu_handle = NULL;
+//	libusb_device_handle * imu_handle = NULL;
 
     usbErr = libusb_init(&usb_ctx);
     if(usbErr){
@@ -148,8 +196,9 @@ int main(int argc, char **argv)
     libusb_set_debug(usb_ctx, 3);
 
     aps_handle = open_usb_device_handle(usb_ctx, is_aps, iface_nums, 1);
-    imu_handle = open_usb_device_handle(usb_ctx, is_imu, iface_nums, 1);
+//    imu_handle = open_usb_device_handle(usb_ctx, is_imu, iface_nums, 1);
 
+    set_port(0, (1<<ATV_SPS_PIN) | (1<<RC_POWER_PIN) | (1<<WIFI_POWER_PIN));
 
 	logfile = fopen("log", "w");
 	if (logfile == NULL)

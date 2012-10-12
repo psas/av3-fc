@@ -98,7 +98,7 @@ libusb_device_handle * open_usb_device_handle(libusb_context * context,
 	return handle;
 }
 
-void print_libusb_error(int libusberrno, char* str) {
+void print_libusb_error(int libusberrno, const char* str) {
 	switch(libusberrno) {
     case LIBUSB_SUCCESS:
 		fprintf(stderr, "**%s: SUCCESS\n",str);
@@ -152,7 +152,7 @@ void print_libusb_error(int libusberrno, char* str) {
  */
 }
 
-void print_libusb_transfer_error(int status, char* str){
+void print_libusb_transfer_error(int status, const char* str){
 	switch(status){
 	case LIBUSB_TRANSFER_COMPLETED:
 		fprintf(stderr, "**%s: LIBUSB_TRANSFER_COMPLETED\n", str);
