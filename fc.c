@@ -22,6 +22,9 @@
 #include <netinet/in.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
+#include <libusb.h>
+
+#include "libusb-util.h"
 
 #define FOURCC(a,b,c,d) htonl(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
@@ -102,9 +105,51 @@ static const struct fd_source {
 	{ dummy_open, dummy_read },
 };
 
+static bool is_aps(libusb_device * device){
+    struct libusb_device_descriptor descr;
+    int retErr = libusb_get_device_descriptor(device, &descr);
+    if(retErr){
+        print_libusb_error(retErr,"is_aps libusb_get_device_descriptor");
+        return false;
+    }
+    if(descr.idVendor == 0xFFFF && descr.idProduct == 0x0006){
+        //todo: more ID methods
+        return true;
+    }
+    return false;
+}
+
+static bool is_imu(libusb_device * device){
+    struct libusb_device_descriptor descr;
+    int retErr = libusb_get_device_descriptor(device, &descr);
+    if(retErr){
+        print_libusb_error(retErr,"is_imu libusb_get_device_descriptor");
+        return false;
+    }
+    if(descr.idVendor == 0xFFFF && descr.idProduct == 0x0005){
+        //todo: more ID methods
+        return true;
+    }
+    return false;
+}
+
 int main(int argc, char **argv)
 {
-	int i;
+	int i, usbErr;
+	libusb_context * usb_ctx = NULL;
+	libusb_device_handle * aps_handle = NULL;
+	libusb_device_handle * imu_handle = NULL;
+
+    usbErr = libusb_init(&usb_ctx);
+    if(usbErr){
+        print_libusb_error(usbErr, "libusb_init");
+        exit(EXIT_FAILURE);
+    }
+    libusb_set_debug(usb_ctx, 3);
+
+    aps_handle = open_usb_device_handle(usb_ctx, is_aps, iface_nums, 1);
+    imu_handle = open_usb_device_handle(usb_ctx, is_imu, iface_nums, 1);
+
 
 	logfile = fopen("log", "w");
 	if (logfile == NULL)
