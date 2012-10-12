@@ -1,5 +1,6 @@
 #include "logging.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +35,7 @@ void init_logging(void)
 
 	clock_gettime(CLOCK_MONOTONIC, &starttime);
 
-	write_tagged_message(FOURCC('L', 'O', 'G', 'S'), "initialized", sizeof("initialized") - 1);
+	printf_tagged_message(FOURCC('L', 'O', 'G', 'S'), "initialized");
 	flush_buffers();
 }
 
@@ -86,4 +87,17 @@ void write_tagged_message(uint32_t fourcc, const char *buf, uint16_t len)
 
 	fwrite(&tag_header, sizeof(tag_header), 1, logfile);
 	fwrite(buf, len, 1, logfile);
+}
+
+void printf_tagged_message(uint32_t fourcc, const char *fmt, ...)
+{
+	char buf[1024];
+	int len;
+	va_list ap;
+
+	va_start(ap, fmt);
+	len = vsnprintf(buf, sizeof buf, fmt, ap);
+	va_end(ap);
+
+	write_tagged_message(fourcc, buf, len);
 }
