@@ -17,14 +17,16 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <netinet/in.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <libusb.h>
+#include <glib.h>
 
-#include "libusb-util.h"
+#include "libusb-gsource.h"
 
 #define FOURCC(a,b,c,d) htonl(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
@@ -43,9 +45,23 @@
 #define WIFI_POWER_PIN 9
 #define RC_TETHER 15
 
+#define MAX_PACKET_SIZE         64
+
+#define CTRL_IN_EP              0x80
+#define CTRL_OUT_EP             0x00
+#define INTR_IN_EP              0x81
+#define INTR_OUT_EP             0x01
+#define BULK_IN_EP              0x82
+#define BULK_OUT_EP             0x02
+#define ISOC_IN_EP              0x83
+#define ISOC_OUT_EP             0x03
+
+
 static FILE *logfile;
 static int net_fd;
 libusb_device_handle * aps_handle = NULL;
+libusb_device_handle * imu_handle = NULL;
+GMainLoop * fc_main = NULL;
 
 static struct timespec starttime;
 
@@ -115,7 +131,7 @@ static const struct fd_source {
 	{ dummy_open, dummy_read },
 };
 
-static bool is_aps(libusb_device * device){
+static gboolean is_aps(libusb_device * device){
     struct libusb_device_descriptor descr;
     int retErr = libusb_get_device_descriptor(device, &descr);
     if(retErr){
@@ -124,10 +140,11 @@ static bool is_aps(libusb_device * device){
     }
     if(descr.idVendor == 0xFFFF && descr.idProduct == 0x0006){
         //todo: more ID methods
-        return true;
+        return TRUE;
     }
-    return false;
+    return FALSE;
 }
+
 #if 0
 static bool is_imu(libusb_device * device){
     struct libusb_device_descriptor descr;
@@ -142,7 +159,57 @@ static bool is_imu(libusb_device * device){
     }
     return false;
 }
+
+static void imu_cb(struct libusb_transfer *transfer){
+    unsigned char *buf = transfer->buffer;
+
+    int retErr;
+    int i;
+    int bytes_written;
+
+    switch(transfer->status){
+    case LIBUSB_TRANSFER_COMPLETED:
+        //write data to socket
+        switch(sensor){
+        case accel:
+            write_tagged_message(FOURCC('A', 'C', 'C', '1'));
+            break;
+        case gyro:
+            write_tagged_message(FOURCC('G', 'Y', 'R', 'O'));
+            break;
+        case magn:
+            write_tagged_message(FOURCC('M', 'A', 'G', 'N'));
+            break;
+        case macc:
+            write_tagged_message(FOURCC('A', 'C', 'C', '2'));
+            break;
+        default:
+            write_tagged_message(FOURCC('E', 'R', 'R', 'O'), "Unknown theo-imu sensor id", sizeof("Unknown theo-imu sensor id") - 1);
+            break;
+        }
+
+        retErr = libusb_submit_transfer(transfer);
+        break;
+    case LIBUSB_TRANSFER_CANCELLED:
+        //do nothing.
+        break;
+    default:
+        print_libusb_transfer_error(transfer->status, "bulk_in_cb");
+        printf("quit bulk_in\n");
+        g_main_loop_quit(fc_main);
+        break;
+    }
+}
 #endif
+static void libusb_mainloop_error_cb(int timeout, int handle_events, GMainLoop * loop){
+    if(timeout)
+        print_libusb_error(timeout, "libusb timeout");
+    if(handle_events)
+        print_libusb_error(handle_events, "libusb handle_events");
+    printf("quit libusb\n");
+    g_main_loop_quit(loop);
+}
+
 static void set_port(int port, uint32_t val){
     int setport = 0x80;
     unsigned char data[64];
@@ -161,6 +228,8 @@ static void set_port(int port, uint32_t val){
         printf("set_port: Didn't send correct number of bytes");
     }
 }
+
+
 #if 0
 static void clear_port(int port, uint32_t val){
     int clearport = 0x40;
@@ -181,24 +250,51 @@ static void clear_port(int port, uint32_t val){
     }
 }
 #endif
+
+
 int main(int argc, char **argv)
 {
-	int i, usbErr;
+	int usbErr;
 	int iface_nums[1] = {0};
-	libusb_context * usb_ctx = NULL;
-//	libusb_device_handle * imu_handle = NULL;
+	libusbSource * usb_source = NULL;
+//	struct libusb_transfer * imu_transfer = NULL;
+//	unsigned char * imu_buf  = calloc(MAX_PACKET_SIZE, sizeof(unsigned char));
 
-    usbErr = libusb_init(&usb_ctx);
+    usbErr = libusb_init(NULL);
     if(usbErr){
         print_libusb_error(usbErr, "libusb_init");
         exit(EXIT_FAILURE);
     }
-    libusb_set_debug(usb_ctx, 3);
+    libusb_set_debug(NULL, 3);
 
-    aps_handle = open_usb_device_handle(usb_ctx, is_aps, iface_nums, 1);
-//    imu_handle = open_usb_device_handle(usb_ctx, is_imu, iface_nums, 1);
+    fc_main = g_main_loop_new(NULL, FALSE);
+
+
+    usb_source = libusbSource_new(NULL);
+    if(usb_source == NULL){
+        exit(1);
+    }
+    g_source_set_callback((GSource*) usb_source,
+            (GSourceFunc)libusb_mainloop_error_cb, &fc_main, NULL);
+    g_source_attach((GSource*) usb_source, NULL);
+    aps_handle = open_usb_device_handle(NULL, is_aps, iface_nums, 1);
+    if(aps_handle == NULL){
+        exit(1);
+    }
+//    imu_handle = open_usb_device_handle(NULL, is_imu, iface_nums, 1);
 
     set_port(0, (1<<ATV_SPS_PIN) | (1<<RC_POWER_PIN) | (1<<WIFI_POWER_PIN));
+#if 0
+    imu_transfer = libusb_alloc_transfer(0);
+    libusb_fill_bulk_transfer(imu_transfer,
+                              imu_handle,
+                              BULK_IN_EP,
+                              imu_buf,
+                              MAX_PACKET_SIZE,
+                              imu_cb,
+                              NULL,
+                              0);
+#endif
 
 	logfile = fopen("log", "w");
 	if (logfile == NULL)
@@ -214,34 +310,17 @@ int main(int argc, char **argv)
 	setsockopt(net_fd, SOL_SOCKET, SO_BROADCAST, &broadcast_flag, sizeof(broadcast_flag));
 	connect(net_fd, (struct sockaddr *) &remote, sizeof(struct sockaddr));
 
-	// initialize devices
-	const int num_fds = (sizeof(fd_sources) / sizeof(*fd_sources));
-	struct pollfd fds[num_fds];
-
-	for (i = 0; i < num_fds; ++i)
-		fds[i].fd = fd_sources[i].open();
-
 	clock_gettime(CLOCK_MONOTONIC, &starttime);
 
 	write_tagged_message(FOURCC('L', 'O', 'G', 'S'), "initialized", sizeof("initialized") - 1);
 	flush_buffers();
 
-	while (1)
-	{
-		int n = poll(fds, num_fds, -1);
-		if(n < 0 && errno != EINTR)
-		{
-			fprintf(logfile, "\npoll: %s\n", strerror(errno));
-		}
-		for(i = 0; n > 0; --n)
-		{
-			while(!fds[i].revents)
-				++i;
-			if(fds[i].revents & POLLIN)
-				fd_sources[i].read(fds[i].fd);
-			if(!(fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)))
-				continue;
-		}
-	}
+	g_main_loop_run(fc_main);
+
+	g_source_destroy((GSource*) usb_source);
+	g_main_loop_unref(fc_main);
+
+	libusb_close(imu_handle);
+	libusb_exit(NULL);
 	return 0;
 }
