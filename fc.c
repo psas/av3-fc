@@ -44,6 +44,16 @@ static gboolean shutdown_gracefully(void *closure)
 
 int main(int argc, char **argv)
 {
+	GError *error = NULL;
+	GOptionContext *option_context = g_option_context_new("- control the PSAS AV3 flight computer");
+	g_option_context_add_group(option_context, options_gps());
+	if(!g_option_context_parse(option_context, &argc, &argv, &error))
+	{
+		printf("option parsing failed: %s\n", error->message);
+		exit(1);
+	}
+	g_option_context_free(option_context);
+
 	GMainLoop * fc_main = g_main_loop_new(NULL, FALSE);
 	g_unix_signal_add(SIGINT, shutdown_gracefully, fc_main);
 	g_unix_signal_add(SIGTERM, shutdown_gracefully, fc_main);

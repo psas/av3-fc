@@ -1,12 +1,29 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <glib.h>
 #include "logging.h"
 #include "crescent.h"
 #include "gps-gsource.h"
 
 #define GPS_CODE FOURCC('G','P','S','U')
+
+static gchar *device;
+
+static GOptionEntry options[] = {
+	{ "gps-device", 'g', 0, G_OPTION_ARG_FILENAME, &device, "Device path", NULL },
+	{ NULL },
+};
+
+GOptionGroup *options_gps(void)
+{
+	GOptionGroup *option_group = g_option_group_new(
+		"gps",
+		"GPS Options:",
+		"Show GPS options",
+		NULL, NULL);
+	g_option_group_add_entries(option_group, options);
+	return option_group;
+}
 
 static void *memstr(const void *m, const char *s, size_t len)
 {
@@ -66,7 +83,10 @@ static gboolean read_gps_cb(GIOChannel *gps, GIOCondition cond, gpointer data)
 
 void init_gps(void)
 {
-	GIOChannel *gps_source = g_io_channel_new_file("/dev/usbserial", "r", NULL);
+	if(!device)
+		device = g_strdup("/dev/usbserial");
+
+	GIOChannel *gps_source = g_io_channel_new_file(device, "r", NULL);
 	if (gps_source == NULL)
 	{
 		printf("Can't connect to GPS\n");
