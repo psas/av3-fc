@@ -26,8 +26,6 @@
 #include "aps.h"
 #include "theo-imu.h"
 
-GMainLoop * fc_main = NULL;
-
 static void libusb_mainloop_error_cb(int timeout, int handle_events, GMainLoop * loop){
     if(timeout)
         print_libusb_error(timeout, "libusb timeout");
@@ -46,7 +44,7 @@ static gboolean shutdown_gracefully(void *closure)
 
 int main(int argc, char **argv)
 {
-    fc_main = g_main_loop_new(NULL, FALSE);
+	GMainLoop * fc_main = g_main_loop_new(NULL, FALSE);
 	g_unix_signal_add(SIGINT, shutdown_gracefully, fc_main);
 	g_unix_signal_add(SIGTERM, shutdown_gracefully, fc_main);
 
