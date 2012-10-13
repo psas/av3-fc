@@ -64,7 +64,7 @@ void flush_buffers(void)
 	fflush(logfile);
 }
 
-void write_tagged_message(uint32_t fourcc, const char *buf, uint16_t len)
+void write_tagged_message(uint32_t fourcc, const void *buf, uint16_t len)
 {
 	uint64_t timestamp = get_timestamp();
 
