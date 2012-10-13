@@ -14,10 +14,11 @@
 /*  fcfifo/net.c */
 /*	ltc-fc-common/net*.c */
 
+#include <glib.h>
+#include <glib-unix.h>
+#include <libusb.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libusb.h>
-#include <glib.h>
 
 #include "logging.h"
 #include "gps-gsource.h"
@@ -36,6 +37,13 @@ static void libusb_mainloop_error_cb(int timeout, int handle_events, GMainLoop *
     g_main_loop_quit(loop);
 }
 
+static gboolean shutdown_gracefully(void *closure)
+{
+	GMainLoop *main_loop = closure;
+	g_main_loop_quit(main_loop);
+	return FALSE; /* if this signal happens again, let the process die */
+}
+
 int main(int argc, char **argv)
 {
 	int usbErr;
@@ -49,7 +57,8 @@ int main(int argc, char **argv)
     libusb_set_debug(NULL, 3);
 
     fc_main = g_main_loop_new(NULL, FALSE);
-
+	g_unix_signal_add(SIGINT, shutdown_gracefully, fc_main);
+	g_unix_signal_add(SIGTERM, shutdown_gracefully, fc_main);
 
     usb_source = libusbSource_new(NULL);
     if(usb_source == NULL){
