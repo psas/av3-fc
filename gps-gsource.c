@@ -33,7 +33,7 @@ static gchar *has_packet(gchar *buf, size_t size, uint16_t *len)
 	uint16_t packet_len;
 	memcpy(&packet_len, p+6, 2);
 	/* check whether we have that much data, and if it ends with \r\n */
-	if (size < packet_len + 12)
+	if (size < packet_len + 12U)
 		return NULL;
 	if (memcmp(p+packet_len+2, "\r\n", 2) != 0)
 		return NULL;		//!!! what to do?
