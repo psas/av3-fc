@@ -46,39 +46,29 @@ static gboolean shutdown_gracefully(void *closure)
 
 int main(int argc, char **argv)
 {
-	int usbErr;
-	libusbSource * usb_source = NULL;
-
-    usbErr = libusb_init(NULL);
-    if(usbErr){
-        print_libusb_error(usbErr, "libusb_init");
-        exit(EXIT_FAILURE);
-    }
-    libusb_set_debug(NULL, 3);
-
     fc_main = g_main_loop_new(NULL, FALSE);
 	g_unix_signal_add(SIGINT, shutdown_gracefully, fc_main);
 	g_unix_signal_add(SIGTERM, shutdown_gracefully, fc_main);
 
-    usb_source = libusbSource_new(NULL);
-    if(usb_source == NULL){
-        exit(1);
-    }
-    g_source_set_callback((GSource*) usb_source,
-            (GSourceFunc)libusb_mainloop_error_cb, &fc_main, NULL);
-    g_source_attach((GSource*) usb_source, NULL);
+	libusbSource * usb_source = libusbSource_new();
+	if(usb_source == NULL){
+		exit(1);
+	}
+	g_source_set_callback((GSource*) usb_source,
+			(GSourceFunc)libusb_mainloop_error_cb, &fc_main, NULL);
+	g_source_attach((GSource*) usb_source, NULL);
 
 	init_logging();
-	init_aps();
-	init_theo_imu();
+	init_aps(usb_source);
+	init_theo_imu(usb_source);
 	init_gps();
+
+	g_source_unref((GSource*) usb_source);
 
 	g_main_loop_run(fc_main);
 
-	g_source_destroy((GSource*) usb_source);
 	g_main_loop_unref(fc_main);
+	g_main_context_unref(g_main_context_default());
 
-	;
-	libusb_exit(NULL);
 	return 0;
 }

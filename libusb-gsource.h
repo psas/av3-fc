@@ -11,21 +11,14 @@
 #include <glib.h>
 
 
-typedef void (*libusbSourceErrorCallback)(int, int, GMainLoop *);
+typedef void (*libusbSourceErrorCallback)(int, int, gpointer);
 typedef gboolean (*is_device)(libusb_device * device);
 
+/* Opaque type for a GSource that embeds libusb in a Glib main-loop. */
+typedef struct libusbSource libusbSource;
 
-typedef struct libusbSource {
-	GSource source;
-	GSList * fds;
-	int timeout_error;
-	int handle_events_error;
-	libusb_context * context;
-	//put gmainloop in libusbSource?
-} libusbSource;
-
-libusbSource * libusbSource_new(libusb_context * context);
-libusb_device_handle * open_usb_device_handle(libusb_context * context,
+libusbSource * libusbSource_new(void);
+libusb_device_handle * open_usb_device_handle(libusbSource * usb_source,
     is_device is_device, int * iface_num, int num_ifaces);
 void print_libusb_error(int libusberrno, const char* str);
 void print_libusb_transfer_error(int status, const char* str);

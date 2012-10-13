@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "libusb-gsource.h"
-
 static libusb_device_handle * aps_handle = NULL;
 
 static gboolean is_aps(libusb_device * device){
@@ -61,10 +59,10 @@ void clear_port(int port, uint32_t val){
     }
 }
 
-void init_aps(void)
+void init_aps(libusbSource * usb_source)
 {
     int iface_nums[1] = {0};
-    aps_handle = open_usb_device_handle(NULL, is_aps, iface_nums, 1);
+    aps_handle = open_usb_device_handle(usb_source, is_aps, iface_nums, 1);
     if(aps_handle == NULL){
         exit(1);
     }
