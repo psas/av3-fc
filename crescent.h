@@ -76,8 +76,4 @@ struct msg {
 	};
 };
 
-// utility functions
-
-int get_packet(FILE *gps, struct msg *m);
-
 #endif

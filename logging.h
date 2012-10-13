@@ -2,6 +2,7 @@
 #define AV3_LOGGING_H
 
 #include <stdint.h>
+#include <netinet/in.h>		/* for htonl() */
 
 #define FOURCC(a,b,c,d) htonl(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 

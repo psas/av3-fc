@@ -22,6 +22,7 @@
 #include <glib.h>
 
 #include "logging.h"
+#include "gps-gsource.h"
 #include "libusb-gsource.h"
 #include "theo-imu.h"
 
@@ -103,7 +104,6 @@ static void clear_port(int port, uint32_t val){
 }
 #endif
 
-
 int main(int argc, char **argv)
 {
 	int usbErr;
@@ -135,9 +135,9 @@ int main(int argc, char **argv)
 
     set_port(0, (1<<ATV_SPS_PIN) | (1<<RC_POWER_PIN) | (1<<WIFI_POWER_PIN));
 
-
 	init_logging();
 	init_theo_imu();
+	init_gps();
 
 	g_main_loop_run(fc_main);
 
