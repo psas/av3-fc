@@ -22,7 +22,7 @@ while 1:
     sequence_number, = packet_header.unpack(message[:packet_header.size])
     message = message[packet_header.size:]
 
-    print "packet sequence", sequence_number
+    print "packet sequence %d (%d bytes)" % (sequence_number, len(message))
 
     while len(message) > 0:
         fourcc, length, timestamp_hi, timestamp_lo = tag_header.unpack(message[:tag_header.size])
@@ -32,4 +32,4 @@ while 1:
         message = message[length:]
 
         timestamp = timestamp_hi << 32 | timestamp_lo
-        print timestamp, fourcc, repr(body)
+        print timestamp, repr(fourcc), repr(body)
