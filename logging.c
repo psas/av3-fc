@@ -56,6 +56,8 @@ static char *pos = bucket.buf;
 
 void flush_buffers(void)
 {
+	if(pos == bucket.buf)
+		return;
 	send(net_fd, &bucket, pos - (char *) &bucket, 0);
 	pos = bucket.buf;
 	bucket.seq = htonl(ntohl(bucket.seq) + 1);

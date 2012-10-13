@@ -78,5 +78,6 @@ int main(int argc, char **argv)
 	g_main_loop_unref(fc_main);
 	g_main_context_unref(g_main_context_default());
 
+	flush_buffers();
 	return 0;
 }
