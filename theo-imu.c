@@ -88,11 +88,13 @@ static void imu_cb(struct libusb_transfer *transfer){
 void init_theo_imu(libusbSource * usb_source){
     int iface_nums[1] = {0};
     struct libusb_transfer * imu_transfer = NULL;
-    unsigned char * imu_buf  = calloc(MAX_PACKET_SIZE, sizeof(unsigned char));
     libusb_device_handle * imu_handle = NULL;
 
     imu_handle = open_usb_device_handle(usb_source, is_imu, iface_nums, 1);
+    if(!imu_handle)
+        return;
 
+    unsigned char * imu_buf = calloc(MAX_PACKET_SIZE, sizeof(unsigned char));
     imu_transfer = libusb_alloc_transfer(0);
     libusb_fill_bulk_transfer(imu_transfer,
                               imu_handle,
