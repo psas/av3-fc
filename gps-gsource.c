@@ -70,11 +70,10 @@ void init_gps(void)
 	if (gps_source == NULL)
 	{
 		printf("Can't connect to GPS\n");
+		return;
 	}
-	else
-	{
-		g_io_channel_set_flags(gps_source, G_IO_FLAG_NONBLOCK, NULL);
-		g_io_add_watch(gps_source, G_IO_IN, read_gps_cb, NULL);
-	}
+	g_io_channel_set_flags(gps_source, G_IO_FLAG_NONBLOCK, NULL);
+	g_io_add_watch(gps_source, G_IO_IN, read_gps_cb, NULL);
+	g_io_channel_unref(gps_source);
 }
 
