@@ -39,22 +39,6 @@ libusb_device_handle * aps_handle = NULL;
 
 GMainLoop * fc_main = NULL;
 
-static int dummy_open(void)
-{
-	return -1;
-}
-
-static void dummy_read(int fd)
-{
-}
-
-static const struct fd_source {
-	int (*open)(void);
-	void (*read)(int fd);
-} fd_sources[] = {
-	{ dummy_open, dummy_read },
-};
-
 static gboolean is_aps(libusb_device * device){
     struct libusb_device_descriptor descr;
     int retErr = libusb_get_device_descriptor(device, &descr);
