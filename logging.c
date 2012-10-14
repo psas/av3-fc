@@ -13,9 +13,26 @@
 #define UDP_HEADER_SIZE 8
 #define IPv4_MAX_HEADER_SIZE 60
 
+static gboolean loopback;
+
+static GOptionEntry options[] = {
+	{ "local", 'l', 0, G_OPTION_ARG_NONE, &loopback, "Send telemetry to localhost (default: broadcast)", NULL },
+	{ NULL },
+};
+
+GOptionGroup *options_logging(void)
+{
+	GOptionGroup *option_group = g_option_group_new(
+		"logging",
+		"Telemetry Logging Options:",
+		"Show telemetry logging options",
+		NULL, NULL);
+	g_option_group_add_entries(option_group, options);
+	return option_group;
+}
+
 static FILE *logfile;
 static int net_fd;
-
 static struct timespec starttime;
 
 void init_logging(void)
@@ -24,13 +41,21 @@ void init_logging(void)
 	if (logfile == NULL)
 		exit(1);
 
+	net_fd = socket(AF_INET, SOCK_DGRAM, 0);
+
 	struct sockaddr_in remote = { AF_INET };
 	remote.sin_port = htons(REMOTE_PORT);
-	remote.sin_addr.s_addr = INADDR_BROADCAST;
 
-	net_fd = socket(AF_INET, SOCK_DGRAM, 0);
-	int broadcast_flag = 1;
-	setsockopt(net_fd, SOL_SOCKET, SO_BROADCAST, &broadcast_flag, sizeof(broadcast_flag));
+	if(loopback)
+		remote.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	else
+	{
+		remote.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+
+		int broadcast_flag = 1;
+		setsockopt(net_fd, SOL_SOCKET, SO_BROADCAST, &broadcast_flag, sizeof(broadcast_flag));
+	}
+
 	connect(net_fd, (struct sockaddr *) &remote, sizeof(struct sockaddr));
 
 	clock_gettime(CLOCK_MONOTONIC, &starttime);

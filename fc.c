@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 {
 	GError *error = NULL;
 	GOptionContext *option_context = g_option_context_new("- control the PSAS AV3 flight computer");
+	g_option_context_add_group(option_context, options_logging());
 	g_option_context_add_group(option_context, options_gps());
 	if(!g_option_context_parse(option_context, &argc, &argv, &error))
 	{
