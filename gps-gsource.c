@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdint.h>
 #include "logging.h"
-#include "crescent.h"
 #include "gps-gsource.h"
 
 static gchar *device;
