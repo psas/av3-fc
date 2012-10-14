@@ -147,6 +147,8 @@ void init_theo_imu(libusbSource * usb_source){
     int iface_nums[1] = {0};
     libusb_device_handle * imu = open_usb_device_handle(usb_source, is_imu,
             iface_nums, 1);
+    if(!imu)
+        return;
 
     struct libusb_transfer * ctrl = libusb_alloc_transfer(0);
     unsigned char * ctrl_buf = calloc(LIBUSB_CONTROL_SETUP_SIZE,
@@ -161,6 +163,5 @@ void init_theo_imu(libusbSource * usb_source){
     start_iso_transfer(imu, GYR_EP, gyr_cb, NULL, 0);
     start_iso_transfer(imu, ACC_EP, acc_cb, NULL, 0);
     start_iso_transfer(imu, CAC_EP, cac_cb, NULL, 0);
-
 }
 //todo: how to libusb_close(imu_handle)?
