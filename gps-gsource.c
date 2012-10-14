@@ -58,7 +58,7 @@ static void find_frames(void)
 		}
 
 		/* Looks valid. Strip the framing and consume it. */
-		write_tagged_message(FOURCC('G', 'P', 'S', pos[4]), pos + 8, data_length - 2);
+		write_tagged_message(FOURCC('G', 'P', 'S', pos[4]), pos + 8, data_length + 2);
 		pos += data_length + 12;
 	}
 
