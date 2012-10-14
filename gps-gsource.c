@@ -80,7 +80,10 @@ static gboolean read_gps_cb(GIOChannel *gps, GIOCondition cond, gpointer data)
                 return FALSE;
 
 	gsize nread = 0;
-	g_io_channel_read_chars(gps, (gchar *) cur, sizeof(buf)-(cur-buf), &nread, NULL);
+	GIOStatus status = g_io_channel_read_chars(gps, (gchar *) cur, sizeof(buf)-(cur-buf), &nread, NULL);
+	if (status == G_IO_STATUS_EOF)
+		return FALSE;
+
 	cur += nread;
 	find_frames();
 	return TRUE;
