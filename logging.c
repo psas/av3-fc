@@ -1,12 +1,17 @@
 #include "logging.h"
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <netinet/in.h>
+#include <sys/stat.h>
 
+#define DEFAULT_LOGDIR "logs"
+#define LOGFILE_DIGITS 3
 #define REMOTE_PORT 5005
 
 #define LINK_MTU 1500
@@ -14,9 +19,11 @@
 #define IPv4_MAX_HEADER_SIZE 60
 
 static gboolean loopback;
+static gchar *logdir;
 
 static GOptionEntry options[] = {
 	{ "local", 'l', 0, G_OPTION_ARG_NONE, &loopback, "Send telemetry to localhost (default: broadcast)", NULL },
+	{ "log-dir", 'd', 0, G_OPTION_ARG_FILENAME, &logdir, "Directory to save logfiles to (default: " DEFAULT_LOGDIR ")", "path" },
 	{ NULL },
 };
 
@@ -35,12 +42,44 @@ static FILE *logfile;
 static int net_fd;
 static struct timespec starttime;
 
-void init_logging(void)
+static void open_logfile(void)
 {
-	logfile = fopen("log", "w");
-	if (logfile == NULL)
-		exit(1);
+	if(!logdir)
+		logdir = g_strdup(DEFAULT_LOGDIR);
 
+	/* For convenience, try to create logdir, but ignore errors.
+	 * We'll detect problems with the logdir below. */
+	mkdir(logdir, 0777);
+
+	/* Compute 10 ** LOGFILE_DIGITS at compile time. */
+	const int attempt_count = G_PASTE(1e, LOGFILE_DIGITS);
+
+	const int bufsize = strlen(logdir) + LOGFILE_DIGITS + 2;
+	char *buf = g_malloc(bufsize);
+
+	int i;
+	for(i = 0; i < attempt_count; ++i)
+	{
+		snprintf(buf, bufsize, "%s/%0" G_STRINGIFY(LOGFILE_DIGITS) "d", logdir, i);
+		int fd = open(buf, O_WRONLY | O_CREAT | O_EXCL, 0444);
+		if(fd == -1)
+		{
+		       	if(errno == EEXIST || errno == EISDIR)
+				continue;
+			printf("permanent failure creating logfile %s: %s\n", buf, strerror(errno));
+			exit(1);
+		}
+
+		logfile = fdopen(fd, "w");
+		return;
+	}
+
+	printf("tried %d filenames but couldn't create any logfile in %s\n", i, logdir);
+	exit(1);
+}
+
+static void open_socket(void)
+{
 	net_fd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	struct sockaddr_in remote = { AF_INET };
@@ -57,6 +96,12 @@ void init_logging(void)
 	}
 
 	connect(net_fd, (struct sockaddr *) &remote, sizeof(struct sockaddr));
+}
+
+void init_logging(void)
+{
+	open_logfile();
+	open_socket();
 
 	clock_gettime(CLOCK_MONOTONIC, &starttime);
 
