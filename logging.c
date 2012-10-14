@@ -56,13 +56,15 @@ static char *pos = bucket.buf;
 
 void flush_buffers(void)
 {
+	if(pos == bucket.buf)
+		return;
 	send(net_fd, &bucket, pos - (char *) &bucket, 0);
 	pos = bucket.buf;
 	bucket.seq = htonl(ntohl(bucket.seq) + 1);
 	fflush(logfile);
 }
 
-void write_tagged_message(uint32_t fourcc, const char *buf, uint16_t len)
+void write_tagged_message(uint32_t fourcc, const void *buf, uint16_t len)
 {
 	uint64_t timestamp = get_timestamp();
 

@@ -1,48 +1,78 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <glib.h>
 #include "logging.h"
 #include "crescent.h"
 #include "gps-gsource.h"
 
-#define GPS_CODE FOURCC('G','P','S','U')
+static gchar *device;
 
-static void *memstr(const void *m, const char *s, size_t len)
+static GOptionEntry options[] = {
+	{ "gps-device", 'g', 0, G_OPTION_ARG_FILENAME, &device, "Device path", NULL },
+	{ NULL },
+};
+
+GOptionGroup *options_gps(void)
 {
-	size_t l = strlen(s);
-	void *p;
-	while ((p = memchr(m, *s, len)) != NULL)
+	GOptionGroup *option_group = g_option_group_new(
+		"gps",
+		"GPS Options:",
+		"Show GPS options",
+		NULL, NULL);
+	g_option_group_add_entries(option_group, options);
+	return option_group;
+}
+
+static unsigned char buf[4096], *cur = buf;
+
+static void find_frames(void)
+{
+	unsigned char *pos = buf;
+	while((pos = memchr(pos, '$', cur - pos)))
 	{
-		len -= p-m + 1;
-		if (len <= l)
-			return NULL;
-		if (memcmp(p, s, l) == 0)
-			return p;
-		m = p + 1;
+		/* Do we have enough for a complete header? */
+		if(cur - pos < 8)
+			break;
+
+		/* Check the rest of the synchronization string, and
+		 * also reject Block IDs greater than 255. */
+		if(memcmp(pos + 1, "BIN", 3) != 0 || pos[5] != 0)
+		{
+			/* Look for the next possible frame. */
+			++pos;
+			continue;
+		}
+
+		/* Have we finished reading the putative packet? */
+		int data_length = pos[6] | (pos[7] << 8);
+		if(cur - pos < data_length + 12)
+			break;
+
+		/* Check the frame epilogue. Ignore the checksum;
+		 * we want to see this frame even if mangled. */
+		if(memcmp(pos + data_length + 10, "\r\n", 2) != 0)
+		{
+			/* "$BIN" can't match '$' again. */
+			pos += 4;
+			continue;
+		}
+
+		/* Looks valid. Strip the framing and consume it. */
+		write_tagged_message(FOURCC('G', 'P', 'S', pos[4]), pos + 8, data_length + 2);
+		pos += data_length + 12;
 	}
-	return p;
+
+	/* If we can't find another '$', discard the rest of the buffer.
+	 * Otherwise, only discard up to the next '$', and preserve the
+	 * rest for the next round. */
+	if(pos == NULL)
+		cur = buf;
+	else
+	{
+		memmove(buf, pos, cur - pos);
+		cur -= pos - buf;
+	}
 }
-
-static gchar *has_packet(gchar *buf, size_t size, uint16_t *len)
-{
-	gchar *p = memstr(buf, "$BIN", size);
-	if (p == NULL)
-		return NULL;
-
-	uint16_t packet_len;
-	memcpy(&packet_len, p+6, 2);
-	/* check whether we have that much data, and if it ends with \r\n */
-	if (size < packet_len + 12U)
-		return NULL;
-	if (memcmp(p+packet_len+2, "\r\n", 2) != 0)
-		return NULL;		//!!! what to do?
-	/* TODO: checksum? return checksum out-of-band? */
-	*len = packet_len + 12;
-	return p;
-}
-
-static gchar buf[4096], *cur = buf;
 
 static gboolean read_gps_cb(GIOChannel *gps, GIOCondition cond, gpointer data)
 {
@@ -50,31 +80,26 @@ static gboolean read_gps_cb(GIOChannel *gps, GIOCondition cond, gpointer data)
                 return FALSE;
 
 	gsize nread = 0;
-        g_io_channel_read_chars(gps, cur, sizeof(buf)-(cur-buf), &nread, NULL);
+	g_io_channel_read_chars(gps, (gchar *) cur, sizeof(buf)-(cur-buf), &nread, NULL);
 	cur += nread;
-	
-	uint16_t len = 0;
-	gchar *packet;
-	while ((packet = has_packet(buf, cur-buf, &len)))
-	{
-		write_tagged_message(GPS_CODE, packet, len);
-		memcpy(buf, packet+len, cur-packet+len);
-		cur = buf + (cur-packet+len);  
-	}
+	find_frames();
 	return TRUE;
 }
 
 void init_gps(void)
 {
-	GIOChannel *gps_source = g_io_channel_new_file("/dev/usbserial", "r", NULL);
+	if(!device)
+		device = g_strdup("/dev/usbserial");
+
+	GIOChannel *gps_source = g_io_channel_new_file(device, "r", NULL);
 	if (gps_source == NULL)
 	{
 		printf("Can't connect to GPS\n");
+		return;
 	}
-	else
-	{
-		g_io_channel_set_flags(gps_source, G_IO_FLAG_NONBLOCK, NULL);
-		g_io_add_watch(gps_source, G_IO_IN, read_gps_cb, NULL);
-	}
+	g_io_channel_set_encoding(gps_source, NULL, NULL); /* use binary mode */
+	g_io_channel_set_flags(gps_source, G_IO_FLAG_NONBLOCK, NULL);
+	g_io_add_watch(gps_source, G_IO_IN, read_gps_cb, NULL);
+	g_io_channel_unref(gps_source);
 }
 

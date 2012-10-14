@@ -63,9 +63,8 @@ void init_aps(libusbSource * usb_source)
 {
     int iface_nums[1] = {0};
     aps_handle = open_usb_device_handle(usb_source, is_aps, iface_nums, 1);
-    if(aps_handle == NULL){
-        exit(1);
-    }
+    if(aps_handle == NULL)
+        return;
 
     set_port(0, (1<<ATV_SPS_PIN) | (1<<RC_POWER_PIN) | (1<<WIFI_POWER_PIN));
 }

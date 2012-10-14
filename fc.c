@@ -26,8 +26,6 @@
 #include "aps.h"
 #include "theo-imu.h"
 
-GMainLoop * fc_main = NULL;
-
 static void libusb_mainloop_error_cb(int timeout, int handle_events, GMainLoop * loop){
     if(timeout)
         print_libusb_error(timeout, "libusb timeout");
@@ -46,7 +44,17 @@ static gboolean shutdown_gracefully(void *closure)
 
 int main(int argc, char **argv)
 {
-    fc_main = g_main_loop_new(NULL, FALSE);
+	GError *error = NULL;
+	GOptionContext *option_context = g_option_context_new("- control the PSAS AV3 flight computer");
+	g_option_context_add_group(option_context, options_gps());
+	if(!g_option_context_parse(option_context, &argc, &argv, &error))
+	{
+		printf("option parsing failed: %s\n", error->message);
+		exit(1);
+	}
+	g_option_context_free(option_context);
+
+	GMainLoop * fc_main = g_main_loop_new(NULL, FALSE);
 	g_unix_signal_add(SIGINT, shutdown_gracefully, fc_main);
 	g_unix_signal_add(SIGTERM, shutdown_gracefully, fc_main);
 
@@ -70,5 +78,6 @@ int main(int argc, char **argv)
 	g_main_loop_unref(fc_main);
 	g_main_context_unref(g_main_context_default());
 
+	flush_buffers();
 	return 0;
 }
