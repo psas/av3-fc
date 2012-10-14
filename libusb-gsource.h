@@ -1,8 +1,8 @@
 /*
  * libusb-gsource.h
  *
- *  Created on: Jul 14, 2012
- *      Author: theo
+ * Functions for integrating libusb with a glib main event loop. Also some
+ * useful libusb utils.
  */
 
 #ifndef LIBUSB_GSOURCE_H_

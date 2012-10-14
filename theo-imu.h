@@ -1,8 +1,8 @@
 /*
  * theo-imu.h
  *
- *  Created on: Oct 12, 2012
- *      Author: theo
+ * Initializes and automatically starts data transfers from theo-imu, and logs
+ * the recorded data.
  */
 
 #ifndef THEO_IMU_H_

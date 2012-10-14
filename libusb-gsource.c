@@ -1,8 +1,8 @@
 /*
  * libusb-gsource.c
  *
- *  Created on: Jul 14, 2012
- *      Author: theo
+ * Functions for integrating libusb with a glib main event loop. Also some
+ * useful libusb utils.
  */
 
 #include <libusb-1.0/libusb.h>
@@ -163,7 +163,6 @@ static int init_usb_fds(libusbSource * usb_source){
 	return 0;
 }
 
-//todo: does this name confuse with libusb funcs?
 libusbSource * libusbSource_new(void){
 	libusb_context * context;
 	int usbErr = libusb_init(&context);

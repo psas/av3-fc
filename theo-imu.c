@@ -1,6 +1,8 @@
 /*
  * theo-imu.c
  *
+ * Initializes and automatically starts data transfers from theo-imu, and logs
+ * the recorded data.
  */
 
 #include <stdlib.h>
