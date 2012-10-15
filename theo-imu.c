@@ -59,14 +59,9 @@ static void common_cb(struct libusb_transfer *transfer, uint32_t fourcc){
     switch(transfer->status){
     case LIBUSB_TRANSFER_COMPLETED:
         buf = libusb_get_iso_packet_buffer_simple(transfer, 0);
-        //USB is little endian but the network is big endian
-        data[0] = buf[1 + SENSOR_DATA_OFFSET];//x lsb
-        data[1] = buf[0 + SENSOR_DATA_OFFSET];//x msb
-        data[2] = buf[3 + SENSOR_DATA_OFFSET];//y lsb
-        data[3] = buf[2 + SENSOR_DATA_OFFSET];//y msb
-        data[4] = buf[5 + SENSOR_DATA_OFFSET];//z lsb
-        data[5] = buf[4 + SENSOR_DATA_OFFSET];//z msb
-
+        for(i = 0; i < len; ++i){
+            data[i] = buf[i + SENSOR_DATA_OFFSET];
+        }
         write_tagged_message(fourcc, data, len);
         retErr = libusb_submit_transfer(transfer);
         if(retErr){
@@ -131,7 +126,6 @@ static int start_iso_transfer(libusb_device_handle * handle,
         libusb_set_iso_packet_lengths(trans[i], packet_size);
         usb_err = libusb_submit_transfer(trans[i]);
         if(usb_err != 0){
-            libusb_free_transfer(trans[i]);
             for(--i; i >=0; --i){
                 libusb_cancel_transfer(trans[i]);
                 //todo: handle error besides LIBUSB_ERROR_NOT_FOUND for cancel
