@@ -222,7 +222,7 @@ static libusb_device * find_usb_device(libusbSource * usb_source, is_device is_d
 }
 
 
-static libusb_device_handle * open_device_interface(libusb_device * dev, int * iface_num, int num_ifaces){
+static libusb_device_handle * open_device_interface(libusbSource * usb_source, libusb_device * dev, int * iface_num, int num_ifaces){
 	libusb_device_handle *handle = NULL;
 	int i = 0;
 	int retErr = 0;
@@ -261,6 +261,7 @@ static libusb_device_handle * open_device_interface(libusb_device * dev, int * i
 		}
 	}
 
+	usb_source->devices = g_slist_prepend(usb_source->devices, handle);
 	return handle;
 }
 
@@ -268,7 +269,7 @@ libusb_device_handle * open_usb_device_handle(libusbSource * usb_source,
     is_device is_device, int * iface_num, int num_ifaces)
 {
 	libusb_device * dev = find_usb_device(usb_source, is_device);
-	return open_device_interface(dev, iface_num,num_ifaces);
+	return open_device_interface(usb_source, dev, iface_num, num_ifaces);
 
 }
 
