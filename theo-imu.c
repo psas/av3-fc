@@ -13,10 +13,14 @@
 #include "logging.h"
 
 
-#define MAG_EP 0x83
-#define GYR_EP 0x87
-#define ACC_EP 0x8B
-#define CAC_EP 0x8F
+#define ISOC0_IN_EP 0x83
+#define ISOC1_IN_EP 0x86
+#define ISOC2_IN_EP 0x89
+#define ISOC3_IN_EP 0x8C
+#define ACC_EP ISOC0_IN_EP
+#define GYR_EP ISOC1_IN_EP
+#define MAG_EP ISOC2_IN_EP
+#define CAC_EP ISOC3_IN_EP
 
 #define CTRL_OUT_EP             0x00
 #define ADDR_ACC                0x80
