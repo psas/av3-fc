@@ -52,17 +52,23 @@ static gboolean is_imu(libusb_device * device){
 
 static void common_cb(struct libusb_transfer *transfer, uint32_t fourcc){
     unsigned char *buf = NULL;
-    const uint16_t len = 6;
-    char data[len];
-    int retErr, i;
+    unsigned int act_len;
+    int retErr;
 
     switch(transfer->status){
     case LIBUSB_TRANSFER_COMPLETED:
         buf = libusb_get_iso_packet_buffer_simple(transfer, 0);
-        for(i = 0; i < len; ++i){
-            data[i] = buf[i + SENSOR_DATA_OFFSET];
+
+        act_len = transfer->iso_packet_desc[0].actual_length;
+        if(act_len != IMU_PACKET_SIZE){
+            write_tagged_message(fourcc, buf, act_len);
+        }else{
+            if(IMU_ADDR(buf[0]) == ADDR_GYR){
+                write_tagged_message(fourcc, buf, act_len);
+            }else{
+                write_tagged_message(fourcc, buf, act_len -1);
+            }
         }
-        write_tagged_message(fourcc, data, len);
         retErr = libusb_submit_transfer(transfer);
         if(retErr){
             print_libusb_transfer_error(transfer->status, "imu_cb resub");
@@ -78,16 +84,32 @@ static void common_cb(struct libusb_transfer *transfer, uint32_t fourcc){
 }
 
 static void mag_cb(struct libusb_transfer *transfer){
-    common_cb(transfer, FOURCC('M','A','G','N'));
+    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+        common_cb(transfer, FOURCC('M','A','G','E'));
+    }else{
+        common_cb(transfer, FOURCC('M','A','G','N'));
+    }
 }
 static void acc_cb(struct libusb_transfer *transfer){
-    common_cb(transfer, FOURCC('A','C','C','1'));
+    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+        common_cb(transfer, FOURCC('A','C','C','E'));
+    }else{
+        common_cb(transfer, FOURCC('A','C','C','L'));
+    }
 }
 static void gyr_cb(struct libusb_transfer *transfer){
-    common_cb(transfer, FOURCC('G','Y','R','O'));
+    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+        common_cb(transfer, FOURCC('G','Y','R','E'));
+    }else{
+        common_cb(transfer, FOURCC('G','Y','R','O'));
+    }
 }
 static void cac_cb(struct libusb_transfer *transfer){
-    common_cb(transfer, FOURCC('A','C','C','2'));
+    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+        common_cb(transfer, FOURCC('C','A','C','E'));
+    }else{
+        common_cb(transfer, FOURCC('C','A','C','C'));
+    }
 }
 
 static void ctrl_cb(struct libusb_transfer *transfer){
@@ -158,4 +180,3 @@ void init_theo_imu(libusbSource * usb_source){
     start_iso_transfer(imu, ACC_EP, acc_cb, NULL, 0);
     start_iso_transfer(imu, CAC_EP, cac_cb, NULL, 0);
 }
-//todo: how to libusb_close(imu_handle)?
