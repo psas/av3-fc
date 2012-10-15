@@ -13,14 +13,14 @@
 #include "logging.h"
 
 
-#define ISOC0_IN_EP 0x83
-#define ISOC1_IN_EP 0x86
-#define ISOC2_IN_EP 0x89
-#define ISOC3_IN_EP 0x8C
-#define ACC_EP ISOC0_IN_EP
-#define GYR_EP ISOC1_IN_EP
-#define MAG_EP ISOC2_IN_EP
-#define CAC_EP ISOC3_IN_EP
+#define BULK0_IN_EP 0x82
+#define BULK1_IN_EP 0x85
+#define BULK2_IN_EP 0x88
+#define BULK3_IN_EP 0x8B
+#define ACC_EP BULK0_IN_EP
+#define GYR_EP BULK1_IN_EP
+#define MAG_EP BULK2_IN_EP
+#define CAC_EP BULK3_IN_EP
 
 #define CTRL_OUT_EP             0x00
 #define ADDR_ACC                0x80
@@ -61,9 +61,9 @@ static void common_cb(struct libusb_transfer *transfer, uint32_t fourcc){
 
     switch(transfer->status){
     case LIBUSB_TRANSFER_COMPLETED:
-        buf = libusb_get_iso_packet_buffer_simple(transfer, 0);
+        buf = transfer->buffer;
 
-        act_len = transfer->iso_packet_desc[0].actual_length;
+        act_len = transfer->actual_length;
         if(act_len != IMU_PACKET_SIZE){
             write_tagged_message(fourcc, buf, act_len);
         }else{
@@ -88,28 +88,28 @@ static void common_cb(struct libusb_transfer *transfer, uint32_t fourcc){
 }
 
 static void mag_cb(struct libusb_transfer *transfer){
-    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+    if(transfer->actual_length != IMU_PACKET_SIZE){
         common_cb(transfer, FOURCC('M','A','G','E'));
     }else{
         common_cb(transfer, FOURCC('M','A','G','N'));
     }
 }
 static void acc_cb(struct libusb_transfer *transfer){
-    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+    if(transfer->actual_length != IMU_PACKET_SIZE){
         common_cb(transfer, FOURCC('A','C','C','E'));
     }else{
         common_cb(transfer, FOURCC('A','C','C','L'));
     }
 }
 static void gyr_cb(struct libusb_transfer *transfer){
-    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+    if(transfer->actual_length != IMU_PACKET_SIZE){
         common_cb(transfer, FOURCC('G','Y','R','E'));
     }else{
         common_cb(transfer, FOURCC('G','Y','R','O'));
     }
 }
 static void cac_cb(struct libusb_transfer *transfer){
-    if(transfer->iso_packet_desc[0].actual_length != IMU_PACKET_SIZE){
+    if(transfer->actual_length != IMU_PACKET_SIZE){
         common_cb(transfer, FOURCC('C','A','C','E'));
     }else{
         common_cb(transfer, FOURCC('C','A','C','C'));
@@ -120,11 +120,11 @@ static void ctrl_cb(struct libusb_transfer *transfer){
 
 }
 
-static int start_iso_transfer(libusb_device_handle * handle,
+static int start_bulk_transfer(libusb_device_handle * handle,
         unsigned int ep, libusb_transfer_cb_fn cb, void * data,
         unsigned int timeout)
 {
-    int iso_packets = 1, usb_err, i, num_urbs_in_flight = 8;
+    int iso_packets = 0, usb_err, i, num_urbs_in_flight = 8;
     struct libusb_transfer * trans[num_urbs_in_flight];
     unsigned char * buf = NULL;
     int packet_size = IMU_PACKET_SIZE;//libusb_get_max_iso_packet_size(device, ep);
@@ -146,10 +146,10 @@ static int start_iso_transfer(libusb_device_handle * handle,
                 libusb_free_transfer(trans[i]);
             return LIBUSB_ERROR_NO_MEM;
         }
-        libusb_fill_iso_transfer(trans[i], handle, ep, buf, packet_size,
-                iso_packets, cb, data, timeout);
+        libusb_fill_bulk_transfer(trans[i], handle, ep, buf, packet_size, cb,
+                data, timeout);
+
         trans[i]->flags = LIBUSB_TRANSFER_FREE_BUFFER;
-        libusb_set_iso_packet_lengths(trans[i], packet_size);
         usb_err = libusb_submit_transfer(trans[i]);
         if(usb_err != 0){
             for(--i; i >=0; --i){
@@ -179,8 +179,8 @@ void init_theo_imu(libusbSource * usb_source){
     libusb_fill_control_transfer(ctrl, imu, ctrl_buf, ctrl_cb, NULL, 0);
     libusb_submit_transfer(ctrl);
 
-    start_iso_transfer(imu, MAG_EP, mag_cb, NULL, 0);
-    start_iso_transfer(imu, GYR_EP, gyr_cb, NULL, 0);
-    start_iso_transfer(imu, ACC_EP, acc_cb, NULL, 0);
-    start_iso_transfer(imu, CAC_EP, cac_cb, NULL, 0);
+    start_bulk_transfer(imu, MAG_EP, mag_cb, NULL, 0);
+    start_bulk_transfer(imu, GYR_EP, gyr_cb, NULL, 0);
+    start_bulk_transfer(imu, ACC_EP, acc_cb, NULL, 0);
+    start_bulk_transfer(imu, CAC_EP, cac_cb, NULL, 0);
 }
