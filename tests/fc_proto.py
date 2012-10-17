@@ -8,6 +8,7 @@ message_types = {
     'GPS\x01': struct.Struct("<BBHdddfffffHH H"),
     'GPS\x02': struct.Struct("<LLHHHH H"),
     'GPS\x4C': struct.Struct("<dH8x 81L 15L 12L H"),
+    'GPS\x5E': struct.Struct("<10d LHHHhhh H"),
     'GPS\x5F': struct.Struct("<HxxL 10L 10L 10L H"),
     'GPS\x60': struct.Struct("<xxHd " + ''.join(("BBBB" for i in range(12))) + "12L 12d 12d H"),
     'GPS\x61': struct.Struct("<L 4H 3L 2H H"),
