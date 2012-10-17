@@ -7,6 +7,9 @@ import socket
 
 from fc_proto import packet_header, tag_header, message_types
 
+# Log all received data
+logfile = open("log", "a")
+
 # UDP packets on localhost
 UDP_IP   = ""
 UDP_PORT = 5005
@@ -19,6 +22,8 @@ sock.bind((UDP_IP, UDP_PORT))
 # Listen
 while 1:
     message = sock.recv(4096)
+    logfile.write(tag_header.pack('SEQN', packet_header.size, 0, 0))
+    logfile.write(message)
     sequence_number, = packet_header.unpack(message[:packet_header.size])
     message = message[packet_header.size:]
 

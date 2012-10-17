@@ -4,6 +4,8 @@ packet_header = struct.Struct('>L')
 tag_header = struct.Struct('>4sHHL')
 
 message_types = {
+    'SEQN': packet_header,
+
     # Crescent GPS
     'GPS\x01': struct.Struct("<BBHdddfffffHH H"),
     'GPS\x02': struct.Struct("<LLHHHH H"),
