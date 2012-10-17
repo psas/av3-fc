@@ -3,12 +3,19 @@
 the (probably fake) flight comptuer and read
 the data as a smoke test"""
 
+import datetime
 import socket
+import sys
 
 from fc_proto import packet_header, tag_header, message_types
 
+quiet = (sys.argv[1:] == ['-q'])
+
 # Log all received data
-logfile = open("log", "a")
+logname = datetime.datetime.now().strftime("log-%Y-%m-%d:%H:%M:%S")
+logfile = open(logname, "a")
+if not quiet:
+    print "logging to", logname
 
 # UDP packets on localhost
 UDP_IP   = ""
@@ -24,6 +31,9 @@ while 1:
     message = sock.recv(4096)
     logfile.write(tag_header.pack('SEQN', packet_header.size, 0, 0))
     logfile.write(message)
+    if quiet:
+        continue
+
     sequence_number, = packet_header.unpack(message[:packet_header.size])
     message = message[packet_header.size:]
 
