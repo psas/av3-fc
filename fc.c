@@ -25,6 +25,7 @@
 #include "libusb-gsource.h"
 #include "aps.h"
 #include "theo-imu.h"
+#include "adis-imu.h"
 
 static void libusb_mainloop_error_cb(int timeout, int handle_events, GMainLoop * loop){
     if(timeout)
@@ -70,6 +71,7 @@ int main(int argc, char **argv)
 	init_logging();
 	init_aps(usb_source);
 	init_theo_imu(usb_source);
+	init_adis_imu(usb_source);
 	init_gps();
 
 	g_source_unref((GSource*) usb_source);

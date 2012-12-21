@@ -9,4 +9,4 @@ LDLIBS := -lrt $(shell pkg-config --libs glib-2.0 libusb-1.0)
 
 all: fc
 
-fc: logging.o libusb-gsource.o aps.o theo-imu.o gps-gsource.o
+fc: logging.o libusb-gsource.o aps.o theo-imu.o gps-gsource.o adis-imu.o

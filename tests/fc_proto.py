@@ -18,8 +18,12 @@ message_types = {
     'GPS\x63': struct.Struct("<BBHd" + ''.join(("8B b 3B H 5h" for i in range(12))) + "hH H"),
 
     # Theo-IMU
-    'ACCL': struct.Struct(">BLBHHH"),
-    'GYRO': struct.Struct(">BLBHHHB"),
-    'MAGN': struct.Struct(">BLBHHH"),
-    'CACC': struct.Struct(">BLBHHH"),
+    'ACCL': struct.Struct(">BLBhhh"),
+    'GYRO': struct.Struct(">BLBhhhB"),
+    'MAGN': struct.Struct(">BLBhhh"),
+    'CACC': struct.Struct(">BLBhhh"),
+    
+    #adis-imu
+    'ADIS': struct.Struct(">hhhhhhhhhhhh"),
+    'ADIE': struct.Struct(">hhhhhhhhhhhh"),
 }
