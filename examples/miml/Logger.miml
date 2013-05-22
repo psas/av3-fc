@@ -1,0 +1,17 @@
+%YAML 1.2
+---
+include: logger.h
+object: logger.o
+init: loggerInit();
+final: loggerFinal();
+
+receivers:
+  getLogMessage:
+  - [source, int32_t]
+  - [buffer, char*]
+  getPositionMessage:
+  - [source, int32_t]
+  - [x, int]
+  - [y, int]
+  - [z, int]
+

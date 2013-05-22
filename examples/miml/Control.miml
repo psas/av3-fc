@@ -1,0 +1,23 @@
+%YAML 1.2
+---
+include: control.h
+object: control.o
+init: controlInit();
+final: controlFinal();
+senders:
+  sendRollControlAdjustment:
+  - [source, int32_t]
+  - [x, int]
+  - [y, int]
+  - [z, int]
+  sendCTLLogMessage:
+  - [source, int32_t]
+  - [buffer, char*]
+
+receivers:
+  getSFPositionData:
+  - [source, int32_t]
+  - [x, int]
+  - [y, int]
+  - [z, int]
+

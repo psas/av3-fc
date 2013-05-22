@@ -1,0 +1,21 @@
+%YAML 1.2
+---
+include: module_gamelogger_disk.h
+object: module_gamelogger_disk.o
+init: init_gamelogger_disk();
+final: finalize_gamelogger_disk();
+
+# Functions that handle outgoing data
+senders:
+
+# Functions that handle incoming data
+receivers:
+  getGameMessage_gamelogger_disk:
+  - [src, char*]
+  - [buffer, char*]
+  - [len, int]
+  getMouseMessage_gamelogger_disk:
+  - [src, const char*]
+  - [buffer, unsigned char*]
+  - [len, int]
+

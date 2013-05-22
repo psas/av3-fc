@@ -1,0 +1,21 @@
+%YAML 1.2
+---
+include: module_rpsgame.h
+object: module_rpsgame.o
+init: init_rpsgame();
+final: finalize_rpsgame();
+
+# Functions that handle outgoing data
+senders:
+  sendMessage_rpsgame:
+  - [ARG1, char*]
+  - [buffer, char*]
+  - [length, int]
+
+# Functions that handle incoming data
+receivers:
+  getDeviceClick_rpsgame:
+  - [src, const char*]
+  - [buffer, unsigned char*]
+  - [length, int]
+

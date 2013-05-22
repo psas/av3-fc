@@ -1,0 +1,23 @@
+%YAML 1.2
+---
+include: sensorfusion.h
+object: sensorfusion.o
+init: sensorFusionInit();
+
+senders:
+  sendSFPositionData:
+  - [source, int32_t]
+  - [x, int]
+  - [y, int]
+  - [z, int]
+  sendSFLogMessage:
+  - [source, int32_t]
+  - [buffer, char*]
+
+receivers:
+  getIMUPositionData:
+  - [source, int32_t]
+  - [x, int]
+  - [y, int]
+  - [z, int]
+

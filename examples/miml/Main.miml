@@ -1,0 +1,39 @@
+sources:
+- [LOG, Logger.miml]
+- [IMU, IMU.miml]
+- [SF, SensorFusion.miml]
+- [CTL, Control.miml]
+
+messages:
+  # IMU Messages
+  IMU.sendIMUData:
+    - SF.getIMUPositionData
+    - LOG.getPositionMessage
+
+  IMU.sendGPSData:
+    - SF.getIMUPositionData
+    - LOG.getPositionMessage
+
+  IMU.sendALTData:
+    - SF.getIMUPositionData
+    - LOG.getPositionMessage
+
+  IMU.sendIMULogMessage:
+    - LOG.getLogMessage
+
+  # Sensor Fusion Messages
+  SF.sendSFPositionData:
+    - CTL.getSFPositionData
+    - LOG.getPositionMessage
+
+  SF.sendSFLogMessage:
+    - LOG.getLogMessage
+
+  # Control Messages
+  CTL.sendRollControlAdjustment:
+    # I did not define the next module in this example but this
+    # would be the receiver for altering roll control hardware.
+    - LOG.getPositionMessage
+
+  CTL.sendCTLLogMessage:
+    - LOG.getLogMessage

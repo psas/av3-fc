@@ -1,0 +1,25 @@
+%YAML 1.2
+---
+include: module_logger_screen.h
+object: module_logger_screen.o
+init: init_logger_screen();
+final: finalize_logger_screen();
+
+# Functions that handle outgoing data
+senders:
+
+# Functions that handle incoming data
+receivers:
+  getMessage_logger_screen:
+  - [src, const char*]
+  - [buffer, unsigned char*]
+  - [length, int]
+  getTemp_logger_screen:
+  - [src, const char*]
+  - [buffer, char*]
+  - [length, int]
+  getMouseMessage_logger_screen:
+  - [src, const char*]
+  - [buffer, unsigned char*]
+  - [length, int]
+

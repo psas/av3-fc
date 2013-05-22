@@ -1,0 +1,19 @@
+%YAML 1.2
+---
+include: module_fakemouse.h
+object: module_fakemouse.o
+init: init_fakemouse();
+final: finalize_fakemouse();
+
+# Functions that handle outgoing data
+senders:
+  sendMessage_fakemouse:
+  - [buff, unsigned char*]
+  - [length, int]
+
+# Functions that handle incoming data
+receivers:
+  getMessage_fakemouse:
+  - [buf, unsigned char*]
+  - [len, int]
+

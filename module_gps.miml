@@ -1,0 +1,24 @@
+%YAML 1.2
+---
+include: module_gps.h
+object: module_gps.o
+init: init_gps();
+final: finalize_gps();
+
+# Functions that handle outgoing data
+senders:
+  sendMessage_gps:
+  - [ret, unsigned char]
+  - [buff, unsigned char*]
+  - [length, int]
+
+# Functions that handle incoming data
+receivers:
+
+# Functions that have not been designated as
+# senders or receivers. Sort them accordingly
+# and delete the [unknown:] header.
+[unknown:]
+  set_gps_devicepath:
+  - [dev, const char*]
+

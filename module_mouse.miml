@@ -1,0 +1,17 @@
+%YAML 1.2
+---
+include: module_mouse.h
+object: module_mouse.o
+init: init_mouse();
+final: finalize_mouse();
+
+# Functions that handle outgoing data
+senders:
+  sendMessage_mouse:
+  - [src, const char*]
+  - [buffer, unsigned char*]
+  - [length, int]
+
+# Functions that handle incoming data
+receivers:
+

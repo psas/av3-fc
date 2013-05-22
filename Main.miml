@@ -1,0 +1,10 @@
+sources:
+- [LOG, module_logger_screen.miml]
+- [VIRT, module_virtdev.miml]
+
+
+messages:
+  VIRT.sendMessage_virtdev:
+    - LOG.getMessage_logger_screen
+
+  
