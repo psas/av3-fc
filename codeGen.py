@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # codeGen.py was written by Ron Astin (rastin71 - github) 
 # 03/16/13 PSU Senior Capstone project (Team Elderberry).
