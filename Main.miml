@@ -1,10 +1,13 @@
 sources:
 - [LOG, module_logger_screen.miml]
-- [VIRT, module_virtdev.miml]
+- [DISK, module_logger_disk.miml]
+- [VIRT, module_virtdemo.miml]
 
 
 messages:
-  VIRT.sendMessage_virtdev:
+  VIRT.sendMessage_virtdemo:
     - LOG.getMessage_logger_screen
+    - DISK.getMessage_logger_disk
+    
 
   

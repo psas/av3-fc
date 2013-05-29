@@ -30,7 +30,7 @@ int init_logger_disk(void) {
  *  @param len Length of data in buffer
  */
 // Writes data to file.
-void getMessage_logger_disk(const char *src, char *buffer, int len) {
+void getMessage_logger_disk(const char *src, unsigned char *buffer, int len) {
 	//fprintf(fp, "%s: %s\n", src, buffer);
 	fwrite(src, 1, sizeof(src)-1, fp);
 	fwrite(": ", 1, 2, fp);

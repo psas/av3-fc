@@ -12,6 +12,6 @@ senders:
 receivers:
   getMessage_logger_disk:
   - [src, const char*]
-  - [buffer, char*]
+  - [buffer, unsigned char*]
   - [len, int]
 
