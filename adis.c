@@ -2,6 +2,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 #include "utils_sockets.h"
 #include "fcfutils.h"
@@ -16,7 +17,7 @@ static void common_cb(const char * src, int fd){
 	int rc = readsocket(fd, buffer, sizeof(buffer));
 	if (rc > 0) {
 	        memcpy (&adis16405_udp_data, buffer, sizeof(ADIS_packet));
-		log_getPositionData_adis(&adis16405_udp_data);
+		sendADISData(&adis16405_udp_data);
 	}
 }
 
