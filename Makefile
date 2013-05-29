@@ -10,7 +10,7 @@ LDLIBS   := -lrt $(shell pkg-config --libs libusb-1.0)
 DOXYFILE := ./Doxyfile
 OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o utils_libusb-1.0.o
 
-MAINMIML ?= Main.miml
+MAINMIML ?= test.miml
 MIMLMK   ?= miml.mk
 
 -include $(MIMLMK)

@@ -1,0 +1,36 @@
+sources:
+  - [ADIS, adis.miml]                   # ADIS Sensor
+  - [GPS, gps.miml]                     # GPS Sensor
+  - [OTHER, other.miml]                 # Test/Other Sensors
+  - [ARM, arm.miml]                     # Arm Code Module
+  - [RC, rollcontrol.miml]              # Roll Control Code Module
+  - [RS, rollservo.miml]                # Roll Servo Control Interface
+  - [LOG, logger.miml]                  # Logger code Module
+
+messages:
+  ADIS.sendADISData:                    # - [data, ADIS_packet*]
+    - ARM.arm_getPositionData_adis
+    - RC.rc_getPositionData_adis
+    - LOG.log_getPositionData_adis
+
+  GPS.sendGPSData:                      # - [data, GPS_packet*]
+    - ARM.arm_getPositionData_gps
+    - LOG.log_getPositionData_gps
+
+  ARM.sendARMData:                      # - [code, char*]
+    - RC.rc_getSignalData_arm
+    - LOG.log_getSignalData_arm
+
+  RC.sendRollControlData:               # - [data, RollServo_adjustment*]
+    - RS.rs_getPositionData_rc
+    - LOG.log_getPositionData_rc
+
+  RS.sendRollServoData:                 # - [code, char*]
+    - RC.rc_getSignalData_rs
+    - LOG.log_getSignalData_rs
+
+  OTHER.sendOtherData_A:                # - [data, Other_A_packet*]
+    - LOG.log_getPositionData_OtherA
+
+  OTHER.sendOtherData_B:                # - [data, Other_B_packet*]
+    - LOG.log_getPositionData_OtherB
