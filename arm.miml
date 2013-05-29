@@ -1,0 +1,14 @@
+%YAML 1.2
+---
+include: arm.h
+object: arm.o
+init: arm_init();
+final: arm_final();
+senders:
+  sendARMData:
+  - [code, char*]
+receivers:
+  arm_getPositionData_adis:
+  - [data, ADIS_packet*]
+  arm_getPositionData_gps:
+  - [data, GPS_packet*]

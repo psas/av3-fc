@@ -1,0 +1,12 @@
+%YAML 1.2
+---
+include: other.h
+object: other.o
+init: other_init();
+final: other_final();
+senders:
+  sendOtherData_A:
+  - [data, Other_A_packet*]
+  sendOtherData_B:
+  - [data, Other_B_packet*]
+

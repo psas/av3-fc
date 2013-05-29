@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+include: rollcontol.h
+object: rollcontrol.o
+init: rollcontrol_init();
+final: rollcontrol_final();
+senders:
+  sendRollControlData:
+  - [data, RollServo_adjustment*]
+receivers:
+  rc_getPositionData_adis:
+  - [data, ADIS_packet*]
+  rc_getSignalData_arm:
+  - [code, char*]
+  rc_getSignalData_rs:
+  - [code, char*]

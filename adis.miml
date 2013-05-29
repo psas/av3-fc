@@ -1,0 +1,9 @@
+%YAML 1.2
+---
+include: adis.h
+object: adis.o
+init: adis_init();
+final: adis_final();
+senders:
+  sendADISData:
+  - [data, ADIS_packet*]

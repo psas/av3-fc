@@ -1,0 +1,21 @@
+%YAML 1.2
+---
+include: logger.h
+object: logger.o
+init: logger_init();
+final: logger_final();
+receivers:
+  log_getPositionData_adis:
+  - [data, ADIS_packet*]
+  log_getPositionData_gps:
+  - [data, GPS_packet*]
+  log_getSignalData_arm:
+  - [code, char*]
+  log_getPositionData_rc:
+  - [data, RollServo_adjustment*]
+  log_getSignalData_rs:
+  - [code, char*]
+  log_getPositionData_OtherA:
+  - [data, Other_A_packet*]
+  log_getPositionData_OtherB:
+  - [data, Other_B_packet*]
