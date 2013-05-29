@@ -1,0 +1,7 @@
+sources:
+  - [ADIS, adis.miml]                   # ADIS Sensor
+  - [LOG, logger.miml]                  # Logger code Module
+
+messages:
+  ADIS.sendADISData:                    # - [data, ADIS_packet*]
+    - LOG.log_getPositionData_adis
