@@ -1,1 +1,0 @@
-../tests/fc_proto.py

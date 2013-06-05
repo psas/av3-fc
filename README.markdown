@@ -1,8 +1,7 @@
-# AV3-FC
+# Simulation Of Flight Computer UDP Packets
 
-[PSAS](http://psas.pdx.edu/)'s avionics version 3 flight computer code.
+**Run fake flight computer:**
 
-## Build
+    $ python fake_fc_data.py
 
-    $ make
 
