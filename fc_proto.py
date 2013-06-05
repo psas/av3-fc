@@ -24,6 +24,6 @@ message_types = {
     'CACC': struct.Struct(">BLBhhh"),
     
     #adis-imu
-    'ADIS': struct.Struct(">hhhhhhhhhhhh"),
+    'ADIS': struct.Struct(">"+'H'*12),
     'ADIE': struct.Struct(">hhhhhhhhhhhh"),
 }
