@@ -17,13 +17,12 @@ message_types = {
     'GPS\x62': struct.Struct("<" + ''.join(("HBBBBbB" for i in range(8))) + "BBxx H"),
     'GPS\x63': struct.Struct("<BBHd" + ''.join(("8B b 3B H 5h" for i in range(12))) + "hH H"),
 
-    # Theo-IMU
-    'ACCL': struct.Struct(">BLBhhh"),
-    'GYRO': struct.Struct(">BLBhhhB"),
-    'MAGN': struct.Struct(">BLBhhh"),
-    'CACC': struct.Struct(">BLBhhh"),
-    
-    #adis-imu
-    'ADIS': struct.Struct(">"+'H'*12),
-    'ADIE': struct.Struct(">hhhhhhhhhhhh"),
+    #MPU1950
+    'MPU9': struct.Struct(">7H"),
+
+    #MPL3115A2
+    'MPL3': struct.Struct(">2L"),
+
+    #ADIS-IMU
+    'ADIS': struct.Struct(">12H"),
 }

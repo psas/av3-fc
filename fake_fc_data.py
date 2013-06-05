@@ -111,7 +111,7 @@ class ADIS(message):
 
 #print repr(ACCL().generate())
 
-messages = [ADIS(), message.make_instance('ACCL')]
+messages = [ADIS(), message.make_instance('MPU9'), message.make_instance('MPL3')]
 
 while(1):
 
