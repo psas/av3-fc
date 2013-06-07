@@ -7,7 +7,7 @@ message_types = {
     'SEQN': packet_header,
 
     # Crescent GPS
-    'GPS\x01': struct.Struct("<BBHdddfffffHH H"),
+    'GPS\x01': struct.Struct("<BBH 3d 5f HH"),
     'GPS\x02': struct.Struct("<LLHHHH H"),
     'GPS\x4C': struct.Struct("<dH8x 81L 15L 12L H"),
     'GPS\x5E': struct.Struct("<10d LHHHhhh H"),
