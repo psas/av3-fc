@@ -9,8 +9,12 @@ import time
 import datetime
 from random import randint, choice, uniform, gauss
 import sys,os
-
 from fc_proto import packet_header, tag_header, message_types
+
+# CONFIG
+# UDP packets on localhost
+UDP_IP   = "127.0.0.1"
+UDP_PORT = 5005
 
 
 # Program Modes:
@@ -46,10 +50,6 @@ if len(sys.argv) > 1:
         print_help()
         exit()
 
-
-# UDP packets on localhost
-UDP_IP   = "127.0.0.1"
-UDP_PORT = 5005
 
 # Open socket
 sock = socket.socket(socket.AF_INET,
