@@ -48,47 +48,51 @@ int readsocket(int fd, unsigned char *buffer, int bufsize) {
 	return rc;
 }
 
-int sendto_socket(int fd, unsigned char *buffer, int bufsize) {
+int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port) {
 
-	int rc = send(fd, buffer, bufsize, 0);
+	//printf("%s (%d) - on socket %d msg with %d\n", dest_ip, dest_port, sd, bufsize);
+	struct sockaddr_in si_other;
+    int slen=sizeof(si_other);
+    
+	memset((char *) &si_other, 0, sizeof(si_other));
+	si_other.sin_family = AF_INET;
+	si_other.sin_port = htons(dest_port);
+	if (inet_aton(dest_ip, &si_other.sin_addr)==0) {
+		fprintf(stderr, "inet_aton() failed\n");
+		exit(1);
+	}
+	
+	if (sendto(sd, buffer, bufsize, 0, (struct sockaddr *)&si_other, slen)==-1)
+	perror("sendto()");
+
+
+	/*printf("fd: %d \n", sdata->fd);
+	int rc = sendto(sdata->fd, buffer, bufsize, 0, (struct sockaddr *)&sdata->addr, sizeof(struct sockaddr_in));
 	if (rc < 0){
 		if (errno != EWOULDBLOCK){
-			perror("readsocket: recv() failed");
+			perror("sendto_socket: sendto() failed");
 			return -2;
 		}
 		return 0;
 	}
 
-	/**
-	* Check to see if the connection has been
-	* closed by the client 
-	*/
+	
 	if (rc == 0){
 		return -1;
 	}
 	
-	return rc;
+	return rc;*/
+	return 0;
 }
 
-int get_send_socket(char *dest_ip, int dest_port){
-	int rc;	
+int get_send_socket(){
 	int sd;
-	struct sockaddr_in addr;
 	
-	addr.sin_family = AF_INET;
-	rc = inet_aton(dest_ip, &addr.sin_addr);
-	if (rc == 0){
-	  perror("inet_aton failure");
-	}
-	
-	addr.sin_port = htons(dest_port);
-      
-	sd = socket(PF_INET, SOCK_DGRAM, 0);
+	sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sd < 0){
 	  perror("socket failure");
-	  return -1;
 	}
-      
+    
 	return sd;
 }
 

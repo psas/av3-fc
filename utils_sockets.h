@@ -7,8 +7,14 @@
 #ifndef NETUTILS_H_
 #define NETUTILS_H_
 
+/*typedef struct socksetup {
+	int fd;
+	struct sockaddr_in *addr;
+} socksetup;*/
+
 int readsocket(int fd, unsigned char *buffer, int bufsize);
-int sendsocket(int fd, unsigned char *buffer, int bufsize);
+int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port);
+int get_send_socket();
 int getsocket(int serverport);
 
 #endif /* NETUTILS_H_ */
