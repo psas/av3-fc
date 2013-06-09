@@ -1,24 +1,30 @@
-FLIGHT CONTROL FRAMEWORK README
-Team Elderberry (2013)
+# PSAS Flight Computer Framework
 
+The Flight Control Framework, or FCF, is a bit of a misnomer in and of itself.
+While it was originally developed to run on high-power rockets, the core
+framework itself is extendable to work with practically any two pieces of C
+code that exchange data. With minimal overhead, this lightweight framework was
+designed for fast and efficient data transfer between multiple, interrelated,
+but abstracted, pieces of code. This abstraction is created by allowing these
+different code fragments, called user modules, to pass data between each other
+without referencing one another explicitly. Instead, a relationship between any
+two or more user modules is set up in a language called MIML.
 
-# 1. Overview
-
-The Flight Control Framework, or FCF, is a bit of a misnomer in and of itself. While it was originally developed to run on high-power rockets, the core framework itself is extendable to work with practically any two pieces of C code that exchange data. With minimal overhead, this lightweight framework was designed for fast and efficient data transfer between multiple, interrelated, but abstracted, pieces of code. This abstraction is created by allowing these different code fragments, called user modules, to pass data between each other without referencing one another explicitly. Instead, a relationship between any two or more user modules is set up in a language called MIML. 
 
 ## 1.1 Framework Repository Structure
 
- - `/` - All the files that comprise the framework, code generator, modules, Makefile, miml files, helper utilities and other configuration files and scripts are all in the root of the framework repository. 
- - `/documentation` - The documentation for the code generation and MIML specification.
- - `/examples` - Example files, demos, miscellaneous code and a reworked copy of the AV3 code that removes GLib and uses the modular framework paradigm.
- - `/html` - The Doxygen user documentation folder. The documentation can also be found here: <http://psas.github.com/elderberry/>
+ - `/` - All the files that comprise the framework, code generator, modules, etc.
  - `/profiler` - External profiler that feeds input through sockets from a remote python script.
  - `/templates` - Basic templates for creating modules that connect to libusb or sockets. Read the in-file instructions for how to properly configure and save to a new module file.
 
 
 # 2 The Framework
 
-The framework itself is simply a conduit for passing data between code modules. It's principally made up of the framework file, fcfutils.c, that includes the main loop and API functions and a collection of sender/receiver relationships, or intermodular data handlers, in the fcfmain.c file. 
+The framework itself is simply a conduit for passing data between code modules.
+It's principally made up of the framework file, fcfutils.c, that includes the
+main loop and API functions and a collection of sender/receiver relationships,
+or intermodular data handlers, in the fcfmain.c file. 
+
 
 ## 2.1 API
 
@@ -90,6 +96,11 @@ For the project to complete all three steps.
 
 
 ### 4.0.1 Installing
+
+
+You might need some packages
+
+    $ sudo apt-get install libusb-1.0-0-dev pkg-config
 
 The code generator runs on python3 using the pyyaml package. It's recomended to
 use a python virtual environment like this:
