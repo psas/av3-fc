@@ -37,3 +37,9 @@ pip-log.txt
 
 /fc
 /logs/
+
+# Generated files
+/fcfmain.c
+/fcfmain.h
+logfile-*
+/miml.mk
