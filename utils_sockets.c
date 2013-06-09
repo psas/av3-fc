@@ -48,7 +48,7 @@ int readsocket(int fd, unsigned char *buffer, int bufsize) {
 	return rc;
 }
 
-int sendsocket(int fd, unsigned char *buffer, int bufsize) {
+int sendto_socket(int fd, unsigned char *buffer, int bufsize) {
 
 	int rc = send(fd, buffer, bufsize, 0);
 	if (rc < 0){
@@ -70,7 +70,7 @@ int sendsocket(int fd, unsigned char *buffer, int bufsize) {
 	return rc;
 }
 
-int getsendsocket(char *dest_ip, int dest_port){
+int get_send_socket(char *dest_ip, int dest_port){
 	int rc;	
 	int sd;
 	struct sockaddr_in addr;
@@ -90,6 +90,7 @@ int getsendsocket(char *dest_ip, int dest_port){
 	}
       
 	return sd;
+}
 
 int getsocket(int serverport) {
 	int listen_sd;
