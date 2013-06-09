@@ -19,7 +19,7 @@ if not quiet:
 
 # UDP packets on localhost
 UDP_IP   = ""
-UDP_PORT = 5005
+UDP_PORT = 36000
 
 # Open socket and bind to address
 sock = socket.socket(socket.AF_INET,
