@@ -272,13 +272,7 @@ static void signalhandler(int signum){
 int main(int argc, char *argv[]){
   printf("\n FLIGHT CONTROL FRAMEWORK V1.0 -- Copyright (C) 2013\n"
 	 " : Ron Astin, Clark Wachsmuth, Chris Glasser\n : Josef Mihalits, Jordan Hewitt, Michael Hooper\n\n"
-	 "----------------------------------------------------------------\n"
-	 " This program comes with ABSOLUTELY NO WARRANTY;\n for details please"
-	 " visit http://www.gnu.org/licenses/gpl.html.\n\n"
-	 " This is free software, and you are welcome to redistribute it\n"
-	 " under certain conditions; For details, please visit\n"
-	 " http://www.gnu.org/licenses/gpl.html.\n"
-	 "----------------------------------------------------------------\n\n\n");
+	 "\n\n\n");
   signal(SIGINT, signalhandler);
 
   int rc = init_fcf();			//< FCF init that sets up fd structures
