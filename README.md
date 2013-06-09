@@ -89,9 +89,7 @@ framework on a particular machine setup. The directions for installing and
 using the profiler are as follows:
 
  1. Hook up the profile module: Edit Main.miml so that the source and messages
-
-sections include the following lines:
-
+    sections include the following lines:
 ```YAML
 sources:
 - [PROFILE, module_profile.miml]
@@ -103,7 +101,6 @@ PROFILE.sendMessage_profile:
 PROFILE.sendMessage_profile3:
   - PROFILE.getMessage_profile3
 ```
-
  1. Run the FC.
  1. After a couple of seconds, the program prints a report message and terminates. The message is in the format: Finished with count: <X> in <Y> sec. <X>, where Y is the time it took to send X dummy messages.
  1. The value of X can be configured by setting MAX_COUNT in module_profile.c. See module_profile.c for details.
