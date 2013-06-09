@@ -1,5 +1,6 @@
 sources:
   - [ADIS, adis.miml]                   # ADIS Sensor
+  - [TEST, module_adis_sim.miml]        # ADIS Simulator
   - [LOG, logger.miml]                  # Logger code Module
 
 messages:
