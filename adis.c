@@ -5,6 +5,9 @@
 #include "fcfutils.h"
 #include "fcfmain.h"
 
+#define LISTEN_PORT 36000
+#define DEVICE_NAME "virt_ADIS"
+
 static unsigned char buffer[1000];
 
 
@@ -17,12 +20,11 @@ static void common_cb(const char * src, int fd){
 
 //active fd
 static void virtADIS_cb(struct pollfd *pfd){
-	common_cb("virt_ADIS", pfd->fd);
+	common_cb(DEVICE_NAME, pfd->fd);
 }
 
 int adis_init(){
-	int port = 36000;
-	int fd = getsocket(port);
+	int fd = getsocket(LISTEN_PORT);
 	int rc = fcf_add_fd(fd, POLLIN, virtADIS_cb);
 	return rc;
 }
