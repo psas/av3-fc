@@ -82,7 +82,26 @@ Due to the need for user module abstraction, the build process for the framework
 2. The code generator, upon successful parsing and validation, creates the fcfmain.c file that include the intermodular data handlers and a Miml.mk Makefile include file.
 3. The Makefile imports the Miml.mk and should successfully compile, link and build the executable "fc."
 
-To help uncomplicate this process, however, the Makefile has been created so that the user only needs to 'make' the project to complete all three steps.
+To help uncomplicate this process, however, the Makefile has been created so that the user only needs to run:
+
+    $ make
+
+For the project to complete all three steps.
+
+
+### 4.0.1 Installing
+
+The code generator runs on python3 using the pyyaml package. It's recomended to
+use a python virtual environment like this:
+
+    $ sudo apt-get install python3 python-pip virtualenvwrapper
+    $ mkvirtualenv -p <path/to/python3/install> av3fc
+    (av3fc)$ pip install -r requirements.txt
+
+Then when you want to build the flight computer run
+
+    (av3fc)$ make
+
 
 ## 4.1 Creating MIML Files
 
