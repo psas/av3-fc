@@ -8,6 +8,7 @@
 #define NETUTILS_H_
 
 int readsocket(int fd, unsigned char *buffer, int bufsize);
+int sendsocket(int fd, unsigned char *buffer, int bufsize);
 int getsocket(int serverport);
 
 #endif /* NETUTILS_H_ */

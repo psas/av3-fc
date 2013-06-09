@@ -27,8 +27,7 @@ int readsocket(int fd, unsigned char *buffer, int bufsize) {
 	*/
 	int rc = recv(fd, buffer, bufsize, 0);
 	if (rc < 0){
-		if (errno != EWOULDBLOCK)
-		{
+		if (errno != EWOULDBLOCK){
 			perror("readsocket: recv() failed");
 			return -2;
 		}
@@ -48,6 +47,49 @@ int readsocket(int fd, unsigned char *buffer, int bufsize) {
 
 	return rc;
 }
+
+int sendsocket(int fd, unsigned char *buffer, int bufsize) {
+
+	int rc = send(fd, buffer, bufsize, 0);
+	if (rc < 0){
+		if (errno != EWOULDBLOCK){
+			perror("readsocket: recv() failed");
+			return -2;
+		}
+		return 0;
+	}
+
+	/**
+	* Check to see if the connection has been
+	* closed by the client 
+	*/
+	if (rc == 0){
+		return -1;
+	}
+	
+	return rc;
+}
+
+int getsendsocket(char *dest_ip, int dest_port){
+	int rc;	
+	int sd;
+	struct sockaddr_in addr;
+	
+	addr.sin_family = AF_INET;
+	rc = inet_aton(dest_ip, &addr.sin_addr);
+	if (rc == 0){
+	  perror("inet_aton failure");
+	}
+	
+	addr.sin_port = htons(dest_port);
+      
+	sd = socket(PF_INET, SOCK_DGRAM, 0);
+	if (sd < 0){
+	  perror("socket failure");
+	  return -1;
+	}
+      
+	return sd;
 
 int getsocket(int serverport) {
 	int listen_sd;
@@ -69,8 +111,7 @@ int getsocket(int serverport) {
 	* connections on
 	*/
 	listen_sd = socket(res->ai_family, res->ai_socktype, 0);
-	if (listen_sd < 0)
-	{
+	if (listen_sd < 0){
 		perror("getsocket: socket() failed");
 		return -1;
 	}
@@ -84,41 +125,11 @@ int getsocket(int serverport) {
 	addr.sin_addr.s_addr = htonl(INADDR_ANY); //INADDR_ANY
 	addr.sin_port        = htons(serverport);
 	rc = bind(listen_sd, (struct sockaddr *)&addr, sizeof(addr));
-	if (rc < 0)
-	{
+	if (rc < 0){
 		perror("getsocket: bind() failed");
 		close(listen_sd);
 		return -2;
 	}
-
-	/**
-	* Set the listen back log
-	*/
-	/*rc = listen(listen_sd, 0);
-	if (rc < 0)
-	{
-		perror("getsocket: listen() failed");
-		close(listen_sd);
-		return -3;
-	}
-
-	/**
-	* Accept each incoming connection. If  
-	* accept fails with EWOULDBLOCK, then we   
-	* have accepted all of them. Any other       
-	* failure on accept will cause us to end the 
-	* server.   
-	*/
-	/*int new_sd = accept(listen_sd, NULL, NULL);
-	if (new_sd < 0)
-	{
-		if (errno != EWOULDBLOCK)
-		{
-			perror("getsocket: accept() failed");
-			close(listen_sd);
-			return -4;
-		}
-	}*/
 
 	return listen_sd;
 }
