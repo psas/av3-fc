@@ -4,6 +4,13 @@ include: adis.h
 object: adis.o
 init: adis_init();
 final: adis_final();
+
+# Functions that handle outgoing data
 senders:
   sendADISData:
-  - [data, ADIS_packet*]
+  - [ARG1, unsigned char*]
+  - [ARG2, int]
+
+# Functions that handle incoming data
+receivers:
+

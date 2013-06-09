@@ -10,7 +10,9 @@ static unsigned char buffer[1000];
 
 static void common_cb(const char * src, int fd){
 	int rc = readsocket(fd, buffer, sizeof(buffer));
-	if (rc > 0){
+	if (rc > 0) {
+	        //memcpy (&adis16405_udp_data, buffer, sizeof(ADIS_packet));
+		//sendADISData(&adis16405_udp_data);
 		sendADISData(buffer, rc);
 	}
 }
