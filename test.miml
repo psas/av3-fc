@@ -3,5 +3,5 @@ sources:
   - [LOG, logger.miml]                  # Logger code Module
 
 messages:
-  ADIS.sendADISData:                    # - [data, ADIS_packet*]
+  ADIS.sendADISData:                    # - [data, unsigned char*]
     - LOG.log_getPositionData_adis
