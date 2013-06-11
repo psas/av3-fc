@@ -1,0 +1,8 @@
+/*
+
+	WIFI ADDRESSES
+
+*/
+
+#define WIFI_IP "192.168.0.20"
+#define WIFI_PORT 36000
