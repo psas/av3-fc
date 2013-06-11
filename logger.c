@@ -11,10 +11,9 @@
 #include "adis.h"
 #include "logger.h"
 #include "utils_sockets.h"
+#include "net_addrs.h"
 
 #define P_LIMIT 1500
-#define WIFI_IP "192.168.0.20"
-#define WIFI_PORT 36000
 
 static FILE *fp = NULL;
 static char filename[50];
