@@ -7,6 +7,8 @@
 
 #define LISTEN_PORT 36000
 #define DEVICE_NAME "virt_ADIS"
+#define ADIS_IP "192.168.0.196"
+#define ADIS_PORT "35002"
 
 static unsigned char buffer[1000];
 
@@ -24,7 +26,7 @@ static void virtADIS_cb(struct pollfd *pfd){
 }
 
 int adis_init(){
-	int fd = getsocket(LISTEN_PORT);
+	int fd = getsocket(ADIS_IP, ADIS_PORT, LISTEN_PORT);
 	int rc = fcf_add_fd(fd, POLLIN, virtADIS_cb);
 	return rc;
 }

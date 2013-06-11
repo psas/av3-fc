@@ -59,7 +59,7 @@ int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int de
 	si_other.sin_port = htons(dest_port);
 	if (inet_aton(dest_ip, &si_other.sin_addr)==0) {
 		fprintf(stderr, "inet_aton() failed\n");
-		exit(1);
+		return -1;
 	}
 	
 	if (sendto(sd, buffer, bufsize, 0, (struct sockaddr *)&si_other, slen)==-1)
@@ -96,7 +96,7 @@ int get_send_socket(){
 	return sd;
 }
 
-int getsocket(int serverport) {
+int getsocket(const char *source_ip, const char *source_port, int listen_port) {
 	int listen_sd;
 	int rc, retval;
 	struct sockaddr_in addr;
@@ -106,9 +106,9 @@ int getsocket(int serverport) {
 	hints.ai_family   = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 	
-	if ((retval = getaddrinfo("192.168.0.196", "35002", &hints, &res)) != 0) {
+	if ((retval = getaddrinfo(source_ip, source_port, &hints, &res)) != 0) {
 		printf("getaddrinfo: \n");
-		exit(1);
+		return -1;
 	}
 
 	/**
@@ -128,7 +128,7 @@ int getsocket(int serverport) {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family      = res->ai_family;
 	addr.sin_addr.s_addr = htonl(INADDR_ANY); //INADDR_ANY
-	addr.sin_port        = htons(serverport);
+	addr.sin_port        = htons(listen_port);
 	rc = bind(listen_sd, (struct sockaddr *)&addr, sizeof(addr));
 	if (rc < 0){
 		perror("getsocket: bind() failed");

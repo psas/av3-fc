@@ -15,6 +15,6 @@
 int readsocket(int fd, unsigned char *buffer, int bufsize);
 int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port);
 int get_send_socket();
-int getsocket(int serverport);
+int getsocket(const char *source_ip, const char *source_port, int listen_port);
 
 #endif /* NETUTILS_H_ */
