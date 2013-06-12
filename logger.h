@@ -5,5 +5,5 @@
 void logger_init(void); // [miml:init]
 void logger_final(void); // [miml:final]
 extern void log_getPositionData_adis(unsigned char *, int); // [miml:receiver]
-//extern void log_getPositionData_adis(ADIS_packet*); 
+
 #endif

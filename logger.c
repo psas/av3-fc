@@ -30,6 +30,7 @@ void logger_init() {
 	}
 	setbuf(fp, NULL);
 	sd = get_send_socket();
+	//printf("Filling packet: ");
 }
 
 
@@ -44,14 +45,16 @@ void logger_final() {
 void  log_getPositionData_adis(unsigned char *data, int size) {
 	if(log_buffer_size + size >= P_LIMIT){
 		// Send current buffer to disk/wifi
+		//printf("\nDumping packet to disk and wifi.\n\n");
 		fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 		sendto_socket(sd, log_buffer, log_buffer_size, WIFI_IP, WIFI_PORT);
 		log_buffer_size = 0;
+		//printf("Filling packet: ");
 	}
 
 	memcpy(&log_buffer[log_buffer_size], data, size);
 	log_buffer_size += size;
 	memcpy(&log_buffer[log_buffer_size], "\n", 1);
 	log_buffer_size++;
-	printf("size: %d (+ %d) \n", log_buffer_size, size);
+	printf("-");
 }

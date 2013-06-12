@@ -49,8 +49,6 @@ int readsocket(int fd, unsigned char *buffer, int bufsize) {
 }
 
 int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port) {
-
-	//printf("%s (%d) - on socket %d msg with %d\n", dest_ip, dest_port, sd, bufsize);
 	struct sockaddr_in si_other;
     int slen=sizeof(si_other);
     
