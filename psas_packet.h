@@ -35,7 +35,7 @@ typedef struct ADIS16405_burst_data ADIS16405_burst_data;
 
 struct ADIS_packet {
     char                 ID[4];
-    uint8_t              timestamp[16];
+    uint8_t              timestamp[6];
     uint16_t             data_length;
     ADIS16405_burst_data data;
 } __attribute__((packed));
