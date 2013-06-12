@@ -10,7 +10,7 @@
 	WIFI
 */
 
-#define WIFI_IP "10.0.0.20"
+#define WIFI_IP "10.0.20.20"
 #define WIFI_PORT 35001
 #define WIFI_PORT_S "35001"
 
@@ -18,9 +18,9 @@
 	ADIS
 */
 
-#define ADIS_IP "192.168.0.196"
-#define ADIS_PORT 35002
-#define ADIS_PORT_S "35002"
+#define ADIS_IP "10.0.0.20"
+#define ADIS_PORT 35001
+#define ADIS_PORT_S "35001"
 
 /*
 	ROLL
