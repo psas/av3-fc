@@ -5,56 +5,81 @@
 #include <sys/timerfd.h>
 #include <sys/time.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <poll.h>
 #include "module_adis_sim.h"
 #include "fcfutils.h"
 #include "utils_sockets.h"
+#include "net_addrs.h"
+#include "psas_packet.h"
 
-#define WIFI_IP "127.0.0.1"
-#define WIFI_PORT 36000
+#define FILENAME "sim_data/adis16405_log.txt-8June2013.csv"
 
 static int fd = -1;	//!< timer fd
 static struct itimerspec t;
 static int sd; // socket descriptor
 
-char msgs[31][200] = {"ADIS,1370722907.358744,4,16382,16074,2,9,16377,16275,16086,15522,4031", 
-"ADIS,1370722907.362227,6,16382,16085,5,14,16379,16276,16085,15523,4031", 
-"ADIS,1370722907.364848,6,16382,16090,6,12,1,16278,16086,15524,4031", 
-"ADIS,1370722907.367357,7,16381,16093,2,7,9,16279,16087,15523,4031", 
-"ADIS,1370722907.369805,7,16383,16093,16376,9,11,16278,16086,15522,4031", 
-"ADIS,1370722907.370995,8,0,16092,16372,11,8,16277,16086,15522,4031", 
-"ADIS,1370722907.380766,6,16382,16084,10,13,16382,16277,16087,15525,4031", 
-"ADIS,1370722907.383351,5,16382,16085,2,10,3,16278,16089,15525,4031", 
-"ADIS,1370722907.385486,5,16382,16086,16380,2,11,16279,16088,15522,4031", 
-"ADIS,1370722907.388096,5,16383,16085,16373,16381,8,16278,16087,15520,4032", 
-"ADIS,1370722907.394223,4,16383,16085,16381,11,1,16275,16088,15521,4031", 
-"ADIS,1370722907.396680,4,0,16086,5,9,6,16277,16087,15523,4031", 
-"ADIS,1370722907.400398,4,16383,16089,3,16383,13,16278,16088,15524,4031", 
-"ADIS,1370722907.402806,4,16383,16089,16382,16382,7,16277,16088,15523,4032", 
-"ADIS,1370722907.405262,5,16383,16088,6,16381,8,16276,16087,15522,4031", 
-"ADIS,1370722907.407790,6,16382,16087,14,0,9,16276,16086,15522,4031", 
-"ADIS,1370722907.411421,6,16381,16088,6,9,0,16277,16087,15523,4031", 
-"ADIS,1370722907.413846,5,16381,16086,16381,16,0,16277,16088,15524,4031", 
-"ADIS,1370722907.416291,4,16381,16084,16378,12,1,16277,16088,15525,4031", 
-"ADIS,1370722907.420005,3,16381,16083,16380,9,7,16277,16088,15523,4031", 
-"ADIS,1370722907.422466,5,16381,16083,3,6,11,16276,16088,15523,4031", 
-"ADIS,1370722907.424848,6,16381,16086,8,0,9,16276,16089,15523,4031", 
-"ADIS,1370722907.428413,6,16381,16088,6,5,13,16277,16088,15524,4031", 
-"ADIS,1370722907.430974,5,16381,16087,4,6,13,16278,16089,15526,4031", 
-"ADIS,1370722907.433432,5,16381,16086,0,4,4,16279,16089,15527,4031", 
-"ADIS,1370722907.435889,6,16381,16085,16380,4,1,16281,16090,15526,4031", 
-"ADIS,1370722907.437148,5,16382,16084,16379,5,4,16281,16091,15525,4031", 
-"ADIS,1370722907.439557,5,16382,16085,16379,7,6,16280,16091,15524,4031", 
-"ADIS,1370722907.442012,5,16383,16086,16380,6,4,16280,16090,15525,4031", 
-"ADIS,1370722907.444476,6,16383,16086,16377,8,2,16280,16091,15526,4031"};
-// timestamp,ax,ay,az,gx,gy,gz,mx,my,mz,C
+FILE* stream = NULL;
+
+
+// timestamp,ax,ay,az,gx,gy,gz,mx,my,mz,C*/
+
+ADIS_packet * prepare_packet(char *line){
+	static ADIS_packet ap;
+	const char* tok;
+	char pdata[1024];
+	int count = 1;
+	int pdata_size = 0;
+
+    tok = strtok(line, ",");
+	while(tok != NULL){
+        switch(count){
+			case 1:
+				memcpy(ap.ID, tok, 4);
+			
+				break;
+			case 2:
+				memcpy(ap.timestamp, tok, 6);
+			printf("%s: \n", tok);
+				break;
+			case 3: 
+				memcpy(&ap.data_length, tok, 2);
+				break;
+			default:
+				if(pdata_size < sizeof(ADIS16405_burst_data)){
+					//unsigned int val = atoi(tok);
+					//printf("%d: \n", val);
+					//uint16_t value = 0;
+					//sprintf(tok, "%u", value);
+					memcpy(&pdata[pdata_size], tok, 2);
+					pdata_size += 2;
+				}
+				break;
+		}
+		memcpy(&ap.data, pdata, pdata_size);
+		tok = strtok(NULL, ",");
+		count++;
+    }
+	return &ap;
+}
 
 
 static void adis_sim_cb (struct pollfd * pfd) {
 	static int count = 0;
+	char line[1024];
 
-	sendto_socket(sd, msgs[count], 200, WIFI_IP, WIFI_PORT);
+	
+	if(fgets(line, 1024, stream) != NULL){
+		char* tmp = strdup(line);
+		ADIS_packet * aptemp = prepare_packet(tmp);
+		if(aptemp != NULL){
+			memcpy(line, aptemp, sizeof(ADIS_packet));
+			sendto_socket(sd, line, sizeof(ADIS_packet), FC_IP, FC_LISTEN_PORT);
+		}
+		free(tmp);
+	}
 
 	timerfd_settime(fd, 0, &t, NULL);	//set up next timer
 	count++;
@@ -67,7 +92,7 @@ void init_profiling() {
 	t.it_interval.tv_sec = 0;
 	t.it_interval.tv_nsec = 0;
 	t.it_value.tv_sec = 0;
-	t.it_value.tv_nsec = 300;
+	t.it_value.tv_nsec = 300000;
 	fd = timerfd_create(CLOCK_MONOTONIC, 0);
 	timerfd_settime(fd, 0, &t, NULL);
 	
@@ -75,7 +100,14 @@ void init_profiling() {
 	sd = get_send_socket();
 		
 	fcf_add_fd (fd, POLLIN, cb);
-	printf ("\nprofile fd : %d", fd);
+
+	char line[1024];
+	char *rc;
+	stream = fopen(FILENAME, "r");
+	if(fgets(line, 1024, stream));
+	if(fgets(line, 1024, stream));
+	if(fgets(line, 1024, stream));
+	
 }
 
 
