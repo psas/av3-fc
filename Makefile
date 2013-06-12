@@ -1,4 +1,6 @@
-OPTSLIVE := -flto -O3 
+# Wouldn't accept flto flag. Not sure why. Seems to work without it.
+# OPTSLIVE := -flto -O3
+OPTSLIVE := -O3 
 OPTSDEV  := -g
 OPTSPROF := -O3 -pg
 OPTS     := -ffast-math
@@ -8,7 +10,9 @@ CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(shell pkg-
 LDLIBS   := -lrt $(shell pkg-config --libs libusb-1.0)
 .DEFAULT_GOAL := all
 DOXYFILE := ./Doxyfile
-OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o utils_libusb-1.0.o
+# Took out libusb object since it was causing error.
+# OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o utils_libusb-1.0.o
+OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o
 
 MAINMIML ?= test.miml
 MIMLMK   ?= miml.mk
