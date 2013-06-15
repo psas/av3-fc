@@ -54,7 +54,5 @@ void  log_getPositionData_adis(unsigned char *data, int size) {
 
 	memcpy(&log_buffer[log_buffer_size], data, size);
 	log_buffer_size += size;
-	memcpy(&log_buffer[log_buffer_size], "\n", 1);
-	log_buffer_size++;
 	printf("-");
 }
