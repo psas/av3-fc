@@ -29,7 +29,7 @@ sock.bind((UDP_IP, UDP_PORT))
 # Listen
 while 1:
     message = sock.recv(4096)
-    logfile.write(tag_header.pack('SEQN', packet_header.size, 0, 0))
+    logfile.write(tag_header.pack('SEQN', 0, 0, packet_header.size))
     logfile.write(message)
     if quiet:
         continue

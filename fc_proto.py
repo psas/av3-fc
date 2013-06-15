@@ -1,7 +1,7 @@
 import struct
 
-packet_header = struct.Struct('>L')
-tag_header = struct.Struct('>4sHHL')
+packet_header = struct.Struct('!L')
+tag_header = struct.Struct('!4sHLH')
 
 message_types = {
     'SEQN': packet_header,

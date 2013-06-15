@@ -80,8 +80,9 @@ class message(object):
         timestamp = int((timestamp - today).total_seconds() * 1e9)
 
         packet = self.pack_body()
-        return tag_header.pack(self.packet_type, len(packet),
-            (timestamp >> 32) & 0xFFFF, timestamp & 0xFFFFFFFF) + packet
+        return tag_header.pack(self.packet_type,
+            (timestamp >> 32) & 0xFFFF, timestamp & 0xFFFFFFFF,
+             len(packet)) + packet
 
     def pack_body(self):
         return os.urandom(message_types[self.packet_type].size)
