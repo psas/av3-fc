@@ -33,6 +33,8 @@ typedef struct {
 	uint8_t u8ServoDisableFlag;
 } RC_OUTPUT_STRUCT_TYPE;
 
+typedef RC_OUTPUT_STRUCT_TYPE RollServo_adjustment;
+
 // Call once to initialize model
 void rc_init( void );
 
