@@ -1,17 +1,24 @@
 #!/usr/bin/env python
 from struct import pack
-import random
+from random import randint
 
-FILE = "sim_data/adis16405_log.txt-8June2013.csv"
+filename = "sim_data/test.ADIS.bin"
 
-
-with open(FILE, 'w') as f_out:
-    for i in range(100):
-        f_out.write('ADIS')
-        f_out.write(',')
-        f_out.write(chr(0)*6)
-        f_out.write(',')
-        for i in range(10):
-            f_out.write(pack('<H', random.randint(0,2**16-1)))
-            f_out.write(',')
+with open(filename,'w') as f_out:
+    for i in range(10000):
+        values = (
+            randint(0,65535),   # Power supply measurement
+            randint(0,65535),   # X-axis gyroscope output
+            randint(0,65535),   # Y-axis gyroscope output
+            randint(0,65535),   # Z-axis gyroscope output
+            randint(0,65535),   # X-axis accelerometer output
+            randint(0,65535),   # Y-axis accelerometer output
+            randint(0,65535),   # Z-axis accelerometer output
+            randint(0,65535),   # X-axis magnetometer measurement
+            randint(0,65535),   # Y-axis magnetometer measurement
+            randint(0,65535),   # Z-axis magnetometer measurement
+            randint(0,65535),   # Temperature output
+            randint(0,65535),   # Auxiliary ADC measurement
+        )
+        f_out.write(pack('<12H', *values))
         f_out.write('\n')
