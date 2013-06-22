@@ -31,7 +31,7 @@ typedef struct {
 
 	// Disable servo (turn off PWM) when this flag is not 0
 	uint8_t u8ServoDisableFlag;
-} RC_OUTPUT_STRUCT_TYPE;
+}RC_OUTPUT_STRUCT_TYPE;
 
 typedef RC_OUTPUT_STRUCT_TYPE RollServo_adjustment;
 

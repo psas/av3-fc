@@ -10,7 +10,6 @@ senders:
   sendADISData:
   - [data, ADIS_packet*]
 
-
 # Functions that handle incoming data
 receivers:
 

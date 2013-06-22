@@ -29,8 +29,8 @@ messages:
     - RC.rc_getSignalData_rs
     - LOG.log_getSignalData_rs
 
-  OTHER.sendOtherData_A:                # - [data, Other_A_packet*]
-    - LOG.log_getPositionData_OtherA
-
-  OTHER.sendOtherData_B:                # - [data, Other_B_packet*]
-    - LOG.log_getPositionData_OtherB
+#  OTHER.sendOtherData_A:                # - [data, Other_A_packet*]
+#    - LOG.log_getPositionData_OtherA
+#
+#  OTHER.sendOtherData_B:                # - [data, Other_B_packet*]
+#    - LOG.log_getPositionData_OtherB
