@@ -12,6 +12,9 @@ typedef struct{
 	char data;
 } GPS_packet;
 
+void gps_init(void);
+void gps_final();
+
 void sendGPSData(GPS_packet *);
 
 #endif /* GPS_H_ */

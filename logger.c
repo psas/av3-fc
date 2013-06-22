@@ -91,3 +91,17 @@ void  log_getPositionData_adis(ADIS_packet *data) {
 	log_buffer_size += sizeof(ADIS_packet);
 	printf("-");
 }
+
+void log_getPositionData_gps(GPS_packet* data){
+	return;
+}
+void log_getSignalData_arm(char* code){
+	return;
+}
+void log_getPositionData_rc(RollServo_adjustment* data){
+	return;
+}
+void log_getSignalData_rs(char* code){
+	return;
+}
+

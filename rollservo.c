@@ -1,8 +1,10 @@
 
-#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "rollControlLibrary.h"
 #include "rollservo.h"
 #include "net_addrs.h"
+#include "utils_sockets.h"
 
 int sd;
 

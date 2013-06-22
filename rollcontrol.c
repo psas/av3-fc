@@ -19,8 +19,8 @@ void rc_getPositionData_adis(ADIS_packet * imu){
 	RC_INPUT_STRUCT_TYPE input;
 	RC_OUTPUT_STRUCT_TYPE output;
 
-	input.u16RawAccelerometerADC = imu.data.adis_zaccl_out;
-	input.u16RawRateGyroADC = imu.data.adis_zgyro_out;
+	input.u16RawAccelerometerADC = imu->data.adis_zaccl_out;
+	input.u16RawRateGyroADC = imu->data.adis_zgyro_out;
 	input.u8IsLaunchDetected = launch;
 	rc_step(&input, &output);
 	sendRollControlData(&output);

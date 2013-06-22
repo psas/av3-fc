@@ -1,7 +1,7 @@
 sources:
   - [ADIS, adis.miml]                   # ADIS Sensor
   - [GPS, gps.miml]                     # GPS Sensor
-  - [OTHER, other.miml]                 # Test/Other Sensors
+#  - [OTHER, other.miml]                 # Test/Other Sensors
   - [ARM, arm.miml]                     # Arm Code Module
   - [RC, rollcontrol.miml]              # Roll Control Code Module
   - [RS, rollservo.miml]                # Roll Servo Control Interface

@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-include: rollcontol.h
+include: rollcontrol.h
 object: rollcontrol.o
 init: rollcontrol_init();
 final: rollcontrol_final();
