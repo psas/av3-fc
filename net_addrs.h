@@ -41,4 +41,10 @@
 #define ROLL_PORT 35003
 #define ROLL_PORT_S "35003"
 
+
+// ARM SIGNAL
+#define ARM_IP "127.0.0.1"
+#define ARM_PORT 35666
+#define ARM_PORT_S "35666"
+
 #endif /* FCF_NETADDRS */
