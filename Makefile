@@ -1,6 +1,6 @@
 # Wouldn't accept flto flag. Not sure why. Seems to work without it.
 # OPTSLIVE := -flto -O3
-OPTSLIVE := -O3 
+OPTSLIVE := -O3 -D FCF_FC_NETWORK
 OPTSDEV  := -g
 OPTSPROF := -O3 -pg
 OPTS     := -ffast-math
@@ -19,21 +19,24 @@ MIMLMK   ?= miml.mk
 
 -include $(MIMLMK)
 
-all: CFLAGS += $(OPTSLIVE)
-all: fc
+all: miml fc
+
+live: CFLAGS += $(OPTSLIVE)
+live: miml fc
 
 debug: CFLAGS  += $(OPTSDEV)
 debug: LDFLAGS += $(OPTSDEV)
-debug: fc
+debug: miml fc
 
 
 prof: CFLAGS  += $(OPTSPROF)
 prof: LDFLAGS += $(OPTSPROF)
-prof: fc
+prof: miml fc
 
 
 fc: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
+
 
 miml: $(MIMLMK)
 
