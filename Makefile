@@ -19,23 +19,24 @@ MIMLMK   ?= miml.mk
 
 -include $(MIMLMK)
 
-all: fc
+all: miml fc
 
 live: CFLAGS += $(OPTSLIVE)
-live: fc
+live: miml fc
 
 debug: CFLAGS  += $(OPTSDEV)
 debug: LDFLAGS += $(OPTSDEV)
-debug: fc
+debug: miml fc
 
 
 prof: CFLAGS  += $(OPTSPROF)
 prof: LDFLAGS += $(OPTSPROF)
-prof: fc
+prof: miml fc
 
 
 fc: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
+
 
 miml: $(MIMLMK)
 
