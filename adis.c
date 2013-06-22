@@ -5,9 +5,8 @@
 #include <time.h>
 #include "utils_sockets.h"
 #include "fcfutils.h"
-#include "fcfmain.h"
 #include "net_addrs.h"
-#include "psas_packet.h"
+#include "adis.h"
 
 #define DEVICE_NAME "virt_ADIS"
 
@@ -29,9 +28,7 @@ static void common_cb(const char * src, int fd) {
 		memcpy(&packet.data, buffer, sizeof(ADIS16405_burst_data));
 
 		// Dump an ADIS packet
-		unsigned char line[256];
-		memcpy(line, &packet, sizeof(ADIS_packet));
-		sendADISData(line, sizeof(ADIS_packet));
+		sendADISData(&packet);
 	}
 }
 
