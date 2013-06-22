@@ -8,8 +8,8 @@ final: adis_final();
 # Functions that handle outgoing data
 senders:
   sendADISData:
-  - [ARG1, unsigned char*]
-  - [ARG2, int]
+  - [data, ADIS_packet*]
+
 
 # Functions that handle incoming data
 receivers:

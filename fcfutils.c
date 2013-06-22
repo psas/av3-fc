@@ -28,8 +28,9 @@
 #include <errno.h>
 #include <libusb-1.0/libusb.h>
 #include <signal.h>
+//#include "psas_packet.h"
 #include "fcfutils.h"
-#include "fcfmain.h"
+//#include "fcfmain.h"
 
 #define FDS_INIT_SIZE 1
 #define FDS_EXPANSION_FACTOR 2
