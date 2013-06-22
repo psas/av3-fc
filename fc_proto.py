@@ -18,11 +18,11 @@ message_types = {
     #'GPS\x63': struct.Struct("<BBHd" + ''.join(("8B b 3B H 5h" for i in range(12))) + "hH H"),
 
     #MPU1950
-    'MPU9': struct.Struct(">7H"),
+    'MPU9': struct.Struct("<7H"),
 
     #MPL3115A2
-    'MPL3': struct.Struct(">2L"),
+    'MPL3': struct.Struct("<2L"),
 
     #ADIS-IMU
-    'ADIS': struct.Struct(">12H"),
+    'ADIS': struct.Struct("<12H"),
 }

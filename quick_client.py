@@ -19,7 +19,7 @@ if not quiet:
 
 # UDP packets on localhost
 UDP_IP   = ""
-UDP_PORT = 36000
+UDP_PORT = 35001
 
 # Open socket and bind to address
 sock = socket.socket(socket.AF_INET,
@@ -37,10 +37,11 @@ while 1:
     sequence_number, = packet_header.unpack(message[:packet_header.size])
     message = message[packet_header.size:]
 
-    print "packet sequence %d (%d bytes)" % (sequence_number, len(message))
+    print "\n~~~~~~~~\npacket sequence %d (%d bytes)" % (sequence_number, len(message))
 
     while len(message) > 0:
-        fourcc, length, timestamp_hi, timestamp_lo = tag_header.unpack(message[:tag_header.size])
+        fourcc, timestamp_hi, timestamp_lo, length = tag_header.unpack(message[:tag_header.size])
+
         message = message[tag_header.size:]
 
         body = message[:length]

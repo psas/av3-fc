@@ -14,7 +14,7 @@ from fc_proto import packet_header, tag_header, message_types
 # CONFIG
 # UDP packets on localhost
 UDP_IP   = "127.0.0.1"
-UDP_PORT = 36000
+UDP_PORT = 35001
 
 
 # Program Modes:
