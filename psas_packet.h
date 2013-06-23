@@ -94,13 +94,13 @@ struct msg99 {
 	int16_t		spare1;
 } __attribute__((packed));
 
-struct GPS99_packet {
+struct GPS_packet {
 	char         ID[4];			// "GPS9"
 	uint8_t      timestamp[6];
 	uint16_t     data_length;
 	struct msg99 data;
 } __attribute__((packed));
-typedef struct GPS99_packet GPS99_packet;
+typedef struct GPS_packet GPS_packet;
 
 #endif
 //! @}

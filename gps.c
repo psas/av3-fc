@@ -12,7 +12,9 @@
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <libusb-1.0/libusb.h>
+#include <arpa/inet.h>
 
+#include "utils_sockets.h"
 #include "utils_libusb-1.0.h"
 #include "psas_packet.h"
 #include "gps.h"
@@ -42,9 +44,10 @@ static const int EPT = 0x81;	//< CHANGE IF NEEDED (Default)
 static int handle_msg99(struct msg99 *m99)
 {
 	// TODO: real timestamp
-	gps99_packet p = { .ID="GP99", .timestamp={0,0,0,0,0,0}, .data_length=htons(sizeof(struct msg99));
+	GPS_packet p = { .ID="GP99", .timestamp={0,0,0,0,0,0}, .data_length=htons(sizeof(struct msg99))};
 	memcpy(&p.data, m99, sizeof(struct msg99));
 	sendGPSData(&p);
+	return 0;
 }
 
 static int handle_packet(struct msg *m)
@@ -151,7 +154,8 @@ static void data_callback(struct libusb_transfer *transfer){
     }
 }
 
-
+struct libusb_transfer * transfer;
+libusb_device_handle * handle;
 void gps_init() {
 	//TODO: correct device name, VID, PID
 	libusb_context *context = init_libusb ("###DEVTAG###");
