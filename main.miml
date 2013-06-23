@@ -1,11 +1,12 @@
 sources:
   - [ADIS, adis.miml]                   # ADIS Sensor
   - [GPS, gps.miml]                     # GPS Sensor
-#  - [OTHER, other.miml]                 # Test/Other Sensors
   - [ARM, arm.miml]                     # Arm Code Module
   - [RC, rollcontrol.miml]              # Roll Control Code Module
   - [RS, rollservo.miml]                # Roll Servo Control Interface
   - [LOG, logger.miml]                  # Logger code Module
+  - [ETH, ethmux.miml]                  # Central Ethernet receiver
+#  - [LD, launchdetect.miml]             # Launch detect module
 
 messages:
   ADIS.sendADISData:                    # - [data, ADIS_packet*]
@@ -27,10 +28,13 @@ messages:
 
   RS.sendRollServoData:                 # - [code, char*]
     - RC.rc_getSignalData_rs
-    - LOG.log_getSignalData_rs
+    - LOG.log_getSignalData_rs 
 
-#  OTHER.sendOtherData_A:                # - [data, Other_A_packet*]
-#    - LOG.log_getPositionData_OtherA
-#
-#  OTHER.sendOtherData_B:                # - [data, Other_B_packet*]
-#    - LOG.log_getPositionData_OtherB
+  ETH.sendADISData:                     # - [data, char*]
+    - ADIS.adis_getRawData_eth
+    
+  ETH.sendARMData:                      # - [data, char*]
+    - ARM.arm_getRawData_eth
+    
+#  ETH.sendLDData:                      # - [data, char*]
+#    - LD.ld_getRawData_eth 
