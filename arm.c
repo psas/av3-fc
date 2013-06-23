@@ -127,6 +127,7 @@ void arm_getPositionData_adis(ADIS_packet * data){
 	return;
 }
 void arm_getPositionData_gps(GPS_packet * data){
-	//TODO: check for GPS lock
+	// check for GPS lock
+	GPS_locked = (data->data.nav_mode > 1);   // at least 2D fix
 	return;
 }

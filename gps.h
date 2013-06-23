@@ -8,9 +8,7 @@
 #ifndef GPS_H_
 #define GPS_H_
 
-typedef struct{
-	char data;
-} GPS_packet;
+#include "psas_packet.h"
 
 void gps_init(void);
 void gps_final();
