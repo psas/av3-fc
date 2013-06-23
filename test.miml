@@ -6,6 +6,8 @@ sources:
   - [ARM, arm.miml]                     # Arm Code Module
   - [RC, rollcontrol.miml]              # Roll Control Code Module
   - [RS, rollservo.miml]                # Roll Servo Control Interface
+  - [ETH, ethmux.miml]                  # Central Ethernet receiver
+
   
 messages:
   ADIS.sendADISData:                    # - [data, ADIS_packet*]
@@ -28,3 +30,6 @@ messages:
   RS.sendRollServoData:                 # - [code, char*]
     - RC.rc_getSignalData_rs
     - LOG.log_getSignalData_rs
+
+  ETH.sendADISPacket:                     # - [data, char*]
+    - ADIS.adis_getRawData_eth

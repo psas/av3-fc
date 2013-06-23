@@ -14,7 +14,7 @@ void ethmux_cb(struct pollfd *pfd){
 }
 
 int ethmux_init(){
-	int fd = getsocket(ADIS_IP, ADIS_PORT_S, FC_LISTEN_PORT);
+	int fd = getsocket(SENSOR_IP, ADIS_RX_PORT_S, FC_LISTEN_PORT);
 	int rc = fcf_add_fd(fd, POLLIN, ethmux_cb);
 	return rc;
 }

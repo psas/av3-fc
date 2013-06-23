@@ -30,11 +30,11 @@ messages:
     - RC.rc_getSignalData_rs
     - LOG.log_getSignalData_rs 
 
-  ETH.sendADISData:                     # - [data, char*]
+  ETH.sendADISPacket:                     # - [data, char*]
     - ADIS.adis_getRawData_eth
     
-  ETH.sendARMData:                      # - [data, char*]
-    - ARM.arm_getRawData_eth
+#  ETH.sendARMData:                      # - [data, char*]
+#    - ARM.arm_getRawData_eth
     
 #  ETH.sendLDData:                      # - [data, char*]
 #    - LD.ld_getRawData_eth 

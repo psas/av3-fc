@@ -21,9 +21,6 @@ void rs_getPositionData_rc(RollServo_adjustment* adj){
 	data[0] = (0xff00 & adj->u16ServoPulseWidthBin14) >> 8;
 	data[1] = (0xff & adj->u16ServoPulseWidthBin14);
 	data[2] = adj->u8ServoDisableFlag;
-	sendto_socket(sd, data, sizeof(data), ROLL_IP, ROLL_PORT);
+	sendto_socket(sd, data, sizeof(data), ROLL_IP, ROLL_TX_PORT);
 	sendRollServoData(data);
 }
-
-
-

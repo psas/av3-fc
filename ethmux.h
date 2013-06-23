@@ -12,6 +12,6 @@ void ethmux_final();
 //senders:
 void sendARMData(char*);
 void sendLDData(char*);
-void sendADISData(char*);
+void sendADISPacket(char*);
 
 #endif /* ETHMUX_H_ */
