@@ -96,7 +96,7 @@ void log_getPositionData_gps(GPS_packet* data){
 	return;
 }
 void log_getSignalData_arm(char* code){
-	return;
+	printf("%s", code);
 }
 void log_getPositionData_rc(RollServo_adjustment* data){
 	return;

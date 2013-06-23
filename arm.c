@@ -6,9 +6,23 @@
  */
 
 #include "arm.h"
+#include "net_addrs.h"
+#include "utils_sockets.h"
+#include "fcfutils.h"
 
-void arm_init(){
-	return;
+static unsigned char buffer[100];
+
+static void arm_signal_cb(struct pollfd *pfd){
+	int rc = readsocket(pfd->fd, buffer, sizeof(buffer));
+	if(rc > 0){
+		sendARMData((char *)buffer);
+	}
+}
+
+int arm_init(){
+	int fd = getsocket(ARM_IP, ARM_PORT_S, FC_LISTEN_PORT);
+	int rc = fcf_add_fd(fd, POLLIN, arm_signal_cb);
+	return rc;
 }
 void arm_final(){
 	return;
