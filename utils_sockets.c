@@ -48,6 +48,31 @@ int readsocket(int fd, unsigned char *buffer, int bufsize) {
 	return rc;
 }
 
+int readsocketfrom(int fd, unsigned char *buffer, int bufsize, struct sockaddr *sender, socklen_t *addrlen) {
+	/**
+	* Receive data packet on this socket,
+	* and also return the sender's address.
+	*/
+	int rc = recvfrom(fd, buffer, bufsize, 0, sender, addrlen);
+	if (rc < 0){
+		if (errno != EWOULDBLOCK){
+			perror("readsocket: recv() failed");
+			return -2;
+		}
+		return 0;
+	}
+
+	/**
+	* Check to see if the connection has been
+	* closed by the client 
+	*/
+	if (rc == 0){
+		return -1;
+	}
+	
+	return rc;
+}
+
 int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port) {
 	struct sockaddr_in si_other;
     int slen=sizeof(si_other);
