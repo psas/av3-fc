@@ -1,5 +1,4 @@
 #include <stdint.h>
-
 #include "rollcontrol.h"
 #include "rollControlLibrary.h"
 #include "psas_packet.h"
@@ -23,6 +22,8 @@ void rc_getPositionData_adis(ADIS_packet * imu){
 	input.u16RawRateGyroADC = imu->data.adis_zgyro_out;
 	input.u8IsLaunchDetected = launch;
 	rc_step(&input, &output);
+	output.u8ServoDisableFlag=0;
+	output.u16ServoPulseWidthBin14 = imu->data.adis_zgyro_out;
 	sendRollControlData(&output);
 }
 
