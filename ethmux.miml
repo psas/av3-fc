@@ -1,0 +1,17 @@
+%YAML 1.2
+---
+include: ethmux.h
+object: ethmux.o
+init: ethmux_init();
+final: ethmux_final();
+senders:
+  sendARMData:
+  - [data, char*]
+  
+  sendLDData:
+  - [data, char*]
+  
+  sendADISData:
+  - [data, char*]
+
+receivers:

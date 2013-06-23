@@ -8,7 +8,7 @@
 #include "net_addrs.h"
 #include "adis.h"
 
-#define DEVICE_NAME "virt_ADIS"
+#define DEVICE_NAME "ADIS"
 
 // Buffer for reading in socket
 static unsigned char buffer[1024];
