@@ -11,8 +11,9 @@ LDLIBS   := -lrt -lm $(shell pkg-config --libs libusb-1.0) -L . -lrollControlLib
 .DEFAULT_GOAL := all
 DOXYFILE := ./Doxyfile
 # Took out libusb object since it was causing error.
-# OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o utils_libusb-1.0.o
-OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o
+# Put back in libusb object since we need it now
+OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o utils_libusb-1.0.o
+#OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o
 
 MAINMIML ?= test.miml
 MIMLMK   ?= miml.mk
