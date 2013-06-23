@@ -14,7 +14,6 @@
 #include <libusb-1.0/libusb.h>
 #include <arpa/inet.h>
 
-#include "utils_sockets.h"
 #include "utils_libusb-1.0.h"
 #include "psas_packet.h"
 #include "gps.h"
@@ -157,13 +156,13 @@ static void data_callback(struct libusb_transfer *transfer){
 struct libusb_transfer * transfer;
 libusb_device_handle * handle;
 void gps_init() {
-	//TODO: correct device name, VID, PID
-	libusb_context *context = init_libusb ("###DEVTAG###");
+	//TODO: correct VID, PID
+	libusb_context *context = init_libusb ("GPS");
 	if (context == NULL) {
 		return;
 	}
 	libusb_set_debug(context, 3);
-	handle = open_device("###DEVTAG###", VID, PID);
+	handle = open_device("GPS", VID, PID);
 	if (handle != NULL) {
 		transfer = start_usb_interrupt_transfer(handle, EPT, data_callback, NULL, -1, 0);
 	}
