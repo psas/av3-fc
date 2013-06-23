@@ -11,6 +11,16 @@ senders:
 # Functions that handle incoming data
 receivers:
   log_getPositionData_adis:
-  - [ARG1, unsigned char*]
-  - [ARG2, int]
+  - [data, ADIS_packet*]
 
+  log_getPositionData_gps:
+  - [data, GPS_packet*]
+  
+  log_getSignalData_arm:
+  - [code, char*]
+  
+  log_getPositionData_rc:
+  - [data, RollServo_adjustment*]
+  
+  log_getSignalData_rs:
+  - [code, char*]

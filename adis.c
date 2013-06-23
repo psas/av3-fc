@@ -1,20 +1,34 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <arpa/inet.h>
+#include <time.h>
 #include "utils_sockets.h"
 #include "fcfutils.h"
-#include "fcfmain.h"
 #include "net_addrs.h"
+#include "adis.h"
 
 #define DEVICE_NAME "virt_ADIS"
 
-static unsigned char buffer[1000];
+// Buffer for reading in socket
+static unsigned char buffer[1024];
 
+static void common_cb(const char * src, int fd) {
 
-static void common_cb(const char * src, int fd){
+	// read ADIS data on socket
 	int rc = readsocket(fd, buffer, sizeof(buffer));
-	if (rc > 0){
-		sendADISData(buffer, rc);
+
+	if (rc > 0) {
+
+		// Build a ADIS packet
+		// TODO: make timestamp
+		ADIS_packet packet ={ .ID="ADIS", .timestamp={0,0,0,0,0,0}, .data_length=htons(sizeof(ADIS16405_burst_data))};
+
+		// Copy in data from socket
+		memcpy(&packet.data, buffer, sizeof(ADIS16405_burst_data));
+
+		// Dump an ADIS packet
+		sendADISData(&packet);
 	}
 }
 

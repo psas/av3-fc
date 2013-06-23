@@ -56,7 +56,7 @@ For the project to complete all three steps.
 
 You might need some packages
 
-    $ sudo apt-get install libusb-1.0-0-dev pkg-config
+    $ sudo apt-get install libusb-dev pkg-config
 
 The code generator runs on python3 using the pyyaml package. It's recomended to
 use a python virtual environment like this:
