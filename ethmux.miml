@@ -6,12 +6,15 @@ init: ethmux_init();
 final: ethmux_final();
 senders:
   sendARMPacket:
-  - [data, char*]
+  - [data, unsigned char*]
+  - [len, int]
   
   sendLDPacket:
-  - [data, char*]
+  - [data, unsigned char*]
+  - [len, int]
   
   sendADISPacket:
-  - [data, char*]
-
+  - [data, unsigned char*]
+  - [len, int]
+  
 receivers:

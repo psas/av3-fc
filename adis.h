@@ -10,5 +10,5 @@
 extern void adis_init(void); // [miml:init]
 extern void adis_final(void); // [miml:final]
 extern void sendADISData(ADIS_packet *); // [miml:sender]
-extern void adis_getRawData_eth(char *buffer); // [miml:reciever]
+extern void adis_getRawData_eth(unsigned char *, int len); // [miml:reciever]
 #endif /* VIRTDEVSRV_H_ */

@@ -13,4 +13,5 @@ senders:
 # Functions that handle incoming data
 receivers:
   adis_getRawData_eth:
-  - [buffer, char*]
+  - [buffer, unsigned char*]
+  - [len, int]

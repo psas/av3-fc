@@ -20,8 +20,6 @@
 
 int response_fd;
 
-static unsigned char buffer[100];
-
 #define IOUT_PIN 23
 #define ACOK_PIN 11
 #define FC_SPS_PIN 5
@@ -46,7 +44,7 @@ static void add_sample(double a)
 		cur = acceleration;
 }
 
-void arm_getArmSignal(char *buffer){
+void arm_getArmSignal(unsigned char *buffer, int len){
 	printf("\nARMARMARM\n\n\n");
 }
 

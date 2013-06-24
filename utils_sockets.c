@@ -110,9 +110,7 @@ int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int de
 
 int get_send_from_socket(int send_port) {
 	struct sockaddr_in sin = {};
-	socklen_t slen;
 	int sock;
-	short unsigned int port;
 
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sin.sin_family = AF_INET;
@@ -129,8 +127,7 @@ int get_send_from_socket(int send_port) {
 }
 
 int get_send_socket(){
-	int sd, rc;
-	struct sockaddr_in addr;
+	int sd;
 
 	sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sd < 0){

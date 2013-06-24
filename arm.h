@@ -15,6 +15,7 @@ void arm_final();
 
 void arm_getPositionData_adis(ADIS_packet *);
 void arm_getPositionData_gps(GPS_packet *);
+void arm_getArmSignal(unsigned char *, int len);
 
 void sendARMData(char *);
 #endif /* ARM_H_ */

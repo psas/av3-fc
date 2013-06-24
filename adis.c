@@ -12,7 +12,7 @@
 
 #define DEVICE_NAME "ADIS"
 
-void adis_getRawData_eth(char *buffer) {
+void adis_getRawData_eth(unsigned char *buffer, int len) {
 
 	// Build a ADIS packet
 	// TODO: make timestamp

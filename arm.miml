@@ -9,7 +9,8 @@ senders:
   - [code, char*]
 receivers:
   arm_getArmSignal:
-  - [buffer, char*]
+  - [buffer, unsigned char*]
+  - [len, int]
   arm_getPositionData_adis:
   - [data, ADIS_packet*]
   arm_getPositionData_gps:

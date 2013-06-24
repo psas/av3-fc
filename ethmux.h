@@ -7,11 +7,11 @@
 #define ETHMUX_H_
 
 
-void ethmux_init();
+int ethmux_init();
 void ethmux_final();
 //senders:
-void sendARMPacket(char*);
-void sendLDPacket(char*);
-void sendADISPacket(char*);
+void sendARMPacket(unsigned char*, int len);
+void sendLDPacket(unsigned char*, int len);
+void sendADISPacket(unsigned char*, int len);
 
 #endif /* ETHMUX_H_ */
