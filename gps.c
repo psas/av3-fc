@@ -9,12 +9,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/time.h>
-#include <sys/poll.h>
-#include <libusb-1.0/libusb.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <sys/poll.h>
 
-#include "utils_libusb-1.0.h"
+#include "fcfutils.h"
 #include "psas_packet.h"
 #include "gps.h"
 
@@ -26,25 +25,19 @@ struct msg {
 	uint16_t	len;			// 52, 16, 40, 56, 96, 128, 300, 28, 68, 304 
 	union {
 		char raw[304];
+		struct msg1 m1;
 		struct msg99 m99;
 		// define more of them if we ever need any
 	};
 };
 
-/**	START DATA */
 
-//TODO: real VID/PID of USB-serial adapter
-static const int VID = 0x0000;	//< CHANGE VID
-static const int PID = 0x0000;	//< CHANGE PID
-static const int EPT = 0x81;	//< CHANGE IF NEEDED (Default)
-
-/**	START FUNCTIONS */
-
-static int handle_msg99(struct msg99 *m99)
+static int handle_msg(const char *id, const void *data, uint16_t len)
 {
 	// TODO: real timestamp
-	GPS_packet p = { .ID="GP99", .timestamp={0,0,0,0,0,0}, .data_length=htons(sizeof(struct msg99))};
-	memcpy(&p.data, m99, sizeof(struct msg99));
+	GPS_packet p = { .timestamp={0,0,0,0,0,0}, .data_length=htons(len) };
+	memcpy(&p.ID, id, 4);
+	memcpy(&p.raw, data, len);
 	sendGPSData(&p);
 	return 0;
 }
@@ -53,24 +46,28 @@ static int handle_packet(struct msg *m)
 {
 	switch (m->type)
 	{
-	case 99:
-		if (m->len == 304)
-			return handle_msg99(&m->m99);
-		fprintf(stderr, "bad length %d != 304\n", m->len);
+	case 1:
+		if (m->len == sizeof(struct msg1))
+			return handle_msg("GPS1", &m->m1, m->len);
+		fprintf(stderr, "bad length %u != %lu\n", m->len, sizeof(struct msg1));
 		return -3;
+	case 99:
+		if (m->len == sizeof(struct msg99))
+			return handle_msg("GP99", &m->m99, m->len);
+		fprintf(stderr, "bad length %u != %lu\n", m->len, sizeof(struct msg99));
+		return -3;
+	case 2:
+	case 80:
+	case 93: case 94: case 95: case 96: case 97: case 98:
+		// log all GPS packets for groundside analysis
+		return handle_msg("GPSX", &m->raw, m->len);
 	default:
-		fprintf(stderr, "unhandled packet type: %d length %d\n", m->type, m->len);
+		fprintf(stderr, "unknown GPS packet type: %u length %u\n", m->type, m->len);
 		return -4;
 	}
 }
 
 static unsigned char buffer[4096], *end = buffer;
-
-static void put_data(unsigned char *buf, int datalen)
-{
-	memcpy(end, buf, datalen);
-	end += datalen;
-}
 
 static uint16_t sum(uint8_t *packet, int len)
 {
@@ -120,57 +117,30 @@ static int get_packet(struct msg *m)
 	return 0;
 }
 
-static void data_callback(struct libusb_transfer *transfer){
-	unsigned char *buf = NULL;
-    int act_len;
-    int retErr;
+int fd;
+static void data_callback(struct pollfd *pfd){
+	int act_len;
 	struct msg m;
 
-	switch(transfer->status){
-    
-		case LIBUSB_TRANSFER_COMPLETED:
-
-			buf = transfer->buffer;
-			act_len = transfer->actual_length;
-			retErr = libusb_submit_transfer(transfer);
-			if(retErr){
-				//print_libusb_transfer_error(transfer->status, "common_cb resub");
-			}
-
-			put_data(buf, act_len);
-			while (get_packet(&m))
-				handle_packet(&m);
-
-			break;
-		
-		case LIBUSB_TRANSFER_CANCELLED:
-			printf("transfer cancelled\n");
-			break;
-		
-		default:
-			printf("data_callback() error\n");
-			break;
-    }
-}
-
-struct libusb_transfer * transfer;
-libusb_device_handle * handle;
-void gps_init() {
-	//TODO: correct VID, PID
-	libusb_context *context = init_libusb ("GPS");
-	if (context == NULL) {
+	act_len = read(fd, end, end-buffer+sizeof(buffer));
+	if (act_len <= 0) {
+		perror("read from GPS device failed");
 		return;
 	}
-	libusb_set_debug(context, 3);
-	handle = open_device("GPS", VID, PID);
-	if (handle != NULL) {
-		transfer = start_usb_interrupt_transfer(handle, EPT, data_callback, NULL, -1, 0);
-	}
+	end += act_len;
+
+	while (get_packet(&m))
+		handle_packet(&m);
+}
+
+void gps_init() {
+	fd = open("/dev/ttyusb0", O_RDONLY);
+	if (fd < 0)
+		perror("Can't open GPS device");
+	else
+		fcf_add_fd(fd, POLLIN, data_callback);
 }
 
 void gps_final() {
-	cancel_transfer(transfer);
-	close_device(handle);
-	handle = NULL;
-	transfer = NULL;
+	close(fd);
 }
