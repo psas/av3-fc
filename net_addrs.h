@@ -12,7 +12,7 @@
 
 // WIFI
 #ifdef FCF_FC_NETWORK
-#define WIFI_IP "10.0.20.20" //should this broadcast? -nathan
+#define WIFI_IP "172.17.0.2" //should this broadcast? -nathan
 #else
 #define WIFI_IP "127.0.0.1"
 #endif
@@ -35,7 +35,11 @@
 #define MPL_RX_PORT_S "35010"
 
 // ROLL
+#ifdef FCF_FC_NETWORK
 #define ROLL_IP "10.0.0.30"
+#else
+#define ROLL_IP "127.0.0.1"
+#endif
 #define ROLL_TX_PORT 35003
 #define ROLL_TX_PORT_S "35003"
 #define ROLL_RX_PORT 35004
