@@ -59,10 +59,10 @@ void logger_final() {
 }
 
 
-void  log_getPositionData_adis(ADIS_packet *data) {
-
+static void logg(void *data, size_t len)
+{
 	// Check size of buffer, if big enough, we can send packet
-	if (log_buffer_size + sizeof(ADIS_packet) >= P_LIMIT) {
+	if (log_buffer_size + len >= P_LIMIT) {
 
 		// Send current buffer to disk
 //		printf("\nDumping packet to disk and wifi.\n\n");
@@ -82,14 +82,17 @@ void  log_getPositionData_adis(ADIS_packet *data) {
 		memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
 		log_buffer_size += sizeof(uint32_t);
 
-		
 //		printf("Filling packet: ");
 	}
 
 	// Copy data into packet buffer
-	memcpy(&log_buffer[log_buffer_size], data, sizeof(ADIS_packet));
-	log_buffer_size += sizeof(ADIS_packet);
+	memcpy(log_buffer + log_buffer_size, data, len);
+	log_buffer_size += len;
 //	printf("-");
+}
+
+void log_getPositionData_adis(ADIS_packet *data) {
+	logg(data, sizeof(ADIS_packet));
 }
 
 void log_getPositionData_gps(GPS_packet* data){
