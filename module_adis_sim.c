@@ -81,7 +81,7 @@ void init_profiling() {
 	timerfd_settime(fd, 0, &t, NULL);
 
 	cb = adis_sim_cb;
-	sd = get_send_socket();
+    sd = get_send_from_socket(ADIS_RX_PORT);
 
 	// Add poll
 	fcf_add_fd (fd, POLLIN, cb);

@@ -35,11 +35,11 @@
 
 // MPU1950
 #define MPU_RX_PORT 35002
-#define MPU_RX_ORT_S "35002"
+#define MPU_RX_PORT_S "35002"
 
 // MPL3115A2
-#define MPU_RX_PORT 35010
-#define MPU_RX_PORT_S "35010"
+#define MPL_RX_PORT 35010
+#define MPL_RX_PORT_S "35010"
 
 
 

@@ -108,14 +108,35 @@ int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int de
 	return 0;
 }
 
+int get_send_from_socket(int send_port) {
+	struct sockaddr_in sin = {};
+	socklen_t slen;
+	int sock;
+	short unsigned int port;
+
+	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sin.sin_family = AF_INET;
+	sin.sin_addr.s_addr = htonl(INADDR_ANY);
+	sin.sin_port = htons(send_port);
+
+	bind(sock, (struct sockaddr *)&sin, sizeof(sin));
+	/* Now bound, get the address */
+	//slen = sizeof(sin);
+	//getsockname(sock, (struct sockaddr *)&sin, &slen);
+	//port = ntohs(sin.sin_port);
+
+	return sock;
+}
+
 int get_send_socket(){
-	int sd;
-	
+	int sd, rc;
+	struct sockaddr_in addr;
+
 	sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sd < 0){
 	  perror("socket failure");
 	}
-    
+
 	return sd;
 }
 

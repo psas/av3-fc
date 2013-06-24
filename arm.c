@@ -97,10 +97,10 @@ int arm_init(){
 	init_libusb(aps_name);
 	aps = open_device (aps_name, 0xFFFF, 0x0006);
 
-	int fd = getsocket(ARM_IP, ARM_PORT_S, FC_LISTEN_PORT);
-	int rc = fcf_add_fd(fd, POLLIN, arm_signal_cb);
-	response_fd = get_send_socket();
-	return rc;
+	//int fd = getsocket(ARM_IP, ARM_PORT_S, FC_LISTEN_PORT);
+	//int rc = fcf_add_fd(fd, POLLIN, arm_signal_cb);
+	//response_fd = get_send_socket();
+	return -1;
 }
 void arm_final(){
 	close_device(aps);
