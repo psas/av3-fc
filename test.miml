@@ -31,5 +31,8 @@ messages:
     - RC.rc_getSignalData_rs
     - LOG.log_getSignalData_rs
 
-  ETH.sendADISPacket:                     # - [data, char*]
+  ETH.sendADISPacket:
     - ADIS.adis_getRawData_eth
+
+  ETH.sendARMPacket:
+    - ARM.arm_getArmSignal

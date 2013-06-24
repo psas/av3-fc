@@ -8,6 +8,8 @@ senders:
   sendARMData:
   - [code, char*]
 receivers:
+  arm_getArmSignal:
+  - [buffer, char*]
   arm_getPositionData_adis:
   - [data, ADIS_packet*]
   arm_getPositionData_gps:

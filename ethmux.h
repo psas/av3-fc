@@ -10,8 +10,8 @@
 void ethmux_init();
 void ethmux_final();
 //senders:
-void sendARMData(char*);
-void sendLDData(char*);
+void sendARMPacket(char*);
+void sendLDPacket(char*);
 void sendADISPacket(char*);
 
 #endif /* ETHMUX_H_ */

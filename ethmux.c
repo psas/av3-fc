@@ -21,7 +21,12 @@ void ethmux_cb(struct pollfd *pfd){
 
 	// Filter ports to modules
 	if (port == ADIS_RX_PORT)
-		adis_getRawData_eth(buffer);
+		sendADISPacket(buffer);
+	else if (port == ARM_PORT)
+		sendARMPacket(buffer);
+	else {
+		printf("unrec");
+	}
 
 }
 

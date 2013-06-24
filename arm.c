@@ -46,6 +46,9 @@ static void add_sample(double a)
 		cur = acceleration;
 }
 
+void arm_getArmSignal(char *buffer){
+	printf("\nARMARMARM\n\n\n");
+}
 
 void set_port(int port, uint32_t val){
     int setport = 0x80;
@@ -64,32 +67,6 @@ void set_port(int port, uint32_t val){
     if(usb_err != 4){
         printf("set_port: Didn't send correct number of bytes");
     }
-}
-
-static void arm_signal_cb(struct pollfd *pfd){
-	struct sockaddr_storage sender;
-	socklen_t addrlen = sizeof(sender);
-	const char *response = "You Only Launch Once";
-	int rc = readsocketfrom(pfd->fd, buffer, sizeof(buffer), (struct sockaddr *)&sender, &addrlen);
-	if(rc > 0){
-		// is it the ARM signal?  ("#YOLO")
-		if (memcmp(buffer, "#YOLO", 6) != 0)
-			response = "Unrecognized ARM command!";
-		// is adis OK (-1G)
-		else if (fabs(sum/SAMPLES - 1.0) > 0.001)
-			response = "Accelerometers out of limits!";
-		// is GPS locked?
-		else if (!GPS_locked)
-			response = "GPS not locked!";
-		else {
-			//see aps-host.c in gfe2386/aps/hostside for more functionality
-			set_port(0, (1<<ROCKET_READY_PIN));
-			sendARMData((char *)buffer);
-		}
-		// send response to sender (success or why failed)
-		if (sendto(response_fd, response, strlen(response)+1, 0, (struct sockaddr *)&sender, addrlen) < 0)
-			perror("sendto() response");
-	}
 }
 
 int arm_init(){

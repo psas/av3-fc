@@ -5,10 +5,10 @@ object: ethmux.o
 init: ethmux_init();
 final: ethmux_final();
 senders:
-  sendARMData:
+  sendARMPacket:
   - [data, char*]
   
-  sendLDData:
+  sendLDPacket:
   - [data, char*]
   
   sendADISPacket:
