@@ -11,7 +11,9 @@ receivers:
   arm_getArmSignal:
   - [buffer, unsigned char*]
   - [len, int]
+  
   arm_getPositionData_adis:
   - [data, ADIS_packet*]
+  
   arm_getPositionData_gps:
   - [data, GPS_packet*]

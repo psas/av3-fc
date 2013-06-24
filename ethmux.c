@@ -29,6 +29,9 @@ void ethmux_cb(struct pollfd *pfd){
 		case ARM_PORT:
 			sendARMPacket(buffer, rc);
 			break;
+		case TEATHER_PORT:
+//			sendLDPacket(buffer, rc);
+			break;
 		default:
 			printf("unrec");
 		}

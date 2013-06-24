@@ -1,10 +1,7 @@
 #ifndef FCF_NETADDRS
 #define FCF_NETADDRS
 
-
-/*
-	FLIGHT COMPUTER
-*/
+// FLIGHT COMPUTER
 #ifdef FCF_FC_NETWORK
 #define FC_IP "10.0.0.10"
 #else
@@ -13,10 +10,7 @@
 #define FC_LISTEN_PORT 36000
 #define FC_LISTEN_PORT_S "36000"
 
-
-/*
-	WIFI
-*/
+// WIFI
 #ifdef FCF_FC_NETWORK
 #define WIFI_IP "10.0.20.20" //should this broadcast? -nathan
 #else
@@ -24,7 +18,6 @@
 #endif
 #define WIFI_PORT 35001
 #define WIFI_PORT_S "35001"
-
 
 // Sensor Node
 #define SENSOR_IP "10.0.0.20"
@@ -41,8 +34,6 @@
 #define MPL_RX_PORT 35010
 #define MPL_RX_PORT_S "35010"
 
-
-
 // ROLL
 #define ROLL_IP "10.0.0.30"
 #define ROLL_TX_PORT 35003
@@ -50,10 +41,15 @@
 #define ROLL_RX_PORT 35004
 #define ROLL_RX_PORT_S "35004"
 
+// ROLL TEATHER SIGNAL
+#define TEATHER_PORT 0
+#define TEATHER_PORT_S ""
 
 // ARM SIGNAL
 #define ARM_IP "127.0.0.1"
 #define ARM_PORT 35666
 #define ARM_PORT_S "35666"
+
+
 
 #endif /* FCF_NETADDRS */
