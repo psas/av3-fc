@@ -49,6 +49,25 @@ struct ADIS_packet {
 } __attribute__((packed));
 typedef struct ADIS_packet ADIS_packet;
 
+/*! \typedef
+ * Crescent GPS 1 packet
+ */
+
+struct msg1 {
+        uint8_t         age_of_diff;
+        uint8_t         num_sats;
+        uint16_t        gps_week;
+        double          time_of_week;   // 8 bytes  (but at a 4 byte boundary, so packed)
+        double          latitude;               // degrees
+        double          longitude;
+        float           height;                 // meters
+        float           v_north;                // meters/s
+        float           v_east;
+        float           v_up;
+        float           sd_residuals;   // meters
+        uint16_t        nav_mode;               // 0 no fix, 1 2D fix, 2 3D fix, 3 2D + Diff, 4 3D + Diff, 5 RTK search, 6 3D + Diff + RTK
+        uint16_t        ext_age_of_diff;        // if 0, use age_of_diff
+} __attribute__((packed));
 
 /*! \typedef
  * Crescent GPS 99 packet
@@ -95,10 +114,14 @@ struct msg99 {
 } __attribute__((packed));
 
 struct GPS_packet {
-	char         ID[4];			// "GPS9"
+	char         ID[4];			// "GPSX", "GPS1" or "GP99"
 	uint8_t      timestamp[6];
 	uint16_t     data_length;
-	struct msg99 data;
+	union {
+		char raw[304];
+		struct msg1  gps1;
+		struct msg99 gps99;
+	};
 } __attribute__((packed));
 typedef struct GPS_packet GPS_packet;
 

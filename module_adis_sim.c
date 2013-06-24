@@ -16,7 +16,7 @@
 #include "psas_packet.h"
 
 #ifndef FCF_FAKE_ADIS_DATA_FILE
-#define FCF_FAKE_ADIS_DATA_FILE  "sim_data/test.ADIS.bin"
+#define FCF_FAKE_ADIS_DATA_FILE  "mock_devices/test.ADIS.bin"
 #endif
 
 static int fd = -1;	//!< timer fd

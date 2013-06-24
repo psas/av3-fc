@@ -103,6 +103,8 @@ void arm_getPositionData_adis(ADIS_packet * data){
 }
 void arm_getPositionData_gps(GPS_packet * data){
 	// check for GPS lock
-	GPS_locked = (data->data.nav_mode > 1);   // at least 2D fix
+	if (data->ID[3] == '1') {
+		GPS_locked = (data->gps1.nav_mode == 2);   // 3D fix
+	}
 	return;
 }
