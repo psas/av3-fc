@@ -8,13 +8,26 @@ senders:
   sendARMPacket:
   - [data, unsigned char*]
   - [len, int]
+  - [timestamp, unsigned char*]
   
   sendLDPacket:
   - [data, unsigned char*]
   - [len, int]
+  - [timestamp, unsigned char*]
   
   sendADISPacket:
   - [data, unsigned char*]
   - [len, int]
+  - [timestamp, unsigned char*]
+  
+  sendMPUPacket:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
+  sendMPLPacket:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
   
 receivers:

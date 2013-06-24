@@ -28,9 +28,13 @@ void rc_getPositionData_adis(ADIS_packet * imu){
 }
 
 void rc_getSignalData_arm(char * signal){
-	launch = 1;
+	if(signal[0]){
+		launch = 1;
+	}else{
+		launch = 0;
+	}
 }
 
-void rc_getSignalData_rs(char * signal){
-	launch = 0;
+void rc_getLaunchDetect(unsigned char * signal, int len, unsigned char* timestamp){
+	launch = 1;
 }

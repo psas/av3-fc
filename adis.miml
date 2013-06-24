@@ -2,8 +2,6 @@
 ---
 include: adis.h
 object: adis.o
-init: adis_init();
-final: adis_final();
 
 # Functions that handle outgoing data
 senders:
@@ -15,3 +13,4 @@ receivers:
   adis_getRawData_eth:
   - [buffer, unsigned char*]
   - [len, int]
+  - [timestamp, unsigned char*]

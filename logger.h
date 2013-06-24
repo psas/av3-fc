@@ -3,6 +3,8 @@
 
 #include "psas_packet.h"
 #include "gps.h"
+#include "mpl.h"
+#include "mpu.h"
 #include "rollControlLibrary.h"
 
 void logger_init(void); // [miml:init]
@@ -10,6 +12,8 @@ void logger_final(void); // [miml:final]
 
 extern void log_getPositionData_adis(ADIS_packet *); // [miml:receiver]
 void log_getPositionData_gps(GPS_packet*);
+void log_getData_mpu(MPU_packet*);
+void log_getData_mpl(MPL_packet*);
 void log_getSignalData_arm(char*);
 void log_getPositionData_rc(RollServo_adjustment*);
 void log_getSignalData_rs(char*);

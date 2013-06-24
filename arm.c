@@ -44,7 +44,7 @@ static void add_sample(double a)
 		cur = acceleration;
 }
 
-void arm_getArmSignal(unsigned char *buffer, int len){
+void arm_getArmSignal(unsigned char *buffer, int len, unsigned char * timestamp){
 	printf("\nARMARMARM\n\n\n");
 }
 

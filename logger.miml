@@ -16,6 +16,12 @@ receivers:
   log_getPositionData_gps:
   - [data, GPS_packet*]
   
+  log_getData_mpu:
+  - [data, MPU_packet*]
+  
+  log_getData_mpl:
+  - [data, MPL_packet*]
+  
   log_getSignalData_arm:
   - [code, char*]
   

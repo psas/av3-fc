@@ -7,6 +7,8 @@ sources:
   - [RC, rollcontrol.miml]              # Roll Control Code Module
   - [RS, rollservo.miml]                # Roll Servo Control Interface
   - [ETH, ethmux.miml]                  # Central Ethernet receiver
+  - [MPU, mpu.miml]                     # MPU module
+  - [MPL, mpl.miml]                     # MPL module
 
   
 messages:
@@ -28,7 +30,6 @@ messages:
     - LOG.log_getPositionData_rc
 
   RS.sendRollServoData:                 # - [code, char*]
-    - RC.rc_getSignalData_rs
     - LOG.log_getSignalData_rs
 
   ETH.sendADISPacket:
@@ -36,3 +37,21 @@ messages:
 
   ETH.sendARMPacket:
     - ARM.arm_getArmSignal
+    
+  ETH.sendLDPacket:
+    - RC.rc_getLaunchDetect
+
+  ETH.sendMPUPacket:
+    - MPU.mpu_getRawData_eth
+
+  ETH.sendMPLPacket:
+    - MPL.mpl_getRawData_eth
+
+  MPU.sendMPUData:
+    - LOG.log_getData_mpu
+
+  MPL.sendMPLData:
+    - LOG.log_getData_mpl
+    
+    
+    

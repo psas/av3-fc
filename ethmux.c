@@ -19,18 +19,25 @@ void ethmux_cb(struct pollfd *pfd){
 	socklen_t len = sizeof(packet_info);
 	int rc = readsocketfrom(pfd->fd, buffer, sizeof(buffer), (struct sockaddr *)&packet_info, &len);
 	int port = ntohs(packet_info.sin_port);
-
+	// TODO: make timestamp
+	unsigned char timestamp[6] = {0,0,0,0,0,0};
 	// Filter ports to modules
 	if(rc > 0){
 		switch(port){
 		case ADIS_RX_PORT:
-			sendADISPacket(buffer, rc);
+			sendADISPacket(buffer, rc, timestamp);
 			break;
 		case ARM_PORT:
-			sendARMPacket(buffer, rc);
+			sendARMPacket(buffer, rc, timestamp);
 			break;
 		case TEATHER_PORT:
-//			sendLDPacket(buffer, rc);
+			sendLDPacket(buffer, rc, timestamp);
+			break;
+		case MPU_RX_PORT:
+			sendMPUPacket(buffer, rc, timestamp);
+			break;
+		case MPL_RX_PORT:
+			sendMPLPacket(buffer, rc, timestamp);
 			break;
 		default:
 			printf("unrec");

@@ -4,13 +4,16 @@ include: arm.h
 object: arm.o
 init: arm_init();
 final: arm_final();
+
 senders:
   sendARMData:
   - [code, char*]
+  
 receivers:
   arm_getArmSignal:
   - [buffer, unsigned char*]
   - [len, int]
+  - [timestamp, unsigned char*]
   
   arm_getPositionData_adis:
   - [data, ADIS_packet*]

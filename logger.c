@@ -95,6 +95,14 @@ void  log_getPositionData_adis(ADIS_packet *data) {
 void log_getPositionData_gps(GPS_packet* data){
 	return;
 }
+
+void log_getData_mpu(MPU_packet* data){
+
+}
+void log_getData_mpl(MPL_packet* data){
+
+}
+
 void log_getSignalData_arm(char* code){
 	printf("%s", code);
 }

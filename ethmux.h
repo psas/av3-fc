@@ -10,8 +10,10 @@
 int ethmux_init();
 void ethmux_final();
 //senders:
-void sendARMPacket(unsigned char*, int len);
-void sendLDPacket(unsigned char*, int len);
-void sendADISPacket(unsigned char*, int len);
+void sendARMPacket(unsigned char*, int, unsigned char*);
+void sendLDPacket(unsigned char*, int, unsigned char*);
+void sendADISPacket(unsigned char*, int, unsigned char*);
+void sendMPUPacket(unsigned char*, int, unsigned char*);
+void sendMPLPacket(unsigned char*, int, unsigned char*);
 
 #endif /* ETHMUX_H_ */

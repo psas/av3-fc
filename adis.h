@@ -1,14 +1,14 @@
 /*
- * virtdevsrv.h
+ * adis.h
  *
- *  Created on: Jan 26, 2013
  */
 
-#ifndef VIRTDEVSRV_H_
-#define VIRTDEVSRV_H_
+#ifndef ADIS_H_
+#define ADIS_H_
 #include "psas_packet.h"
-extern void adis_init(void); // [miml:init]
-extern void adis_final(void); // [miml:final]
-extern void sendADISData(ADIS_packet *); // [miml:sender]
-extern void adis_getRawData_eth(unsigned char *, int len); // [miml:reciever]
-#endif /* VIRTDEVSRV_H_ */
+
+extern void sendADISData(ADIS_packet*); // [miml:sender]
+
+extern void adis_getRawData_eth(unsigned char*, int, unsigned char*); // [miml:reciever]
+
+#endif /* ADIS_H_ */
