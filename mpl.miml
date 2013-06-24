@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+include: mpl.h
+object: mpl.o
+
+# Functions that handle outgoing data
+senders:
+  sendMPLData:
+  - [data, MPL_packet*]
+
+# Functions that handle incoming data
+receivers:
+  mpl_getRawData_eth:
+  - [buffer, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]

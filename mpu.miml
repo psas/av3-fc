@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+include: mpu.h
+object: mpu.o
+
+# Functions that handle outgoing data
+senders:
+  sendMPUData:
+  - [data, MPU_packet*]
+
+# Functions that handle incoming data
+receivers:
+  mpu_getRawData_eth:
+  - [buffer, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
