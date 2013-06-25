@@ -63,6 +63,9 @@ static void flush_log()
 {
 	// Send current buffer to disk
 //	printf("\nDumping packet to disk and wifi.\n\n");
+	// for the log file, convert the sequence number to a SEQN message
+	packet_header header = { .ID="SEQN", .timestamp={0,0,0,0,0,0}, .data_length=htons(4) };
+	fwrite(&header, 1, sizeof(packet_header), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 
 	// Send current buffer to WiFi
