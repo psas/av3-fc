@@ -105,7 +105,7 @@ static void log_message(char *msg)
 
 	message_header header = { .ID = "MESG", .timestamp = {0,0,0,0,0,0}, .data_length=htons(len) };
 	logg(&header, sizeof(message_header));
-	logg(&msg, len);
+	logg(msg, len);
 }
 
 void log_receive_adis(ADISMessage *data) {
@@ -130,7 +130,8 @@ void log_receive_mpl(MPLMessage* data){
 }
 
 void log_receive_arm(char* code){
-	log_message(code);
+	// single byte: arm if nonzero
+	log_message(code[0] ? "ARM" : "DISARM");
 }
 void log_receive_rc(RollServoMessage* data){
 	data->data_length = htons(data->data_length);
