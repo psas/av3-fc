@@ -16,4 +16,5 @@ ROLL_RX_PORT    = 35003
 
 # Messages:
 RC_Servo_Message = struct.Struct('>HB')
+ADIS_Header = struct.Struct('!4sHLH')
 ADIS_Message = struct.Struct('<12H')

@@ -25,9 +25,12 @@ class SensorDevice(object):
             randint(0,65535),   # Temperature output
             randint(0,65535),   # Auxiliary ADC measurement
         )
-        packet = config.ADIS_Message.pack(*values)
+ 
+        packet  = config.ADIS_Header.pack('ADIS', 0, 0, config.ADIS_Message.size)
+        packet += config.ADIS_Message.pack(*values)
+
         self.ADISsocket.sendto(packet, (config.FC_IP, config.FC_LISTEN_PORT))
-        time.sleep(0.1)
+        time.sleep(0.01)
 
     def close(self):
         self.ADISsocket.close()
