@@ -5,7 +5,6 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <arpa/inet.h>
 #include "mpu.h"
 
 void mpu_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {

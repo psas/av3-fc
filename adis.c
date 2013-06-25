@@ -3,7 +3,6 @@
  */
 #include <string.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 #include "adis.h"
 
 void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
