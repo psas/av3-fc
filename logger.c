@@ -131,6 +131,7 @@ void log_getPositionData_rc(RollServo_adjustment* data){
 	logg(data, sizeof(RollServo_adjustment));
 }
 void log_getSignalData_rs(char* code){
-	log_message(code);
+	//TODO: revisit when these three bytes are converted into a RollServo_packet
+	return;
 }
 
