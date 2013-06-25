@@ -2,13 +2,13 @@
 #define ROLLCONTROL_H_
 
 #include "adis.h"
-#include "rollControlLibrary.h"
 
 typedef struct{
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	RC_OUTPUT_STRUCT_TYPE roll_adj;
+	uint16_t u16ServoPulseWidthBin14;
+	uint8_t u8ServoDisableFlag;
 }__attribute__((packed)) RollServoMessage;
 
 void rollcontrol_init(void); // [miml:init]

@@ -109,18 +109,23 @@ static void log_message(char *msg)
 }
 
 void log_receive_adis(ADISMessage *data) {
+	data->data_length = htons(data->data_length);
 	logg(data, sizeof(ADISMessage));
 }
 
 void log_receive_gps(GPSMessage* data){
+	uint16_t len = data->data_length;
+	data->data_length = htons(data->data_length);
 	// different GPS packets have different lengths
-	logg(data, sizeof(message_header) + htons(data->data_length));
+	logg(data, sizeof(message_header) + len);
 }
 
 void log_receive_mpu(MPUMessage* data){
+	data->data_length = htons(data->data_length);
 	logg(data, sizeof(MPUMessage));
 }
 void log_receive_mpl(MPLMessage* data){
+	data->data_length = htons(data->data_length);
 	logg(data, sizeof(MPLMessage));
 }
 
@@ -128,6 +133,7 @@ void log_receive_arm(char* code){
 	log_message(code);
 }
 void log_receive_rc(RollServoMessage* data){
+	data->data_length = htons(data->data_length);
 	logg(data, sizeof(RollServoMessage));
 }
 

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "rollcontrol.h"
+#include "rollControlLibrary.h"
 
 static bool launch;
 
@@ -19,9 +20,14 @@ void rc_receive_imu(ADISMessage * imu){
 	output.u8ServoDisableFlag=0;
 	output.u16ServoPulseWidthBin14 = imu->data.adis_zgyro_out;
 
-	RollServoMessage out;
-	out.roll_adj.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14;
-	out.roll_adj.u8ServoDisableFlag = output.u8ServoDisableFlag;
+	RollServoMessage out = {
+			.ID = {"ROLL"},
+			.timestamp = {0,0,0,0,0,0},
+			.data_length = 3,
+			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
+			.u8ServoDisableFlag = output.u8ServoDisableFlag,
+	};
+
 	rc_send_servo(&out);
 }
 
