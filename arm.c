@@ -48,6 +48,7 @@ static double raw2g(uint16_t raw)
 	return d * 0.00333;
 }
 
+/*
 static void set_port(int port, uint32_t val){
     int setport = 0x80;
     unsigned char data[64];
@@ -66,7 +67,7 @@ static void set_port(int port, uint32_t val){
         printf("set_port: Didn't send correct number of bytes");
     }
 }
-
+*/
 void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 	printf("\nARMARMARM\n\n\n");
 }

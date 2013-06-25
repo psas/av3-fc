@@ -3,6 +3,7 @@
  *
  */
 #include <unistd.h>
+#include <stdio.h>
 #include <netinet/in.h>
 #include "utils_sockets.h"
 #include "fcfutils.h"
@@ -12,13 +13,13 @@
 static unsigned char buffer[1024];
 
 void demux(struct pollfd *pfd){
+
 	struct sockaddr_in packet_info;
 	socklen_t len = sizeof(packet_info);
 	int bytes = readsocketfrom(pfd->fd, buffer, sizeof(buffer), (struct sockaddr *)&packet_info, &len);
 	int port = ntohs(packet_info.sin_port);
 	// TODO: make timestamp
 	unsigned char timestamp[6] = {0,0,0,0,0,0};
-
 	if(bytes > 0){
 		switch(port){
 		case ADIS_RX_PORT:
