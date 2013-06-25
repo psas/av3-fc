@@ -3,20 +3,19 @@
 include: rollcontrol.h
 object: rollcontrol.o
 init: rollcontrol_init();
-final: rollcontrol_final();
 
 senders:
-  sendRollControlData:
-  - [data, RollServo_adjustment*]
+  rc_send_servo:
+  - [data, RollServoMessage*]
   
 receivers:
-  rc_getPositionData_adis:
-  - [data, ADIS_packet*]
+  rc_receive_imu:
+  - [data, ADISMessage*]
   
-  rc_getSignalData_arm:
+  rc_receive_arm:
   - [code, char*]
   
-  rc_getLaunchDetect:
+  rc_raw_ld_in:
   - [code, unsigned char*]
   - [len, int]
   - [timestamp, unsigned char*]

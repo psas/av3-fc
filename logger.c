@@ -9,7 +9,7 @@
 #include <inttypes.h>
 #include <time.h>
 #include <arpa/inet.h>
-#include "adis.h"
+#include "psas_packet.h"
 #include "logger.h"
 #include "utils_sockets.h"
 #include "net_addrs.h"
@@ -64,8 +64,8 @@ static void flush_log()
 	// Send current buffer to disk
 //	printf("\nDumping packet to disk and wifi.\n\n");
 	// for the log file, convert the sequence number to a SEQN message
-	packet_header header = { .ID="SEQN", .timestamp={0,0,0,0,0,0}, .data_length=htons(4) };
-	fwrite(&header, 1, sizeof(packet_header), fp);
+	message_header header = { .ID="SEQN", .timestamp={0,0,0,0,0,0}, .data_length=htons(4) };
+	fwrite(&header, 1, sizeof(message_header), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 
 	// Send current buffer to WiFi
@@ -100,38 +100,34 @@ static void logg(void *data, size_t len)
 static void log_message(char *msg)
 {
 	int len = strlen(msg);
-	if (log_buffer_size + sizeof(packet_header) + len > P_LIMIT)
+	if (log_buffer_size + sizeof(message_header) + len > P_LIMIT)
 		flush_log();
 
-	packet_header header = { .ID = "MESG", .timestamp = {0,0,0,0,0,0}, .data_length=htons(len) };
-	logg(&header, sizeof(packet_header));
+	message_header header = { .ID = "MESG", .timestamp = {0,0,0,0,0,0}, .data_length=htons(len) };
+	logg(&header, sizeof(message_header));
 	logg(&msg, len);
 }
 
-void log_getPositionData_adis(ADIS_packet *data) {
-	logg(data, sizeof(ADIS_packet));
+void log_receive_adis(ADISMessage *data) {
+	logg(data, sizeof(ADISMessage));
 }
 
-void log_getPositionData_gps(GPS_packet* data){
+void log_receive_gps(GPSMessage* data){
 	// different GPS packets have different lengths
-	logg(data, sizeof(packet_header) + htons(data->data_length));
+	logg(data, sizeof(message_header) + htons(data->data_length));
 }
 
-void log_getData_mpu(MPU_packet* data){
-	logg(data, sizeof(MPU_packet));
+void log_receive_mpu(MPUMessage* data){
+	logg(data, sizeof(MPUMessage));
 }
-void log_getData_mpl(MPL_packet* data){
-	logg(data, sizeof(MPL_packet));
+void log_receive_mpl(MPLMessage* data){
+	logg(data, sizeof(MPLMessage));
 }
 
-void log_getSignalData_arm(char* code){
+void log_receive_arm(char* code){
 	log_message(code);
 }
-void log_getPositionData_rc(RollServo_adjustment* data){
-	logg(data, sizeof(RollServo_adjustment));
-}
-void log_getSignalData_rs(char* code){
-	//TODO: revisit when these three bytes are converted into a RollServo_packet
-	return;
+void log_receive_rc(RollServoMessage* data){
+	logg(data, sizeof(RollServoMessage));
 }
 

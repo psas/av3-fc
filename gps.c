@@ -1,8 +1,6 @@
 /*
  * gps.c
  *
- *  Created on: Jun 22, 2013
- *      Author: theo
  */
 
 #include <stdlib.h>
@@ -14,11 +12,9 @@
 #include <sys/poll.h>
 
 #include "fcfutils.h"
-#include "psas_packet.h"
 #include "gps.h"
 
 // cf 7.1  Crescent Integrators Manual
-
 struct msg {
 	char 		magic[4];		// "$BIN"
 	uint16_t	type;			//  1,  2, 80, 93-99
@@ -35,10 +31,10 @@ struct msg {
 static int handle_msg(const char *id, const void *data, uint16_t len)
 {
 	// TODO: real timestamp
-	GPS_packet p = { .timestamp={0,0,0,0,0,0}, .data_length=htons(len) };
+	GPSMessage p = { .timestamp={0,0,0,0,0,0}, .data_length=htons(len) };
 	memcpy(&p.ID, id, 4);
 	memcpy(&p.raw, data, len);
-	sendGPSData(&p);
+	gps_data_out(&p);
 	return 0;
 }
 
@@ -117,12 +113,12 @@ static int get_packet(struct msg *m)
 	return 0;
 }
 
-int fd;
+
 static void data_callback(struct pollfd *pfd){
 	int act_len;
 	struct msg m;
 
-	act_len = read(fd, end, end-buffer+sizeof(buffer));
+	act_len = read(pfd->fd, end, end-buffer+sizeof(buffer));
 	if (act_len <= 0) {
 		perror("read from GPS device failed");
 		return;
@@ -133,14 +129,15 @@ static void data_callback(struct pollfd *pfd){
 		handle_packet(&m);
 }
 
-void gps_init() {
-	fd = open("/dev/ttyusb0", O_RDONLY);
+int fd;
+void gps_init(void) {
+	fd = open("/dev/ttyUSB0", O_RDONLY);
 	if (fd < 0)
 		perror("Can't open GPS device");
 	else
 		fcf_add_fd(fd, POLLIN, data_callback);
 }
 
-void gps_final() {
+void gps_final(void) {
 	close(fd);
 }

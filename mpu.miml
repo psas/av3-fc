@@ -5,12 +5,12 @@ object: mpu.o
 
 # Functions that handle outgoing data
 senders:
-  sendMPUData:
-  - [data, MPU_packet*]
+  mpu_data_out:
+  - [data, MPUMessage*]
 
 # Functions that handle incoming data
 receivers:
-  mpu_getRawData_eth:
+  mpu_raw_in:
   - [buffer, unsigned char*]
   - [len, int]
   - [timestamp, unsigned char*]

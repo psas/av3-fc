@@ -6,17 +6,17 @@ init: arm_init();
 final: arm_final();
 
 senders:
-  sendARMData:
+  arm_send_signal:
   - [code, char*]
   
 receivers:
-  arm_getArmSignal:
+  arm_raw_in:
   - [buffer, unsigned char*]
   - [len, int]
   - [timestamp, unsigned char*]
   
-  arm_getPositionData_adis:
-  - [data, ADIS_packet*]
+  arm_receive_imu:
+  - [data, ADISMessage*]
   
-  arm_getPositionData_gps:
-  - [data, GPS_packet*]
+  arm_receive_gps:
+  - [data, GPSMessage*]

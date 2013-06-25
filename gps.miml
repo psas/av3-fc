@@ -4,6 +4,7 @@ include: gps.h
 object: gps.o
 init: gps_init();
 final: gps_final();
+
 senders:
-  sendGPSData:
-  - [data, GPS_packet*]
+  gps_data_out:
+  - [data, GPSMessage*]

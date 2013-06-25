@@ -4,9 +4,7 @@ include: rollservo.h
 object: rollservo.o
 init: rollservo_init();
 final: rollservo_final();
-senders:
-  sendRollServoData:
-  - [code, char*]
+
 receivers:
-  rs_getPositionData_rc:
-  - [data, RollServo_adjustment*]
+  rs_receive_adj:
+  - [data, RollServoMessage*]

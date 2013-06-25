@@ -3,14 +3,12 @@
 include: adis.h
 object: adis.o
 
-# Functions that handle outgoing data
 senders:
-  sendADISData:
-  - [data, ADIS_packet*]
+  adis_data_out:
+  - [data, ADISMessage*]
 
-# Functions that handle incoming data
 receivers:
-  adis_getRawData_eth:
+  adis_raw_in:
   - [buffer, unsigned char*]
   - [len, int]
   - [timestamp, unsigned char*]

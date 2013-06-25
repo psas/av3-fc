@@ -1,21 +1,21 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
-#include "psas_packet.h"
+#include "adis.h"
 #include "gps.h"
 #include "mpl.h"
 #include "mpu.h"
-#include "rollControlLibrary.h"
+#include "rollcontrol.h"
 
 void logger_init(void); // [miml:init]
 void logger_final(void); // [miml:final]
 
-extern void log_getPositionData_adis(ADIS_packet *); // [miml:receiver]
-void log_getPositionData_gps(GPS_packet*);
-void log_getData_mpu(MPU_packet*);
-void log_getData_mpl(MPL_packet*);
-void log_getSignalData_arm(char*);
-void log_getPositionData_rc(RollServo_adjustment*);
-void log_getSignalData_rs(char*);
+extern void log_receive_adis(ADISMessage *); // [miml:receiver]
+extern void log_receive_gps(GPSMessage*);
+extern void log_receive_mpu(MPUMessage*);
+extern void log_receive_mpl(MPLMessage*);
+extern void log_receive_rc(RollServoMessage*);
+extern void log_receive_arm(char*);
+
 
 #endif

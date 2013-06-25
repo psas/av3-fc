@@ -11,46 +11,45 @@ sources:
 
   
 messages:
-  ADIS.sendADISData:                    # - [data, ADIS_packet*]
-    - ARM.arm_getPositionData_adis
-    - RC.rc_getPositionData_adis
-    - LOG.log_getPositionData_adis
+  ETH.demuxed_ADIS:
+    - ADIS.adis_raw_in
 
-  GPS.sendGPSData:                      # - [data, GPS_packet*]
-    - ARM.arm_getPositionData_gps
-    - LOG.log_getPositionData_gps
-
-  ARM.sendARMData:                      # - [code, char*]
-    - RC.rc_getSignalData_arm
-    - LOG.log_getSignalData_arm
-
-  RC.sendRollControlData:               # - [data, RollServo_adjustment*]
-    - RS.rs_getPositionData_rc
-    - LOG.log_getPositionData_rc
-
-  RS.sendRollServoData:                 # - [code, char*]
-    - LOG.log_getSignalData_rs
-
-  ETH.sendADISPacket:
-    - ADIS.adis_getRawData_eth
-
-  ETH.sendARMPacket:
-    - ARM.arm_getArmSignal
+  ETH.demuxed_ARM:
+    - ARM.arm_raw_in
     
-  ETH.sendLDPacket:
-    - RC.rc_getLaunchDetect
+  ETH.demuxed_LD:
+    - RC.rc_raw_ld_in
 
-  ETH.sendMPUPacket:
-    - MPU.mpu_getRawData_eth
+  ETH.demuxed_MPU:
+    - MPU.mpu_raw_in
 
-  ETH.sendMPLPacket:
-    - MPL.mpl_getRawData_eth
+  ETH.demuxed_MPL:
+    - MPL.mpl_raw_in
 
-  MPU.sendMPUData:
-    - LOG.log_getData_mpu
+  ADIS.adis_data_out:                    # - [data, ADIS_packet*]
+    - ARM.arm_receive_imu
+    - RC.rc_receive_imu
+    - LOG.log_receive_adis
 
-  MPL.sendMPLData:
-    - LOG.log_getData_mpl
+  GPS.gps_data_out:                      # - [data, GPS_packet*]
+    - ARM.arm_receive_gps
+    - LOG.log_receive_gps
+
+  ARM.arm_send_signal:                      # - [code, char*]
+    - RC.rc_receive_arm
+    - LOG.log_receive_arm
+
+  RC.rc_send_servo:               # - [data, RollServo_adjustment*]
+    - RS.rs_receive_adj
+    - LOG.log_receive_rc
+
+  MPU.mpu_data_out:
+    - LOG.log_receive_mpu
+
+  MPL.mpl_data_out:
+    - LOG.log_receive_mpl
+
+
     
     
     

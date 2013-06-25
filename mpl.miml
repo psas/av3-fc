@@ -3,14 +3,12 @@
 include: mpl.h
 object: mpl.o
 
-# Functions that handle outgoing data
 senders:
-  sendMPLData:
-  - [data, MPL_packet*]
+  mpl_data_out:
+  - [data, MPLMessage*]
 
-# Functions that handle incoming data
 receivers:
-  mpl_getRawData_eth:
+  mpl_raw_in:
   - [buffer, unsigned char*]
   - [len, int]
   - [timestamp, unsigned char*]
