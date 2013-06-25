@@ -96,23 +96,24 @@ void log_getPositionData_adis(ADIS_packet *data) {
 }
 
 void log_getPositionData_gps(GPS_packet* data){
-	return;
+	// different GPS packets have different lengths
+	logg(data, sizeof(packet_header) + htons(data->data_length));
 }
 
 void log_getData_mpu(MPU_packet* data){
-
+	logg(data, sizeof(MPU_packet));
 }
 void log_getData_mpl(MPL_packet* data){
-
+	logg(data, sizeof(MPL_packet));
 }
 
 void log_getSignalData_arm(char* code){
 	printf("%s", code);
 }
 void log_getPositionData_rc(RollServo_adjustment* data){
-	return;
+	logg(data, sizeof(RollServo_adjustment));
 }
 void log_getSignalData_rs(char* code){
-	return;
+	printf("%s", code);
 }
 
