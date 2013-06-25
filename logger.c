@@ -59,36 +59,50 @@ void logger_final() {
 }
 
 
+static void flush_log()
+{
+	// Send current buffer to disk
+//	printf("\nDumping packet to disk and wifi.\n\n");
+	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
+
+	// Send current buffer to WiFi
+	sendto_socket(sd, log_buffer, log_buffer_size, WIFI_IP, WIFI_PORT);
+
+	// Reset buffer size
+	log_buffer_size = 0;
+
+	// Increment sequence number
+	sequence++;
+
+	// Write sequence number to head of next packet
+	uint32_t s  = htonl(sequence);
+	memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
+	log_buffer_size += sizeof(uint32_t);
+
+//	printf("Filling packet: ");
+}
+
 static void logg(void *data, size_t len)
 {
 	// Check size of buffer, if big enough, we can send packet
-	if (log_buffer_size + len >= P_LIMIT) {
-
-		// Send current buffer to disk
-//		printf("\nDumping packet to disk and wifi.\n\n");
-		fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
-
-		// Send current buffer to WiFi
-		sendto_socket(sd, log_buffer, log_buffer_size, WIFI_IP, WIFI_PORT);
-
-		// Reset buffer size
-		log_buffer_size = 0;
-
-		// Increment sequence number
-		sequence++;
-
-		// Write sequence number to head of next packet
-		uint32_t s  = htonl(sequence);
-		memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
-		log_buffer_size += sizeof(uint32_t);
-
-//		printf("Filling packet: ");
-	}
+	if (log_buffer_size + len >= P_LIMIT)
+		flush_log();
 
 	// Copy data into packet buffer
 	memcpy(log_buffer + log_buffer_size, data, len);
 	log_buffer_size += len;
 //	printf("-");
+}
+
+static void log_message(char *msg)
+{
+	int len = strlen(msg);
+	if (log_buffer_size + sizeof(packet_header) + len > P_LIMIT)
+		flush_log();
+
+	packet_header header = { .ID = "MESG", .timestamp = {0,0,0,0,0,0}, .data_length=htons(len) };
+	logg(&header, sizeof(packet_header));
+	logg(&msg, len);
 }
 
 void log_getPositionData_adis(ADIS_packet *data) {
@@ -108,12 +122,12 @@ void log_getData_mpl(MPL_packet* data){
 }
 
 void log_getSignalData_arm(char* code){
-	printf("%s", code);
+	log_message(code);
 }
 void log_getPositionData_rc(RollServo_adjustment* data){
 	logg(data, sizeof(RollServo_adjustment));
 }
 void log_getSignalData_rs(char* code){
-	printf("%s", code);
+	log_message(code);
 }
 
