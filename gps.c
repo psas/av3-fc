@@ -73,7 +73,7 @@ static uint16_t sum(uint8_t *packet, int len)
 	return s;
 }
 
-// return 0 if could parse a good packet out of the data within [buffer-end)
+// return 1 if could parse a good packet out of the data within [buffer-end)
 static int get_packet(struct msg *m)
 {
 	unsigned char *p = buffer;
@@ -92,7 +92,7 @@ static int get_packet(struct msg *m)
 			p += 4;
 			continue;
 		}
-		if (8 + m->len + 4 < end - p) {
+		if (8 + m->len + 4 > end - p) {
 			// incomplete, need more data
 			return 0;
 		}
@@ -115,10 +115,10 @@ static int get_packet(struct msg *m)
 
 
 static void data_callback(struct pollfd *pfd){
-	int act_len;
+	int act_len = sizeof(buffer) - (end-buffer);
 	struct msg m;
 
-	act_len = read(pfd->fd, end, end-buffer+sizeof(buffer));
+	act_len = read(pfd->fd, end, act_len);
 	if (act_len <= 0) {
 		perror("read from GPS device failed");
 		return;
