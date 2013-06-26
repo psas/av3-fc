@@ -18,6 +18,11 @@
  *  32/33 = TEMP - 12bit
 */
 
+int16_t fix_complement(uint16_t value, int bits) {
+	int distance = 16 - bits;
+	return ((int16_t)value << distance) >> distance;
+}
+
 void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 	if(len == sizeof(ADISMessage)){
 		// Build message header
@@ -29,18 +34,25 @@ void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 				.data_length=buffer[10] << 8 | buffer[11]
 		};
 		// Copy in data from socket
-		unsigned char* data_section = &(buffer[12]);
-		memcpy(&packet.data, data_section, sizeof(ADIS16405BurstData));
-
+		packet.data.adis_supply_out = buffer[12] << 8 | buffer[13];
+		packet.data.adis_xgyro_out = fix_complement(buffer[14] << 8 | buffer[15], 14);
+		packet.data.adis_ygyro_out = fix_complement(buffer[16] << 8 | buffer[17], 14);
+		packet.data.adis_zgyro_out = fix_complement(buffer[18] << 8 | buffer[19], 14);
+		packet.data.adis_xaccl_out = fix_complement(buffer[20] << 8 | buffer[21], 14);
+		packet.data.adis_yaccl_out = fix_complement(buffer[22] << 8 | buffer[23], 14);
+		packet.data.adis_zaccl_out = fix_complement(buffer[24] << 8 | buffer[25], 14);
+		packet.data.adis_xmagn_out = fix_complement(buffer[26] << 8 | buffer[27], 14);
+		packet.data.adis_ymagn_out = fix_complement(buffer[28] << 8 | buffer[29], 14);
+		packet.data.adis_zmagn_out = fix_complement(buffer[30] << 8 | buffer[31], 14);
+		packet.data.adis_temp_out = fix_complement(buffer[32] << 8 | buffer[33], 12);
+		packet.data.adis_aux_adc = buffer[34] << 8 | buffer[35];
+//		unsigned char* data_section = &(buffer[12]);
+//		memcpy(&packet.data, data_section, sizeof(ADIS16405BurstData));
+//		printf("%d, %d, %d\n", packet.data.adis_xgyro_out, packet.data.adis_xaccl_out, packet.data.adis_temp_out);
 		// Send data out
 		adis_data_out(&packet);
 	}
 	//TODO: else log error?
 }
-/*
-void complement_shift(uint8_t **start, int len) {
-  int distance = 16 - len;
-  uint8_t high = start;
-  uint8_t low = start+1;
-  start+1 = (high << 2) >> 2
-}*/
+
+
