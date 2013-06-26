@@ -95,11 +95,10 @@ void arm_receive_gps(GPSMessage * data){
 	return;
 }
 
-int arm_init(void){
+void arm_init(void){
 	char aps_name[] = "aps";
 	init_libusb(aps_name);
 	aps = open_device (aps_name, 0xFFFF, 0x0006);
-	return -1;
 }
 void arm_final(void){
 	close_device(aps);

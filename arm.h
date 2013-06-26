@@ -9,7 +9,7 @@
 #include "gps.h"
 #include "adis.h"
 
-int arm_init(void);
+void arm_init(void);
 void arm_final(void);
 
 void arm_receive_imu(ADISMessage*);
