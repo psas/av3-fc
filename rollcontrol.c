@@ -21,7 +21,7 @@ static uint16_t scale_gyro(int16_t gyr){
 	return (uint16_t)(((double)-gyr)*scale + shift);
 }
 
-static void step(){
+static void step(struct pollfd * fd){
 	RC_INPUT_STRUCT_TYPE input;
 	RC_OUTPUT_STRUCT_TYPE output;
 
@@ -38,7 +38,7 @@ static void step(){
 			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
 			.u8ServoDisableFlag = output.u8ServoDisableFlag,
 	};
-
+	printf("%d\n", output.u16ServoPulseWidthBin14);
 	rc_send_servo(&out);
 }
 
@@ -51,8 +51,8 @@ void rollcontrol_init(void){
 	struct itimerspec  newval;
 	newval.it_interval.tv_sec = 0;
 	newval.it_interval.tv_nsec = 1000000; //1 ms
-	newval.it_value.tv_sec = 60*60*24*7; // TODO: re-add a new tfd when this finally expires
-	newval.it_value.tv_nsec = 0;
+	newval.it_value.tv_sec = 0;
+	newval.it_value.tv_nsec = 1000000;
 	timerfd_settime(tfd, 0, &newval, NULL);
 	fcf_add_fd(tfd, POLLIN, step);
 }
