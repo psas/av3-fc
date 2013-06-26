@@ -7,7 +7,7 @@ OPTS     := -ffast-math
 #WARNINGS := -Werror -Wall -Wextra -Wmissing-prototypes -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
 WARNINGS := -Wall
 CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(shell pkg-config --cflags libusb-1.0)
-LDLIBS   := -lrt -lm $(shell pkg-config --libs libusb-1.0) -L . -lrollControlLibrary
+LDLIBS   := -lrt -lm $(shell pkg-config --libs libusb-1.0) -L . -lrc_library
 .DEFAULT_GOAL := all
 DOXYFILE := ./Doxyfile
 # Took out libusb object since it was causing error.
