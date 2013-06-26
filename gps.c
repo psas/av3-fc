@@ -45,12 +45,12 @@ static int handle_packet(struct msg *m)
 	case 1:
 		if (m->len == sizeof(struct msg1))
 			return handle_msg("GPS1", &m->m1, m->len);
-		fprintf(stderr, "bad length %u != %lu\n", m->len, sizeof(struct msg1));
+		fprintf(stderr, "GPS bad length %u != %lu\n", m->len, sizeof(struct msg1));
 		return -3;
 	case 99:
 		if (m->len == sizeof(struct msg99))
 			return handle_msg("GP99", &m->m99, m->len);
-		fprintf(stderr, "bad length %u != %lu\n", m->len, sizeof(struct msg99));
+		fprintf(stderr, "GPS bad length %u != %lu\n", m->len, sizeof(struct msg99));
 		return -3;
 	case 2:
 	case 80:
@@ -58,7 +58,7 @@ static int handle_packet(struct msg *m)
 		// log all GPS packets for groundside analysis
 		return handle_msg("GPSX", &m->raw, m->len);
 	default:
-		fprintf(stderr, "unknown GPS packet type: %u length %u\n", m->type, m->len);
+		fprintf(stderr, "GPS unknown packet type: %u length %u\n", m->type, m->len);
 		return -4;
 	}
 }
@@ -88,7 +88,7 @@ static int get_packet(struct msg *m)
 		}
 		memcpy(m, p, 8);
 		if (m->type > 99 || m->len > 304) {
-			fprintf(stderr, "bad header\n");
+			fprintf(stderr, "GPS bad header: type %u len %u\n", m->type, m->len);
 			p += 4;
 			continue;
 		}
@@ -106,7 +106,8 @@ static int get_packet(struct msg *m)
 			end = buffer + (end - p);
 			return 1;
 		}
-		fprintf(stderr, "bad checksum %u (expected %u)\n", sum(p + 8, m->len), checksum);
+		fprintf(stderr, "GPS(%u:%u) bad checksum %u (expected %u)\n",
+			m->type, m->len, sum(p + 8, m->len), checksum);
 		p += 4;
 	}
 	end = buffer;
@@ -120,7 +121,7 @@ static void data_callback(struct pollfd *pfd){
 
 	act_len = read(pfd->fd, end, act_len);
 	if (act_len <= 0) {
-		perror("read from GPS device failed");
+		perror("GPS read failed");
 		return;
 	}
 	end += act_len;
@@ -134,7 +135,7 @@ void gps_init(void) {
 	struct termios attrib;
 	fd = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY);
 	if (fd < 0) {
-		perror("Can't open GPS device");
+		perror("GPS can't open device");
 		return;
 	}
         tcgetattr(fd, &attrib);
