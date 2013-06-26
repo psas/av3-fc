@@ -151,6 +151,6 @@ while(1):
     sock.sendto(packet, (UDP_IP, UDP_PORT))
 
     # Wait a little
-    time.sleep(0.01)
+    time.sleep(0.1)
     sequence_num = sequence_num + 1
 

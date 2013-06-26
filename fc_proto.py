@@ -25,4 +25,7 @@ message_types = {
 
     #ADIS-IMU
     'ADIS': struct.Struct("<12H"),
+
+	#ROLL
+	'ROLL': struct.Struct("<HB"),
 }
