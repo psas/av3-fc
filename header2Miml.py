@@ -66,9 +66,6 @@ for item in cgConf:
 		allowedTypes = re.sub( r"\,[\s]*", "|", allowedTypes)
 		allowedTypes = re.sub( r"'", "", allowedTypes)
 		allowedTypes = re.sub( r"(const|unsigned)[\s]+", "", allowedTypes)
-
-
-		print "Allowed types: " + allowedTypes + "\n\n"
 		break
 
 
