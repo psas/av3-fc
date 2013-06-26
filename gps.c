@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <termios.h>
 #include <sys/poll.h>
 
 #include "fcfutils.h"
@@ -130,11 +131,18 @@ static void data_callback(struct pollfd *pfd){
 
 int fd;
 void gps_init(void) {
-	fd = open("/dev/ttyUSB0", O_RDONLY);
-	if (fd < 0)
+	struct termios attrib;
+	fd = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY);
+	if (fd < 0) {
 		perror("Can't open GPS device");
-	else
-		fcf_add_fd(fd, POLLIN, data_callback);
+		return;
+	}
+        tcgetattr(fd, &attrib);
+        cfsetispeed(&attrib, B115200);
+	cfmakeraw(&attrib);
+        tcsetattr(fd, TCSANOW, &attrib);
+
+	fcf_add_fd(fd, POLLIN, data_callback);
 }
 
 void gps_final(void) {
