@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include "rollcontrol.h"
 #include "rollControlLibrary.h"
-
+#include <stdio.h>
 static bool launch;
 
 void rollcontrol_init(void){
@@ -40,5 +40,5 @@ void rc_receive_arm(char * signal){
 }
 
 void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){
-	launch = 1;
+	launch = (signal[0]) ? 1 : 0;
 }
