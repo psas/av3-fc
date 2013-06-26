@@ -39,8 +39,5 @@ extern void adis_data_out(ADISMessage*); // [miml:sender]
 
 extern void adis_raw_in(unsigned char*, int, unsigned char*); // [miml:receiver]
 
-void init(); // [miml:init];
-void final(); // [miml:final];
-
 
 #endif /* ADIS_H_ */

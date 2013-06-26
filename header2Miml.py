@@ -136,8 +136,12 @@ except IOError as e:
 	print "I/O error({0}): Output Miml file --> {1}".format(e.errno, e.strerror)
 	sys.exit(-1)
 fout.write(outputCodeHeader + "\n")
-fout.write(outputCodeInit + "\n")
-fout.write(outputCodeFinal + "\n\n")
+if(foundInit):
+	fout.write(outputCodeInit + "\n")
+if(foundFinal):
+	fout.write(outputCodeFinal + "\n\n")
+else:
+	fout.write("\n")
 fout.write(outputCodeSenders + "\n")
 fout.write(outputCodeReceivers + "\n")
 #if foundUnknown:

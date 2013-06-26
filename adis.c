@@ -18,8 +18,6 @@
  *  32/33 = TEMP - 12bit
 */
 
-void init(){}
-void final(){}
 
 void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 	if(len == sizeof(ADISMessage)){
