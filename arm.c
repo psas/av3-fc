@@ -38,16 +38,6 @@ static void add_sample(double a)
 		cur = acceleration;
 }
 
-static double raw2g(uint16_t raw)
-{
-	// 3.3mg per bit, 14 bits per axis
-	// conversions: cf. stm32/src/si/host_fc/data-analysis/adis16405/adis_convert.py
-	int16_t d = raw;
-	if (raw & 0x2000)
-		d |= 0xc000;	// sign-extend 14 -> 16 bits
-	return d * 0.00333;
-}
-
 /*
 static void set_port(int port, uint32_t val){
     int setport = 0x80;
@@ -74,9 +64,10 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 
 void arm_receive_imu(ADISMessage * data){
 	// does the acceleration vector == -1g over the last 100 samples?
-	double x = raw2g(data->data.adis_xaccl_out);
-	double y = raw2g(data->data.adis_yaccl_out);
-	double z = raw2g(data->data.adis_zaccl_out);
+	// 3.3mg per bit
+	double x = data->data.adis_xaccl_out * 0.00333;
+	double y = data->data.adis_yaccl_out * 0.00333;
+	double z = data->data.adis_zaccl_out * 0.00333;
 	add_sample(sqrt(x*x + y*y + z*z));
 	return;
 }
