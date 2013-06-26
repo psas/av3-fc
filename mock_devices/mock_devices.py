@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import threading
 import time
+import sys
 import e407_roll
 import e407_sensor
 
@@ -26,10 +27,10 @@ class RollControl(threading.Thread):
 
 class Sensor(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, OR_file):
         threading.Thread.__init__(self)
         self._stop = threading.Event()
-        self.mock_sensor = e407_sensor.SensorDevice()
+        self.mock_sensor = e407_sensor.SensorDevice(OR_file)
         self.daemon = True
 
     def run(self):
@@ -43,9 +44,13 @@ class Sensor(threading.Thread):
         self.mock_sensor.close()
         self.join()
 
+OR_file = None
 
+if len(sys.argv) > 1:
+    OR_file = sys.argv[1]
+
+sens = Sensor(OR_file)
 roll = RollControl()
-sens = Sensor()
 
 try:
     roll.start()
