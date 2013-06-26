@@ -82,6 +82,8 @@ static int get_packet(struct msg *m)
 	while ((p = memchr(p, '$', end - p)) != NULL)
 	{
 		// sync stream to "$BIN"
+		if (end - p < 8)
+			return 0;	// incomplete, need more data
 		if (memcmp(p, "$BIN", 4) != 0) {
 			p++;
 			continue;
@@ -92,10 +94,8 @@ static int get_packet(struct msg *m)
 			p += 4;
 			continue;
 		}
-		if (8 + m->len + 4 > end - p) {
-			// incomplete, need more data
-			return 0;
-		}
+		if (end - p < 8 + m->len + 4)
+			return 0;	// incomplete, need more data
 		memcpy(&checksum, p + 8 + m->len, 2);
 		if (sum(p + 8, m->len) == checksum) {
 			// good packet: advance and return success
