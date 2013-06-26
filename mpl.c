@@ -15,7 +15,7 @@ void mpl_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 				.timestamp={(uint8_t)timestamp[0], (uint8_t)timestamp[1],
 						    (uint8_t)timestamp[2], (uint8_t)timestamp[3],
 						    (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-				.data_length=buffer[10] << 8 | buffer[11]
+				.data_length=buffer[10] | buffer[11] << 8
 		};
 		// Copy in data from socket
 		packet.data = buffer;
