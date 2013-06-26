@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <sys/timerfd.h>
 #include "fcfutils.h"
 #include "rollcontrol.h"
@@ -21,7 +22,9 @@ static uint16_t scale_gyro(int16_t gyr){
 	return (uint16_t)(((double)-gyr)*scale + shift);
 }
 
-static void step(struct pollfd * fd){
+static void step(struct pollfd * pfd){
+	char buf[8];
+	while(!read(pfd->fd, buf, 8));
 	RC_INPUT_STRUCT_TYPE input;
 	RC_OUTPUT_STRUCT_TYPE output;
 
@@ -38,7 +41,7 @@ static void step(struct pollfd * fd){
 			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
 			.u8ServoDisableFlag = output.u8ServoDisableFlag,
 	};
-	printf("%d\n", output.u16ServoPulseWidthBin14);
+//	printf("%d\n", output.u16ServoPulseWidthBin14);
 	rc_send_servo(&out);
 }
 
@@ -60,6 +63,7 @@ void rollcontrol_init(void){
 void rc_receive_imu(ADISMessage * imu){
 	accel = scale_accel(imu->data.adis_xaccl_out);
 	roll = scale_gyro(imu->data.adis_xgyro_out);
+	//	printf("%d\n", roll);
 }
 
 void rc_receive_arm(char * signal){
