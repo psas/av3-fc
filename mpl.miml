@@ -1,0 +1,14 @@
+%YAML 1.2
+---
+include: mpl.h
+object: mpl.o
+
+senders:
+  mpl_data_out:
+  - [data, MPLMessage*]
+
+receivers:
+  mpl_raw_in:
+  - [buffer, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]

@@ -2,14 +2,12 @@
 #ifndef ROLLSERVO_H_
 #define ROLLSERVO_H_
 
-#include "rollControlLibrary.h"
+#include "rollcontrol.h"
 
 void rollservo_init(void);
 void rollservo_final(void);
 
-void sendRollServoData(char*);
-
-void rs_getPositionData_rc(RollServo_adjustment*);
+void rs_receive_adj(RollServoMessage*);
 
 
 

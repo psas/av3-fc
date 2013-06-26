@@ -1,30 +1,55 @@
 sources:
   - [ADIS, adis.miml]                   # ADIS Sensor
-  - [TEST, module_adis_sim.miml]        # ADIS Simulator
   - [LOG, logger.miml]                  # Logger code Module
   - [GPS, gps.miml]                     # GPS Sensor
   - [ARM, arm.miml]                     # Arm Code Module
   - [RC, rollcontrol.miml]              # Roll Control Code Module
   - [RS, rollservo.miml]                # Roll Servo Control Interface
+  - [ETH, ethmux.miml]                  # Central Ethernet receiver
+  - [MPU, mpu.miml]                     # MPU module
+  - [MPL, mpl.miml]                     # MPL module
+
   
 messages:
-  ADIS.sendADISData:                    # - [data, ADIS_packet*]
-    - ARM.arm_getPositionData_adis
-    - RC.rc_getPositionData_adis
-    - LOG.log_getPositionData_adis
+  ETH.demuxed_ADIS:
+    - ADIS.adis_raw_in
 
-  GPS.sendGPSData:                      # - [data, GPS_packet*]
-    - ARM.arm_getPositionData_gps
-    - LOG.log_getPositionData_gps
+  ETH.demuxed_ARM:
+    - ARM.arm_raw_in
+    
+  ETH.demuxed_LD:
+    - RC.rc_raw_ld_in
 
-  ARM.sendARMData:                      # - [code, char*]
-    - RC.rc_getSignalData_arm
-    - LOG.log_getSignalData_arm
+  ETH.demuxed_MPU:
+    - MPU.mpu_raw_in
 
-  RC.sendRollControlData:               # - [data, RollServo_adjustment*]
-    - RS.rs_getPositionData_rc
-    - LOG.log_getPositionData_rc
+  ETH.demuxed_MPL:
+    - MPL.mpl_raw_in
 
-  RS.sendRollServoData:                 # - [code, char*]
-    - RC.rc_getSignalData_rs
-    - LOG.log_getSignalData_rs
+  ADIS.adis_data_out:                    # - [data, ADIS_packet*]
+    - ARM.arm_receive_imu
+    - RC.rc_receive_imu
+    - LOG.log_receive_adis
+
+  GPS.gps_data_out:                      # - [data, GPS_packet*]
+    - ARM.arm_receive_gps
+    - LOG.log_receive_gps
+
+  ARM.arm_send_signal:                      # - [code, char*]
+    - RC.rc_receive_arm
+    - LOG.log_receive_arm
+
+  RC.rc_send_servo:               # - [data, RollServo_adjustment*]
+    - RS.rs_receive_adj
+    - LOG.log_receive_rc
+
+  MPU.mpu_data_out:
+    - LOG.log_receive_mpu
+
+  MPL.mpl_data_out:
+    - LOG.log_receive_mpl
+
+
+    
+    
+    

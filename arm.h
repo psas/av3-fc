@@ -1,20 +1,20 @@
 /*
  * arm.h
  *
- *  Created on: Jun 22, 2013
- *      Author: theo
+ * ARM = ARM Rocket Manager
  */
 
 #ifndef ARM_H_
 #define ARM_H_
 #include "gps.h"
-#include "psas_packet.h"
+#include "adis.h"
 
-int arm_init();
-void arm_final();
+int arm_init(void);
+void arm_final(void);
 
-void arm_getPositionData_adis(ADIS_packet *);
-void arm_getPositionData_gps(GPS_packet *);
+void arm_receive_imu(ADISMessage*);
+void arm_receive_gps(GPSMessage*);
+void arm_raw_in(unsigned char *, int, unsigned char *);
 
-void sendARMData(char *);
+void arm_send_signal(char *);
 #endif /* ARM_H_ */

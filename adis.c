@@ -1,49 +1,26 @@
-
-#include <stdio.h>
+/*
+ *
+ */
 #include <string.h>
-#include <arpa/inet.h>
-#include <time.h>
-#include "utils_sockets.h"
-#include "fcfutils.h"
-#include "net_addrs.h"
+#include <stdio.h>
 #include "adis.h"
 
-#define DEVICE_NAME "ADIS"
-
-// Buffer for reading in socket
-static unsigned char buffer[1024];
-
-static void common_cb(const char * src, int fd) {
-
-	// read ADIS data on socket
-	int rc = readsocket(fd, buffer, sizeof(buffer));
-
-	if (rc > 0) {
-
-		// Build a ADIS packet
-		// TODO: make timestamp
-		ADIS_packet packet ={ .ID="ADIS", .timestamp={0,0,0,0,0,0}, .data_length=htons(sizeof(ADIS16405_burst_data))};
-
+void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
+	if(len == sizeof(ADISMessage)){
+		// Build message header
+		ADISMessage packet ={
+				.ID={"ADIS"},
+				.timestamp={(uint8_t)timestamp[0], (uint8_t)timestamp[1],
+						    (uint8_t)timestamp[2], (uint8_t)timestamp[3],
+						    (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
+				.data_length=buffer[10] << 8 | buffer[11]
+		};
 		// Copy in data from socket
-		memcpy(&packet.data, buffer, sizeof(ADIS16405_burst_data));
+		unsigned char* data_section = &(buffer[12]);
+		memcpy(&packet.data, data_section, sizeof(ADIS16405BurstData));
 
-		// Dump an ADIS packet
-		sendADISData(&packet);
+		// Send data out
+		adis_data_out(&packet);
 	}
+	//TODO: else log error?
 }
-
-//active fd
-static void virtADIS_cb(struct pollfd *pfd){
-	common_cb(DEVICE_NAME, pfd->fd);
-}
-
-int adis_init(){
-	int fd = getsocket(ADIS_IP, ADIS_PORT_S, FC_LISTEN_PORT);
-	int rc = fcf_add_fd(fd, POLLIN, virtADIS_cb);
-	return rc;
-}
-
-void adis_final(){
-}
-
-

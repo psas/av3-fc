@@ -4,11 +4,19 @@ include: arm.h
 object: arm.o
 init: arm_init();
 final: arm_final();
+
 senders:
-  sendARMData:
+  arm_send_signal:
   - [code, char*]
+  
 receivers:
-  arm_getPositionData_adis:
-  - [data, ADIS_packet*]
-  arm_getPositionData_gps:
-  - [data, GPS_packet*]
+  arm_raw_in:
+  - [buffer, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
+  arm_receive_imu:
+  - [data, ADISMessage*]
+  
+  arm_receive_gps:
+  - [data, GPSMessage*]

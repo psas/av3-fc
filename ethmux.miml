@@ -4,14 +4,31 @@ include: ethmux.h
 object: ethmux.o
 init: ethmux_init();
 final: ethmux_final();
-senders:
-  sendARMData:
-  - [data, char*]
-  
-  sendLDData:
-  - [data, char*]
-  
-  sendADISData:
-  - [data, char*]
 
+senders:
+  demuxed_ARM:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
+  demuxed_LD:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
+  demuxed_ADIS:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
+  demuxed_MPU:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
+  demuxed_MPL:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
+  
 receivers:

@@ -9,18 +9,10 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <libusb-1.0/libusb.h>
 #include "arm.h"
-#include "net_addrs.h"
-#include "utils_sockets.h"
 #include "fcfutils.h"
 #include "utils_libusb-1.0.h"
-
-int response_fd;
-
-static unsigned char buffer[100];
 
 #define IOUT_PIN 23
 #define ACOK_PIN 11
@@ -46,8 +38,18 @@ static void add_sample(double a)
 		cur = acceleration;
 }
 
+static double raw2g(uint16_t raw)
+{
+	// 3.3mg per bit, 14 bits per axis
+	// conversions: cf. stm32/src/si/host_fc/data-analysis/adis16405/adis_convert.py
+	int16_t d = raw;
+	if (raw & 0x2000)
+		d |= 0xc000;	// sign-extend 14 -> 16 bits
+	return d * 0.00333;
+}
 
-void set_port(int port, uint32_t val){
+/*
+static void set_port(int port, uint32_t val){
     int setport = 0x80;
     unsigned char data[64];
     int usb_err;
@@ -65,60 +67,12 @@ void set_port(int port, uint32_t val){
         printf("set_port: Didn't send correct number of bytes");
     }
 }
-
-static void arm_signal_cb(struct pollfd *pfd){
-	struct sockaddr_storage sender;
-	socklen_t addrlen = sizeof(sender);
-	const char *response = "You Only Launch Once";
-	int rc = readsocketfrom(pfd->fd, buffer, sizeof(buffer), (struct sockaddr *)&sender, &addrlen);
-	if(rc > 0){
-		// is it the ARM signal?  ("#YOLO")
-		if (memcmp(buffer, "#YOLO", 6) != 0)
-			response = "Unrecognized ARM command!";
-		// is adis OK (-1G)
-		else if (fabs(sum/SAMPLES - 1.0) > 0.001)
-			response = "Accelerometers out of limits!";
-		// is GPS locked?
-		else if (!GPS_locked)
-			response = "GPS not locked!";
-		else {
-			//see aps-host.c in gfe2386/aps/hostside for more functionality
-			set_port(0, (1<<ROCKET_READY_PIN));
-			sendARMData((char *)buffer);
-		}
-		// send response to sender (success or why failed)
-		if (sendto(response_fd, response, strlen(response)+1, 0, (struct sockaddr *)&sender, addrlen) < 0)
-			perror("sendto() response");
-	}
+*/
+void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
+	printf("\nARMARMARM\n\n\n");
 }
 
-int arm_init(){
-	char aps_name[] = "aps";
-	init_libusb(aps_name);
-	aps = open_device (aps_name, 0xFFFF, 0x0006);
-
-	int fd = getsocket(ARM_IP, ARM_PORT_S, FC_LISTEN_PORT);
-	int rc = fcf_add_fd(fd, POLLIN, arm_signal_cb);
-	response_fd = get_send_socket();
-	return rc;
-}
-void arm_final(){
-	close_device(aps);
-	close(response_fd);
-	return;
-}
-
-static double raw2g(uint16_t raw)
-{
-	// 3.3mg per bit, 14 bits per axis
-	// conversions: cf. stm32/src/si/host_fc/data-analysis/adis16405/adis_convert.py
-	int16_t d = raw;
-	if (raw & 0x2000)
-		d |= 0xc000;	// sign-extend 14 -> 16 bits
-	return d * 0.00333;
-}
-
-void arm_getPositionData_adis(ADIS_packet * data){
+void arm_receive_imu(ADISMessage * data){
 	// does the acceleration vector == -1g over the last 100 samples?
 	double x = raw2g(data->data.adis_xaccl_out);
 	double y = raw2g(data->data.adis_yaccl_out);
@@ -126,8 +80,21 @@ void arm_getPositionData_adis(ADIS_packet * data){
 	add_sample(sqrt(x*x + y*y + z*z));
 	return;
 }
-void arm_getPositionData_gps(GPS_packet * data){
+void arm_receive_gps(GPSMessage * data){
 	// check for GPS lock
-	GPS_locked = (data->data.nav_mode > 1);   // at least 2D fix
+	if (data->ID[3] == '1') {
+		GPS_locked = (data->gps1.nav_mode == 2);   // 3D fix
+	}
+	return;
+}
+
+int arm_init(void){
+	char aps_name[] = "aps";
+	init_libusb(aps_name);
+	aps = open_device (aps_name, 0xFFFF, 0x0006);
+	return -1;
+}
+void arm_final(void){
+	close_device(aps);
 	return;
 }
