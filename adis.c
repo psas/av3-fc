@@ -18,6 +18,9 @@
  *  32/33 = TEMP - 12bit
 */
 
+void init(){}
+void final(){}
+
 void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 	if(len == sizeof(ADISMessage)){
 		// Build message header
@@ -38,9 +41,10 @@ void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 	//TODO: else log error?
 }
 
-void complement_shift(uint8_t **start, len) {
-  int distance = 16 - len;
+void complement_shift(uint8_t **start, int len) {
+  /*int distance = 16 - len;
   uint8_t high = start;
   uint8_t low = start+1;
-  start+1 = (high << 2) >> 2
+  start+1 = (high << 2) >> 2;*/
+
 }
