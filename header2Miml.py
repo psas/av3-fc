@@ -50,6 +50,25 @@ except IOError as e:
 codeLines = f.readlines()
 f.close()
 
+try:
+	f = open('cg.conf', 'r')
+except IOError as e:
+	print "I/O error({0}): cg.conf --> {1}".format(e.errno, e.strerror)
+	sys.exit(-1)
+
+cgConf = f.readlines()
+f.close()
+
+for item in cgConf:
+	match = re.match( r'[\s]*allowed_types: \[(.*)\][\s]*', item, re.M|re.I)
+	if match:
+		allowedTypes = match.group(1)
+		allowedTypes = re.sub( r"\,[\s]*", "|", allowedTypes)
+		allowedTypes = re.sub( r"'", "", allowedTypes)
+		allowedTypes = re.sub( r"(const|unsigned)[\s]+", "", allowedTypes)
+		break
+
+
 outputCodeHeader = "%YAML 1.2\n---\ninclude: " + inputfile + "\nobject: " + objfile
 outputCodeInit = "init: "
 outputCodeFinal = "final: "
@@ -88,7 +107,7 @@ for item in codeLines:
 		argVals = ""
 		for item2 in content:
 			counter += 1
-			match2 = re.match( r'[\s]*((const|unsigned)[\s]+)?(int|char)[\s]*(\*)?([\s]*([\w_-]+)[\s]*)?', item2, re.M|re.I)
+			match2 = re.match( r'[\s]*((const|unsigned)[\s]+)?(' + allowedTypes + ')[\s]*(\*)?([\s]*([\w_-]+)[\s]*)?', item2, re.M|re.I)
 			if match2:
 				argType = xstr(match2.group(1)) + xstr(match2.group(3)) + xstr(match2.group(4))
 				argName = match2.group(6)
@@ -114,8 +133,12 @@ except IOError as e:
 	print "I/O error({0}): Output Miml file --> {1}".format(e.errno, e.strerror)
 	sys.exit(-1)
 fout.write(outputCodeHeader + "\n")
-fout.write(outputCodeInit + "\n")
-fout.write(outputCodeFinal + "\n\n")
+if(foundInit):
+	fout.write(outputCodeInit + "\n")
+if(foundFinal):
+	fout.write(outputCodeFinal + "\n\n")
+else:
+	fout.write("\n")
 fout.write(outputCodeSenders + "\n")
 fout.write(outputCodeReceivers + "\n")
 #if foundUnknown:
