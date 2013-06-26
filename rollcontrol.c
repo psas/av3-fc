@@ -24,7 +24,7 @@ static uint16_t scale_gyro(int16_t gyr){
 
 static void step(struct pollfd * pfd){
 	char buf[8];
-	while(!read(pfd->fd, buf, 8));
+	read(pfd->fd, buf, 8); //clears timerfd
 	RC_INPUT_STRUCT_TYPE input;
 	RC_OUTPUT_STRUCT_TYPE output;
 
@@ -64,14 +64,6 @@ void rc_receive_imu(ADISMessage * imu){
 	accel = scale_accel(imu->data.adis_xaccl_out);
 	roll = scale_gyro(imu->data.adis_xgyro_out);
 	//	printf("%d\n", roll);
-}
-
-void rc_receive_arm(char * signal){
-	if(signal[0]){
-		launch = 1;
-	}else{
-		launch = 0;
-	}
 }
 
 void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){

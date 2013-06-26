@@ -15,7 +15,7 @@ DOXYFILE := ./Doxyfile
 OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o utils_libusb-1.0.o
 #OBJECTS  += fcfutils.o fcfmain.o utils_sockets.o
 
-MAINMIML ?= test.miml
+MAINMIML ?= main.miml
 MIMLMK   ?= miml.mk
 
 -include $(MIMLMK)

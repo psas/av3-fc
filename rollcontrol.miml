@@ -12,9 +12,6 @@ receivers:
   rc_receive_imu:
   - [data, ADISMessage*]
   
-  rc_receive_arm:
-  - [code, char*]
-  
   rc_raw_ld_in:
   - [code, unsigned char*]
   - [len, int]
