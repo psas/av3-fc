@@ -83,7 +83,14 @@ void arm_receive_imu(ADISMessage * data){
 void arm_receive_gps(GPSMessage * data){
 	// check for GPS lock
 	if (data->ID[3] == '1') {
-		GPS_locked = (data->gps1.nav_mode == 2);   // 3D fix
+		switch(data->gps1.nav_mode) {
+		case 2:   // 3D fix
+		case 4:   // 3D + diff
+		case 6:	  // 3D + diff + rtk
+			GPS_locked = 1; break;
+		default:
+			GPS_locked = 0; break;
+		}
 	}
 	return;
 }
