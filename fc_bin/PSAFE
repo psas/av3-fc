@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+import socket
+
+FC_IP = '127.0.0.1'
+FC_LISTEN_PORT = 36000
+ARM_FROM_PORT = 35666
+
+SAFE_MESSAGE = "PSAFE"
+
+sock = socket.socket(socket.AF_INET,
+                     socket.SOCK_DGRAM)
+sock.bind(('0.0.0.0', ARM_FROM_PORT))
+sock.sendto(SAFE_MESSAGE, (FC_IP, FC_LISTEN_PORT))
+sock.close()
+
+print "Sending safeing message"
+

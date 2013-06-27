@@ -24,10 +24,10 @@ void demux(struct pollfd *pfd){
 	int bytes = readsocketfromts(pfd->fd, buffer, sizeof(buffer), &packet_info, len, &ts);
 
 	int port = ntohs(packet_info.sin_port);
-//	printf("%d, %d\n", ts.tv_sec, starttime.tv_sec);
 	offset_start_time(&ts);
 	unsigned char timestamp[6];
 	to_psas_time(&ts, timestamp);
+
 	if(bytes > 0){
 		switch(port){
 		case ADIS_RX_PORT:
@@ -44,6 +44,9 @@ void demux(struct pollfd *pfd){
 			break;
 		case MPL_RX_PORT:
 			demuxed_MPL(buffer, bytes, timestamp);
+			break;
+		case RC_SERVO_ENABLE_PORT:
+			demuxed_RC(buffer, bytes, timestamp);
 			break;
 		default:
 			break;

@@ -31,4 +31,8 @@ senders:
   - [len, int]
   - [timestamp, unsigned char*]
   
+  demuxed_RC:
+  - [data, unsigned char*]
+  - [len, int]
+  - [timestamp, unsigned char*]
 receivers:

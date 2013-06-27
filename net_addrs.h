@@ -54,6 +54,7 @@
 #define ARM_PORT 35666
 #define ARM_PORT_S "35666"
 
-
+#define RC_SERVO_ENABLE_PORT 35667
+#define RC_SERVO_ENABLE_PORT_S "35667"
 
 #endif /* FCF_NETADDRS */

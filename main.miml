@@ -27,6 +27,9 @@ messages:
   ETH.demuxed_MPL:
     - MPL.mpl_raw_in
 
+  ETH.demuxed_RC:
+   - RC.rc_raw_testrc
+
   ADIS.adis_data_out:                    # - [data, ADIS_packet*]
     - ARM.arm_receive_imu
     - RC.rc_receive_imu
@@ -37,6 +40,7 @@ messages:
     - LOG.log_receive_gps
 
   ARM.arm_send_signal:                      # - [code, char*]
+    - RC.rc_receive_arm
     - LOG.log_receive_arm
 
   RC.rc_send_servo:               # - [data, RollServo_adjustment*]

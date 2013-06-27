@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/timerfd.h>
+#include "utils_time.h"
 #include "fcfutils.h"
 #include "rollcontrol.h"
 #include "rollControlLibrary.h"
 
+
 static bool launch;
+static bool enable_servo;
 static uint16_t accel;
 static uint16_t roll;
 
@@ -38,14 +42,15 @@ static void step(struct pollfd * pfd){
 			.ID = {"ROLL"},
 			.data_length = 3,
 			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
-			.u8ServoDisableFlag = output.u8ServoDisableFlag,
+			.u8ServoDisableFlag = output.u8ServoDisableFlag && !enable_servo,
 	};
 	get_psas_time(out.timestamp);
 	rc_send_servo(&out);
 }
 
 void rollcontrol_init(void){
-	launch = 0;
+	launch = false;
+	enable_servo = false;
 	accel = scale_accel(0);
 	roll = scale_gyro(0);
 	rc_init();
@@ -62,9 +67,22 @@ void rollcontrol_init(void){
 void rc_receive_imu(ADISMessage * imu){
 	accel = scale_accel(imu->data.adis_xaccl_out);
 	roll = scale_gyro(imu->data.adis_xgyro_out);
-	//	printf("%d\n", roll);
+}
+
+void rc_receive_arm(char * signal){
+	if(strcmp(signal, "ARM")){
+		enable_servo = true;
+	}else if(strcmp(signal, "SAFE")){
+		enable_servo = false;
+	}
 }
 
 void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){
-	launch = (signal[0]) ? 1 : 0;
+	if(len > 0){
+		launch = (signal[0]) ? 1 : 0;
+	}
+}
+
+void rc_raw_testrc(unsigned char * signal, int len, unsigned char* timestamp){
+
 }
