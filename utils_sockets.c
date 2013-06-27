@@ -16,6 +16,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <time.h>
+#include <linux/net_tstamp.h>
 
 
 int readsocket(int fd, unsigned char *buffer, int bufsize) {
@@ -72,6 +74,60 @@ int readsocketfrom(int fd, unsigned char *buffer, int bufsize, struct sockaddr *
 	
 	return rc;
 }
+
+
+int readsocketfromts(int fd, unsigned char *buffer, int bufsize, struct sockaddr_in *sender, socklen_t addrlen, struct timespec *ts){
+	struct msghdr msg;
+	struct cmsghdr *cmsg;
+	struct iovec entry;
+	struct {
+	struct cmsghdr cm;
+		char control[512];
+	} control;
+
+	memset(&msg, 0, sizeof(msg));
+	msg.msg_iov = &entry;
+	msg.msg_iovlen = 1;
+	entry.iov_base = buffer;
+	entry.iov_len = bufsize;
+	msg.msg_name = (caddr_t)sender;
+	msg.msg_namelen = addrlen;
+	msg.msg_control = &control;
+	msg.msg_controllen = sizeof(control);
+
+	int rc = recvmsg(fd, &msg, 0);
+	if (rc < 0){
+		if (errno != EWOULDBLOCK){
+			perror("readsocketfromts: recvmsg() failed");
+			return -2;
+		}
+		return 0;
+	}
+
+	/**
+	* Check to see if the connection has been
+	* closed by the client
+	*/
+	if (rc == 0){
+		return -1;
+	}
+
+	/** Extract info from msg **/
+	//timestamp info
+	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)){
+		if(cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPNS){
+			ts->tv_nsec = ((struct timespec *)CMSG_DATA(cmsg))->tv_nsec;
+			ts->tv_sec = ((struct timespec *)CMSG_DATA(cmsg))->tv_sec;
+		}
+	}
+	//data
+	if(msg.msg_iovlen > 1){
+		printf("utils_sockets rsft: iovlen greater than 1\n");
+	}
+
+	return rc;
+}
+
 
 int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port) {
 	struct sockaddr_in si_other;
@@ -162,6 +218,12 @@ int getsocket(const char *source_ip, const char *source_port, int listen_port) {
 		return -1;
 	}
 
+	/**
+	 * Turn on timestamping
+	 */
+	int opts = SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_RX_SOFTWARE |
+			SOF_TIMESTAMPING_SYS_HARDWARE;
+	setsockopt(listen_sd, SOL_SOCKET, SO_TIMESTAMPNS, &opts, sizeof(opts));
 
 	/**
 	* Bind the socket

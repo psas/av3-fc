@@ -36,12 +36,11 @@ static void step(struct pollfd * pfd){
 
 	RollServoMessage out = {
 			.ID = {"ROLL"},
-			.timestamp = {0,0,0,0,0,0},
 			.data_length = 3,
 			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
 			.u8ServoDisableFlag = output.u8ServoDisableFlag,
 	};
-//	printf("%d\n", output.u16ServoPulseWidthBin14);
+	get_psas_time(out.timestamp);
 	rc_send_servo(&out);
 }
 

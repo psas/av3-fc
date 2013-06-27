@@ -30,8 +30,8 @@ struct msg {
 
 static int handle_msg(const char *id, const void *data, uint16_t len)
 {
-	// TODO: real timestamp
-	GPSMessage p = { .timestamp={0,0,0,0,0,0}, .data_length=len };
+	GPSMessage p = { .data_length=len };
+	get_psas_time(p.timestamp);
 	memcpy(&p.ID, id, 4);
 	memcpy(&p.raw, data, len);
 	gps_data_out(&p);

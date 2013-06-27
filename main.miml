@@ -1,4 +1,5 @@
 sources:
+  - [TIME, utils_time.miml]             # Time utilities
   - [ADIS, adis.miml]                   # ADIS Sensor
   - [LOG, logger.miml]                  # Logger code Module
   - [GPS, gps.miml]                     # GPS Sensor

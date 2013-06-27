@@ -5,21 +5,29 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <netinet/in.h>
+#include <linux/net_tstamp.h>
+#include <time.h>
+#include <string.h>
 #include "utils_sockets.h"
+#include "utils_time.h"
 #include "fcfutils.h"
 #include "net_addrs.h"
 #include "ethmux.h"
 
-static unsigned char buffer[1024];
+static unsigned char buffer[1024]; // TODO: packet len
 
 void demux(struct pollfd *pfd){
 
 	struct sockaddr_in packet_info;
+	struct timespec ts;
 	socklen_t len = sizeof(packet_info);
-	int bytes = readsocketfrom(pfd->fd, buffer, sizeof(buffer), (struct sockaddr *)&packet_info, &len);
+	int bytes = readsocketfromts(pfd->fd, buffer, sizeof(buffer), &packet_info, len, &ts);
+
 	int port = ntohs(packet_info.sin_port);
-	// TODO: make timestamp
-	unsigned char timestamp[6] = {0,0,0,0,0,0};
+//	printf("%d, %d\n", ts.tv_sec, starttime.tv_sec);
+	offset_start_time(&ts);
+	unsigned char timestamp[6];
+	to_psas_time(&ts, timestamp);
 	if(bytes > 0){
 		switch(port){
 		case ADIS_RX_PORT:
