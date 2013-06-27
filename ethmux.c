@@ -24,7 +24,6 @@ void demux(struct pollfd *pfd){
 	int bytes = readsocketfromts(pfd->fd, buffer, sizeof(buffer), &packet_info, len, &ts);
 
 	int port = ntohs(packet_info.sin_port);
-	offset_start_time(&ts);
 	unsigned char timestamp[6];
 	to_psas_time(&ts, timestamp);
 

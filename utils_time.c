@@ -11,17 +11,9 @@ void utils_time_init(){
 	clock_gettime(CLOCK_REALTIME, &starttime);
 }
 
-void offset_start_time(struct timespec * ts){
+void to_psas_time(struct timespec* ts, unsigned char* out){
     ts->tv_sec -= starttime.tv_sec;
     ts->tv_nsec -= starttime.tv_nsec;
-}
-
-void get_offset_time(struct timespec * ts){
-	clock_gettime(CLOCK_REALTIME, ts);
-	offset_start_time(ts);
-}
-
-void to_psas_time(struct timespec* ts, unsigned char* out){
 	uint64_t now = ts->tv_nsec + (uint64_t) ts->tv_sec * 1000000000;
 
 	out[0] = now >> 40;
@@ -34,7 +26,7 @@ void to_psas_time(struct timespec* ts, unsigned char* out){
 
 void get_psas_time(unsigned char* out){
 	struct timespec ts;
-	get_offset_time(&ts);
+	clock_gettime(CLOCK_REALTIME, &ts);
 	to_psas_time(&ts, out);
 }
 
