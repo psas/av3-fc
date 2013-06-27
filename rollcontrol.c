@@ -42,7 +42,7 @@ static void step(struct pollfd * pfd){
 			.ID = {"ROLL"},
 			.data_length = 3,
 			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
-			.u8ServoDisableFlag = output.u8ServoDisableFlag && !enable_servo,
+			.u8ServoDisableFlag = output.u8ServoDisableFlag || !enable_servo,
 	};
 	get_psas_time(out.timestamp);
 	rc_send_servo(&out);
@@ -70,9 +70,9 @@ void rc_receive_imu(ADISMessage * imu){
 }
 
 void rc_receive_arm(char * signal){
-	if(strcmp(signal, "ARM")){
+	if(!strcmp(signal, "ARM")){
 		enable_servo = true;
-	}else if(strcmp(signal, "SAFE")){
+	}else if(!strcmp(signal, "SAFE")){
 		enable_servo = false;
 	}
 }
