@@ -11,6 +11,7 @@
 
 static bool launch;
 static bool enable_servo;
+static bool armed;
 static uint16_t accel;
 static uint16_t roll;
 
@@ -71,8 +72,10 @@ void rc_receive_imu(ADISMessage * imu){
 
 void rc_receive_arm(char * signal){
 	if(!strcmp(signal, "ARM")){
+		armed = true;
 		enable_servo = true;
 	}else if(!strcmp(signal, "SAFE")){
+		armed = false;
 		enable_servo = false;
 	}
 }
@@ -83,6 +86,22 @@ void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){
 	}
 }
 
-void rc_raw_testrc(unsigned char * signal, int len, unsigned char* timestamp){
+void rc_raw_testrc(unsigned char * data, int len, unsigned char* timestamp){
+	char signal[8];
+	int end = len > sizeof(signal)? sizeof(signal): len;
+	memcpy(signal, data, end);
+	signal[end] = '\0';
 
+	if(!strcmp(signal, "ENABLE")){
+		if(!armed){
+			enable_servo = true;
+			printf("Servo enabled\n");
+		}
+
+	}else if(!strcmp(signal, "DISABLE")){
+		if(!armed){
+			enable_servo = false;
+			printf("Servo disabled\n");
+		}
+	}
 }

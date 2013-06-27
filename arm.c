@@ -70,7 +70,12 @@ static void clear_aps_gpio(int port, uint32_t val){
     }
 }
 void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
-	if(len == 5 && !strcmp((char*)buffer, "#YOLO")){
+	char signal[8];
+	int end = len > sizeof(signal)? sizeof(signal): len;
+	memcpy(signal, buffer, end);
+	signal[end] = '\0';
+
+	if(len == 5 && !strcmp(signal, "#YOLO")){
 		//send arm
 		int sensors_allow_launch = 0; // TODO: conditions for setting this
 		if(aps && sensors_allow_launch){
@@ -78,7 +83,7 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 		}
 		arm_send_signal("ARM");
 		printf("ARM\n");
-	}else if(len == 5 && !strcmp((char*)buffer, "PSAFE")){
+	}else if(len == 5 && !strcmp(signal, "PSAFE")){
 		//send safe
 		if(aps){
 			clear_aps_gpio(ROCKET_READY_PIN, (1<<ROCKET_READY_PORT));
