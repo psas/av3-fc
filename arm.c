@@ -17,6 +17,8 @@
 #define ROCKET_READY_PIN 8
 #define ROCKET_READY_PORT 0
 
+#define ACCEL_NOISE_BOUND 0.1
+
 int GPS_locked;
 libusb_device_handle * aps;
 #define SAMPLES 100
@@ -70,26 +72,21 @@ static void clear_aps_gpio(int port, uint32_t val){
     }
 }
 void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
-	char signal[8];
-	int end = len > sizeof(signal)? sizeof(signal): len;
-	memcpy(signal, buffer, end);
-	signal[end] = '\0';
-
-	if(len == 5 && !strcmp(signal, "#YOLO")){
+	if(len == 5 && !strncmp((char*)buffer, "#YOLO", 5 > len? len: 5)){
 		//send arm
-		int sensors_allow_launch = 0; // TODO: conditions for setting this
+		int accel_locked = sum > -1 - ACCEL_NOISE_BOUND && sum < -1 + ACCEL_NOISE_BOUND;
+		int sensors_allow_launch = GPS_locked && accel_locked;
 		if(aps && sensors_allow_launch){
 			set_aps_gpio(ROCKET_READY_PIN, (1<<ROCKET_READY_PORT));
+			arm_send_signal("ARM");
 		}
-		arm_send_signal("ARM");
-		printf("ARM\n");
-	}else if(len == 5 && !strcmp(signal, "PSAFE")){
+
+	}else if(len == 5 && !strncmp((char*)buffer, "PSAFE", 5 > len? len: 5)){
 		//send safe
 		if(aps){
 			clear_aps_gpio(ROCKET_READY_PIN, (1<<ROCKET_READY_PORT));
 		}
 		arm_send_signal("SAFE");
-		printf("SAFE\n");
 	}
 }
 
@@ -97,9 +94,10 @@ void arm_receive_imu(ADISMessage * data){
 	// does the acceleration vector == -1g over the last 100 samples?
 	// 3.3mg per bit
 	double x = data->data.adis_xaccl_out * 0.00333;
-	double y = data->data.adis_yaccl_out * 0.00333;
-	double z = data->data.adis_zaccl_out * 0.00333;
-	add_sample(sqrt(x*x + y*y + z*z));
+//	double y = data->data.adis_yaccl_out * 0.00333;
+//	double z = data->data.adis_zaccl_out * 0.00333;
+//	add_sample(sqrt(x*x + y*y + z*z));
+	add_sample(-x);
 	return;
 }
 void arm_receive_gps(GPSMessage * data){

@@ -87,21 +87,11 @@ void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){
 }
 
 void rc_raw_testrc(unsigned char * data, int len, unsigned char* timestamp){
-	char signal[8];
-	int end = len > sizeof(signal)? sizeof(signal): len;
-	memcpy(signal, data, end);
-	signal[end] = '\0';
-
-	if(!strcmp(signal, "ENABLE")){
-		if(!armed){
+	if(!armed){
+		if(!strncmp((char *)data, "ENABLE", 6 > len? len: 6)){
 			enable_servo = true;
-			printf("Servo enabled\n");
-		}
-
-	}else if(!strcmp(signal, "DISABLE")){
-		if(!armed){
+		}else if(!strncmp((char *)data, "DISABLE", 7 > len? len: 7)){
 			enable_servo = false;
-			printf("Servo disabled\n");
 		}
 	}
 }
