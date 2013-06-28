@@ -14,7 +14,7 @@ class RollDevice(object):
         try:
             message = self.socket.recv(4096)
             m = config.RC_Servo_Message.unpack(message)
-            print m
+            #print m
         except socket.timeout:
             return
 
