@@ -16,7 +16,7 @@ class SensorDevice(object):
         self.ADISsocket.bind((config.SENSOR_IP, config.ADIS_TX_PORT))
 
         self.apogee = False
-        self.launch_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
+        self.launch_time = datetime.datetime.now() + datetime.timedelta(seconds=1)
         self.last_t = 0 
         self.next_t = datetime.datetime.now()
 
@@ -120,9 +120,6 @@ class SensorDevice(object):
         # spare ADC
         newval[11] = int(values[11])
 
-        
-        #print newval[4]
-
         #twos' compliment
         for i, n in enumerate(newval):
             if n<0:
@@ -165,8 +162,6 @@ class SensorDevice(object):
             values = self.from_file()
             values = self.noise(values)
             values = self.ADIS(values)
-
-            #print values[4]
         else:
             values = self.gen_random()
 
