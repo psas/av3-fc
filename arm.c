@@ -28,28 +28,26 @@ int sd;
 
 bool slock_enable;
 bool GPS_locked;
-#define SAMPLES 100
-static double acceleration[SAMPLES], *cur = acceleration, sum = 0.0;
-#define ACCEL_NOISE_BOUND 0.1
 
-// running average
-static void add_sample(double a)
-{
-	sum = sum - *cur + a;
-	*cur++ = a;
-	if (cur == acceleration + SAMPLES)
-		cur = acceleration;
+#define ACCEL_NOISE_BOUND 0.1
+static int upright = 0;
+
+int about(double a, double b){
+	return abs(a-b) < ACCEL_NOISE_BOUND;
 }
 
 void arm_receive_imu(ADISMessage * data){
 	// does the acceleration vector == -1g over the last 100 samples?
 	// 3.3mg per bit
 	double x = data->data.adis_xaccl_out * 0.00333;
-//	double y = data->data.adis_yaccl_out * 0.00333;
-//	double z = data->data.adis_zaccl_out * 0.00333;
-//	add_sample(sqrt(x*x + y*y + z*z));
-	add_sample(-x);
-	return;
+	double y = data->data.adis_yaccl_out * 0.00333;
+	double z = data->data.adis_zaccl_out * 0.00333;
+	if(!about(x, -1) || !about(y, 0) || !about(z, 0)){
+		upright = 0;
+	}
+	else if(upright < 100){
+		++upright;
+	}
 }
 
 void arm_receive_gps(GPSMessage * data){
@@ -132,7 +130,7 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 
 	if(COMPARE_BUFFER_TO_CMD(buffer, ARM, len)){
 		//send arm
-		bool accel_locked = sum > -1 - ACCEL_NOISE_BOUND && sum < -1 + ACCEL_NOISE_BOUND;
+		bool accel_locked = upright == 100;
 		bool sensors_allow_launch = (GPS_locked && accel_locked) || !slock_enable;
 		if(sensors_allow_launch){
 			if(aps){
