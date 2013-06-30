@@ -129,7 +129,7 @@ int readsocketfromts(int fd, unsigned char *buffer, int bufsize, struct sockaddr
 }
 
 
-int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int dest_port) {
+int sendto_socket(int sd, const char *buffer, int bufsize, const char *dest_ip, int dest_port) {
 	struct sockaddr_in si_other;
     int slen=sizeof(si_other);
     
@@ -141,26 +141,9 @@ int sendto_socket(int sd, char *buffer, int bufsize, const char *dest_ip, int de
 		return -1;
 	}
 	
-	if (sendto(sd, buffer, bufsize, 0, (struct sockaddr *)&si_other, slen)==-1)
-	perror("sendto()");
-
-
-	/*printf("fd: %d \n", sdata->fd);
-	int rc = sendto(sdata->fd, buffer, bufsize, 0, (struct sockaddr *)&sdata->addr, sizeof(struct sockaddr_in));
-	if (rc < 0){
-		if (errno != EWOULDBLOCK){
-			perror("sendto_socket: sendto() failed");
-			return -2;
-		}
-		return 0;
+	if (sendto(sd, buffer, bufsize, 0, (struct sockaddr *)&si_other, slen)==-1){
+		perror("sendto()");
 	}
-
-	
-	if (rc == 0){
-		return -1;
-	}
-	
-	return rc;*/
 	return 0;
 }
 
@@ -174,10 +157,6 @@ int get_send_from_socket(int send_port) {
 	sin.sin_port = htons(send_port);
 
 	bind(sock, (struct sockaddr *)&sin, sizeof(sin));
-	/* Now bound, get the address */
-	//slen = sizeof(sin);
-	//getsockname(sock, (struct sockaddr *)&sin, &slen);
-	//port = ntohs(sin.sin_port);
 
 	return sock;
 }

@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import talktofc
+
+talktofc.the_easy_way("DI_SLOCK", 35666)

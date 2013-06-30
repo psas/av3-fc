@@ -1,16 +1,5 @@
 #!/usr/bin/env python
-import socket
+import talktofc
 
-FC_IP = '127.0.0.1'
-FC_LISTEN_PORT = 36000
-SERVO_FROM_PORT = 35667
+talktofc.the_easy_way("DISABLE", 35667)
 
-SERVO_MESSAGE = "DISABLE"
-
-sock = socket.socket(socket.AF_INET,
-                     socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', SERVO_FROM_PORT))
-sock.sendto(SERVO_MESSAGE, (FC_IP, FC_LISTEN_PORT))
-sock.close()
-
-print "Sending disable servo message"

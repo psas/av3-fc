@@ -1,16 +1,5 @@
 #!/usr/bin/env python
-import socket
+import talktofc
 
-FC_IP = '127.0.0.1'
-FC_LISTEN_PORT = 36000
-ARM_FROM_PORT = 35666
+talktofc.the_easy_way("#YOLO", 35666)
 
-ARM_MESSAGE = "#YOLO"
-
-sock = socket.socket(socket.AF_INET,
-                     socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', ARM_FROM_PORT))
-sock.sendto(ARM_MESSAGE, (FC_IP, FC_LISTEN_PORT))
-sock.close()
-
-print "Sending arming message"
