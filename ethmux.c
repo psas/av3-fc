@@ -58,7 +58,7 @@ static int fd;
 static int idx;
 
 void ethmux_init(void){
-	fd = getsocket(SENSOR_IP, ADIS_RX_PORT_S, FC_LISTEN_PORT);
+	fd = getsocket(FC_IP, FC_LISTEN_PORT_S, FC_LISTEN_PORT);
 	idx = fcf_add_fd(fd, POLLIN, demux);
 }
 

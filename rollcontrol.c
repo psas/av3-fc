@@ -7,13 +7,17 @@
 #include "fcfutils.h"
 #include "rollcontrol.h"
 #include "rollControlLibrary.h"
+#include "net_addrs.h"
+#include "utils_sockets.h"
 
+int sd;
 
 static bool launch;
 static bool enable_servo;
 static bool armed;
 static uint16_t accel;
 static uint16_t roll;
+static uint8_t prev_servo_disable;
 
 static uint16_t scale_accel(int16_t acc){
 	const double shift = 34500 + 1374.05;
@@ -38,7 +42,6 @@ static void step(struct pollfd * pfd){
 	input.u8IsLaunchDetected = launch;
 
 	rc_step(&input, &output);
-
 	RollServoMessage out = {
 			.ID = {"ROLL"},
 			.data_length = 3,
@@ -46,12 +49,18 @@ static void step(struct pollfd * pfd){
 			.u8ServoDisableFlag = output.u8ServoDisableFlag || !enable_servo,
 	};
 	get_psas_time(out.timestamp);
-	rc_send_servo(&out);
+
+	// Servo disable flag gets sent, and then stop sending packets
+	if(!prev_servo_disable || !out.u8ServoDisableFlag){
+		rc_send_servo(&out);
+		prev_servo_disable = out.u8ServoDisableFlag;
+	}
 }
 
 void rollcontrol_init(void){
 	launch = false;
 	enable_servo = false;
+	prev_servo_disable = 0;
 	accel = scale_accel(0);
 	roll = scale_gyro(0);
 	rc_init();
@@ -63,6 +72,7 @@ void rollcontrol_init(void){
 	newval.it_value.tv_nsec = 1000000;
 	timerfd_settime(tfd, 0, &newval, NULL);
 	fcf_add_fd(tfd, POLLIN, step);
+	sd = get_send_socket();
 }
 
 void rc_receive_imu(ADISMessage * imu){
@@ -74,6 +84,7 @@ void rc_receive_arm(char * signal){
 	if(!strcmp(signal, "ARM")){
 		armed = true;
 		enable_servo = true;
+		launch = true;
 	}else if(!strcmp(signal, "SAFE")){
 		armed = false;
 		enable_servo = false;
@@ -86,12 +97,29 @@ void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){
 	}
 }
 
+static void send_servo_response(const char * message){
+	sendto_socket(sd, message, strlen(message), ARM_IP, RC_SERVO_ENABLE_PORT);
+}
+
+#define COMPARE_BUFFER_TO_CMD(a, b, len)\
+	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))
+
+
 void rc_raw_testrc(unsigned char * data, int len, unsigned char* timestamp){
 	if(!armed){
-		if(!strncmp((char *)data, "ENABLE", 6 > len? len: 6)){
+		if(COMPARE_BUFFER_TO_CMD(data, "ENABLE", len)){
 			enable_servo = true;
-		}else if(!strncmp((char *)data, "DISABLE", 7 > len? len: 7)){
-			enable_servo = false;
+			send_servo_response("Roll control servos enabled");
 		}
+		else if(COMPARE_BUFFER_TO_CMD(data, "DISABLE", len)){
+			enable_servo = false;
+			send_servo_response("Roll control servos disabled");
+		}
+		else{
+			send_servo_response("Unknown servo command");
+		}
+	}
+	else{
+		send_servo_response("Roll control servos state not changed due to being armed");
 	}
 }
