@@ -3,6 +3,7 @@ from random import randint, gauss
 import datetime
 import time
 import config
+from math import isnan
 
 RAD2DEG = 57.2957795
 MSS2GEE = 1.0/9.81
@@ -15,9 +16,10 @@ class SensorDevice(object):
         self.ADISsocket.bind((config.SENSOR_IP, config.ADIS_TX_PORT))
 
         self.apogee = False
-        self.launch_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
+        self.launch_time = datetime.datetime.now() + datetime.timedelta(seconds=1)
+        self.last_t = 0 
+        self.next_t = datetime.datetime.now()
 
-        print self.launch_time
         self.simdata = None
         # Open Rocket file, if exists:
         if OR_file:
@@ -33,9 +35,14 @@ class SensorDevice(object):
         if now < self.launch_time:
             return (3.3,0,0,0,9.8,0,0,250,0,0,32.2,0)
 
+        if now < self.next_t:
+            return self.last_vset
+
         line = self.simdata.readline()
         if "# Event APOGEE occurred" in line:
             self.apogee = True
+        if len(line) < 1:
+            return (3.3,0,0,0,9.8,0,0,250,0,0,32.2,0)
         if line[0] != '#':
             li = line.split(',')
             if len(li) > 18:
@@ -48,13 +55,22 @@ class SensorDevice(object):
                 z_acc   = float(li[11])  #m/s/s
                 grav    = float(li[14])  #m/s/s
 
+                if isnan(x_rate): x_rate = 0
+                if isnan(y_rate): y_rate = 0
+                if isnan(z_rate): z_rate = 0
+
+
                 ## body frame rotation
                 x_rate = -x_rate
                 if self.apogee:
                     x_acc   = -(x_acc - grav)
                 else:
                     x_acc   = -(x_acc + grav)
-                return (3.3, x_rate, y_rate, z_rate, x_acc, y_acc, z_acc, 250,0,0,32.2,0)
+
+                self.next_t = self.launch_time + datetime.timedelta(seconds=t)
+                self.last_vset = (3.3, x_rate, y_rate, z_rate, x_acc, y_acc, z_acc, 250,0,0,32.2,0)
+
+                return self.last_vset
         else:
             return self.from_file()
 
@@ -104,19 +120,12 @@ class SensorDevice(object):
         # spare ADC
         newval[11] = int(values[11])
 
-
         #twos' compliment
         for i, n in enumerate(newval):
-            negative = 0
-            if n < 0:
-                negative = 1
+            if n<0:
+                n = (n-1 & 0xffff) + 1
+            newval[i] = n
 
-            n = abs(n)
-
-            if negative:
-                newval[i] = (n^0xff) + 1
-            else:
-                newval[i] = n
         return newval
 
     def noise(self, values):
@@ -130,9 +139,9 @@ class SensorDevice(object):
         newval[3] = values[3] + gauss(0,0.001)
 
         # accel
-        newval[4] = values[4] + gauss(0,0.5)
-        newval[5] = values[5] + gauss(0,0.5)
-        newval[6] = values[6] + gauss(0,0.5)
+        newval[4] = values[4] + gauss(0,0.01)
+        newval[5] = values[5] + gauss(0,0.01)
+        newval[6] = values[6] + gauss(0,0.01)
 
         # mag
         newval[7] = values[7] + gauss(0,1)
@@ -163,7 +172,7 @@ class SensorDevice(object):
         packet += config.ADIS_Message.pack(*values)
 
         self.ADISsocket.sendto(packet, (config.FC_IP, config.FC_LISTEN_PORT))
-        time.sleep(0.01)
+        time.sleep(0.001218)
 
     def close(self):
         self.ADISsocket.close()
