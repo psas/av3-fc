@@ -14,6 +14,12 @@
 #include "utils_sockets.h"
 #include "net_addrs.h"
 
+#define PASTE(a, b) a##b
+#define STRINGIFY(x) #x
+
+#define LOGFILE_DIGITS 3
+#define LOGFILE_BASE "logfile-"
+
 #define P_LIMIT 1500
 
 static FILE *fp = NULL;
@@ -26,28 +32,47 @@ static int sd;
 uint32_t sequence;
 
 
-void logger_init() {
+static void open_logfile(void)
+{
+	/* Compute 10 ** LOGFILE_DIGITS at compile time. */
+	const int attempt_count = PASTE(1e, LOGFILE_DIGITS);
 
-	// Show we're opening a file
-	sprintf(filename, "logfile-%d.log", (int)time(NULL));
-	fp = fopen(filename, "w+");
-	if(!fp){
-		fprintf (stderr, "disk logger: could not open file %s for writing: %s\n", filename, strerror(errno));
+	char buf[sizeof LOGFILE_BASE + LOGFILE_DIGITS];
+
+	int i;
+	for(i = 0; i < attempt_count; ++i)
+	{
+		snprintf(buf, sizeof buf, LOGFILE_BASE "%0" STRINGIFY(LOGFILE_DIGITS) "d", i);
+		int fd = open(buf, O_WRONLY | O_CREAT | O_EXCL, 0444);
+		if(fd == -1)
+		{
+			if(errno == EEXIST || errno == EISDIR)
+				continue;
+			fprintf(stderr, "permanent failure creating logfile %s: %s\n", buf, strerror(errno));
+			exit(1);
+		}
+
+		fp = fdopen(fd, "w");
+		return;
 	}
+
+	fprintf(stderr, "tried %d filenames but couldn't create any logfile\n", i);
+	exit(1);
+}
+
+void logger_init() {
+	open_logfile();
 	setbuf(fp, NULL);
 
 	// Outgoing socket (WiFi)
 	sd = get_send_socket();
 
-	// Initilize sequence number
-    sequence = 0;
+	// Initialize sequence number
+	sequence = 0;
 
 	// Add sequence number to the first packet
 	memcpy(&log_buffer[log_buffer_size], &sequence, sizeof(uint32_t));
 	log_buffer_size += sizeof(uint32_t);
-
-	// Print some debug
-//	printf("Filling packet: ");
 }
 
 
