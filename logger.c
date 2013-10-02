@@ -2,11 +2,13 @@
  *  @file logger.c
  */
 
-#include <stdio.h>
-#include <limits.h>
 #include <errno.h>
-#include <string.h>
+#include <fcntl.h>
 #include <inttypes.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <arpa/inet.h>
 #include "psas_packet.h"
@@ -14,8 +16,10 @@
 #include "utils_sockets.h"
 #include "net_addrs.h"
 
-#define PASTE(a, b) a##b
-#define STRINGIFY(x) #x
+#define _PASTE(a, b) a##b
+#define PASTE(a, b) _PASTE(a, b)
+#define _STRINGIFY(x) #x
+#define STRINGIFY(x) _STRINGIFY(x)
 
 #define LOGFILE_DIGITS 3
 #define LOGFILE_BASE "logfile-"
@@ -23,7 +27,6 @@
 #define P_LIMIT 1500
 
 static FILE *fp = NULL;
-static char filename[50];
 static char log_buffer[1500]; 		// Global so destructor can flush final data
 static int log_buffer_size = 0;
 static int sd;
