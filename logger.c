@@ -12,10 +12,17 @@
 #include <time.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/timerfd.h>
+#include "fcfutils.h"
 #include "psas_packet.h"
 #include "logger.h"
 #include "utils_sockets.h"
 #include "net_addrs.h"
+
+/*
+ * because of preprocessor shenanigans, macro defined constants need to pass
+ * through two layers of macro function to correctly stringify.
+ */
 
 #define _PASTE(a, b) a##b
 #define PASTE(a, b) _PASTE(a, b)
@@ -26,6 +33,7 @@
 #define LOGFILE_BASE "logfile-"
 
 #define P_LIMIT 1500
+#define LOG_TIMEOUT_NS 10e6 //10ms
 
 static FILE *fp = NULL;
 static char log_buffer[1500]; 		// Global so destructor can flush final data
@@ -91,7 +99,7 @@ static void open_socket(void)
 		exit(1);
 	}
 }
-
+static void log_timeout(struct pollfd * pfd);
 void logger_init() {
 	open_logfile();
 	setbuf(fp, NULL);
@@ -105,6 +113,16 @@ void logger_init() {
 	// Add sequence number to the first packet
 	memcpy(&log_buffer[log_buffer_size], &sequence, sizeof(uint32_t));
 	log_buffer_size += sizeof(uint32_t);
+
+
+    int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+    struct itimerspec  newval;
+    newval.it_interval.tv_sec = 0;
+    newval.it_interval.tv_nsec = 10e6; //10 ms
+    newval.it_value.tv_sec = 0;
+    newval.it_value.tv_nsec = 10e6;
+    timerfd_settime(tfd, 0, &newval, NULL);
+    fcf_add_fd(tfd, POLLIN, log_timeout);
 }
 
 
@@ -151,6 +169,14 @@ static void logg(void *data, size_t len)
 //	printf("-");
 }
 
+static void log_timeout(struct pollfd * pfd){
+    char buf[8];
+    read(pfd->fd, buf, 8); //clears timerfd
+    if(log_buffer_size > sizeof(uint32_t)){ //sequence number
+        flush_log();
+    }
+}
+
 static void log_message(char *msg)
 {
 	int len = strlen(msg);
@@ -184,9 +210,9 @@ void log_receive_mpl(MPLMessage* data){
 }
 
 void log_receive_arm(char* code){
-	// single byte: arm if nonzero
 	log_message(code);
 }
+
 void log_receive_rc(RollServoMessage* data){
 	data->data_length = htons(data->data_length);
 	logg(data, sizeof(RollServoMessage));
