@@ -28,7 +28,8 @@ int16_t fix_complement(uint16_t val, int bits) {
 }
 
 void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
-	if(len == sizeof(ADIS16405BurstData)){
+	//FIXME: this works right now, but is not actually right
+	if(len == sizeof(ADISMessage)){
 		// Build message header
 		ADISMessage packet ={
 				.ID={"ADIS"},
