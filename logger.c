@@ -33,7 +33,7 @@
 #define LOGFILE_BASE "logfile-"
 
 #define P_LIMIT 1500
-#define LOG_TIMEOUT_NS 10e6 //10ms
+#define LOG_TIMEOUT_NS 100e6 //100ms
 
 static FILE *fp = NULL;
 static char log_buffer[1500]; 		// Global so destructor can flush final data
@@ -118,9 +118,9 @@ void logger_init() {
     int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     struct itimerspec  newval;
     newval.it_interval.tv_sec = 0;
-    newval.it_interval.tv_nsec = 10e6; //10 ms
+    newval.it_interval.tv_nsec = LOG_TIMEOUT_NS;
     newval.it_value.tv_sec = 0;
-    newval.it_value.tv_nsec = 10e6;
+    newval.it_value.tv_nsec = LOG_TIMEOUT_NS;
     timerfd_settime(tfd, 0, &newval, NULL);
     fcf_add_fd(tfd, POLLIN, log_timeout);
 }
