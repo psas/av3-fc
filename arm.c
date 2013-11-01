@@ -90,11 +90,10 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 	if(COMPARE_BUFFER_TO_CMD(buffer, ARM, len)){
 		//send arm
 		bool accel_locked = upright == 100;
-		//bool sensors_allow_launch = (GPS_locked && accel_locked) || !slock_enable;
-        bool sensors_allow_launch = accel_locked || !slock_enable;
+		bool sensors_allow_launch = (GPS_locked && accel_locked) || !slock_enable;
 
 		if(sensors_allow_launch){
-            arm_send_signal("ARM");
+			arm_send_signal("ARM");
 			send_arm_response(ARM_response);
 		}
 		else{
