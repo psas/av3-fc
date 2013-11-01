@@ -2,52 +2,109 @@
  *  @file logger.c
  */
 
-#include <stdio.h>
-#include <limits.h>
 #include <errno.h>
-#include <string.h>
+#include <fcntl.h>
 #include <inttypes.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 #include "psas_packet.h"
 #include "logger.h"
 #include "utils_sockets.h"
 #include "net_addrs.h"
 
+#define _PASTE(a, b) a##b
+#define PASTE(a, b) _PASTE(a, b)
+#define _STRINGIFY(x) #x
+#define STRINGIFY(x) _STRINGIFY(x)
+
+#define LOGFILE_DIGITS 3
+#define LOGFILE_BASE "logfile-"
+
 #define P_LIMIT 1500
 
 static FILE *fp = NULL;
-static char filename[50];
 static char log_buffer[1500]; 		// Global so destructor can flush final data
 static int log_buffer_size = 0;
-static int sd;
+static int net_fd;
 
 // sequence number, each UDP packet gets a number
 uint32_t sequence;
 
 
-void logger_init() {
+static void open_logfile(void)
+{
+	/* Compute 10 ** LOGFILE_DIGITS at compile time. */
+	const int attempt_count = PASTE(1e, LOGFILE_DIGITS);
 
-	// Show we're opening a file
-	sprintf(filename, "logfile-%d.log", (int)time(NULL));
-	fp = fopen(filename, "w+");
-	if(!fp){
-		fprintf (stderr, "disk logger: could not open file %s for writing: %s\n", filename, strerror(errno));
+	char buf[sizeof LOGFILE_BASE + LOGFILE_DIGITS];
+
+	int i;
+	for(i = 0; i < attempt_count; ++i)
+	{
+		snprintf(buf, sizeof buf, LOGFILE_BASE "%0" STRINGIFY(LOGFILE_DIGITS) "d", i);
+		int fd = open(buf, O_WRONLY | O_CREAT | O_EXCL, 0444);
+		if(fd == -1)
+		{
+			if(errno == EEXIST || errno == EISDIR)
+				continue;
+			fprintf(stderr, "permanent failure creating logfile %s: %s\n", buf, strerror(errno));
+			exit(1);
+		}
+
+		fp = fdopen(fd, "w");
+		return;
 	}
+
+	fprintf(stderr, "tried %d filenames but couldn't create any logfile\n", i);
+	exit(1);
+}
+
+static void open_socket(void)
+{
+	net_fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if(net_fd < 0)
+	{
+		perror("socket(AF_INET, SOCK_DGRAM, 0)");
+		exit(1);
+	}
+
+	int broadcast_flag = 1;
+	/* ignore errors from allowing broadcast addresses; we'll detect the error at connect, below */
+	setsockopt(net_fd, SOL_SOCKET, SO_BROADCAST, &broadcast_flag, sizeof(broadcast_flag));
+
+	struct sockaddr_in remote = { AF_INET };
+	remote.sin_port = htons(WIFI_PORT);
+	if(!inet_aton(WIFI_IP, &remote.sin_addr))
+	{
+		fprintf(stderr, "inet_aton(\"" WIFI_IP "\") failed\n");
+		exit(1);
+	}
+
+	if(connect(net_fd, (struct sockaddr *) &remote, sizeof(struct sockaddr)) < 0)
+	{
+		perror("could not connect to " WIFI_IP ":" STRINGIFY(WIFI_PORT));
+		exit(1);
+	}
+}
+
+void logger_init() {
+	open_logfile();
 	setbuf(fp, NULL);
 
 	// Outgoing socket (WiFi)
-	sd = get_send_socket();
+	open_socket();
 
-	// Initilize sequence number
-    sequence = 0;
+	// Initialize sequence number
+	sequence = 0;
 
 	// Add sequence number to the first packet
 	memcpy(&log_buffer[log_buffer_size], &sequence, sizeof(uint32_t));
 	log_buffer_size += sizeof(uint32_t);
-
-	// Print some debug
-//	printf("Filling packet: ");
 }
 
 
@@ -62,13 +119,13 @@ void logger_final() {
 static void flush_log()
 {
 	// Send current buffer to disk
-//	printf("\nDumping packet to disk and wifi.\n\n");
 	// for the log file, convert the sequence number to a SEQN message
 	message_header header = { .ID="SEQN", .timestamp={0,0,0,0,0,0}, .data_length=htons(4) };
 	fwrite(&header, 1, sizeof(message_header), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 	// Send current buffer to WiFi
-	sendto_socket(sd, log_buffer, log_buffer_size, WIFI_IP, WIFI_PORT);
+	if(write(net_fd, log_buffer, log_buffer_size) != log_buffer_size)
+		perror("flush_log: ignoring error from write(net_fd)");
 
 	// Reset buffer size
 	log_buffer_size = 0;
@@ -80,8 +137,6 @@ static void flush_log()
 	uint32_t s  = htonl(sequence);
 	memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
 	log_buffer_size += sizeof(uint32_t);
-
-//	printf("Filling packet: ");
 }
 
 static void logg(void *data, size_t len)
