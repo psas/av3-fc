@@ -10,11 +10,9 @@
 #include <math.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include <libusb-1.0/libusb.h>
 #include "net_addrs.h"
 #include "arm.h"
 #include "fcfutils.h"
-#include "utils_libusb-1.0.h"
 #include "utils_sockets.h"
 
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
@@ -23,7 +21,6 @@
 #define ROCKET_READY_PIN 8
 #define ROCKET_READY_PORT 0
 
-libusb_device_handle * aps;
 int sd;
 
 bool slock_enable;
@@ -65,44 +62,6 @@ void arm_receive_gps(GPSMessage * data){
 	return;
 }
 
-static void set_aps_gpio(int port, uint32_t val){
-    int setport = 0x80;
-    unsigned char data[64];
-    int usb_err;
-    data[0] = (val & 0xFF<<0)>>0;
-    data[1] = (val & 0xFF<<8)>>8;
-    data[2] = (val & 0xFF<<16)>>16;
-    data[3] = (val & 0xFF<<24)>>24;
-    usb_err = libusb_control_transfer(aps,
-            LIBUSB_RECIPIENT_OTHER | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT,
-            setport | port, 0, 0, data, 4, 2000);
-    if(usb_err < 0){
-//        print_libusb_error(usb_err, "set_port");
-    }
-    if(usb_err != 4){
-        printf("set_port: Didn't send correct number of bytes");
-    }
-}
-
-static void clear_aps_gpio(int port, uint32_t val){
-    int clearport = 0x40;
-    unsigned char data[64];
-    int usb_err;
-    data[0] = (val & 0xFF<<0)>>0;
-    data[1] = (val & 0xFF<<8)>>8;
-    data[2] = (val & 0xFF<<16)>>16;
-    data[3] = (val & 0xFF<<24)>>24;
-    usb_err = libusb_control_transfer(aps,
-            LIBUSB_RECIPIENT_OTHER | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT,
-            clearport | port, 0, 0, data, 4, 2000);
-    if(usb_err < 0){
-//        print_libusb_error(usb_err, "set_port");
-    }
-    if(usb_err != 4){
-        printf("set_port: Didn't send correct number of bytes");
-    }
-}
-
 static void send_arm_response(const char * message){
 	sendto_socket(sd, message, strlen(message), ARM_IP, ARM_PORT);
 }
@@ -117,11 +76,11 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 
 	char ARM[] = "#YOLO";
 	char ARM_response[] = "successful ARM";
-	char ARM_response_no_aps[] = "successful ARM but RR not sent due to bad APS";
+	//har ARM_response_no_aps[] = "successful ARM but RR not sent due to bad APS";
 	char ARM_decline_sensors[] = "ARM failed due to sensor lock";
 	char SAFE[] ="#SAFE";
 	char SAFE_response[] = "successful SAFE";
-	char SAFE_response_no_aps[] = "successful SAFE but RR not unsent due to bad APS";
+	//char SAFE_response_no_aps[] = "successful SAFE but RR not unsent due to bad APS";
 	char EN_SLOCK []= "EN_SLOCK";
 	char EN_SLOCK_response[] = "successful EN_SLOCK";
 	char DI_SLOCK []= "DI_SLOCK";
@@ -131,17 +90,12 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 	if(COMPARE_BUFFER_TO_CMD(buffer, ARM, len)){
 		//send arm
 		bool accel_locked = upright == 100;
-		bool sensors_allow_launch = (GPS_locked && accel_locked) || !slock_enable;
+		//bool sensors_allow_launch = (GPS_locked && accel_locked) || !slock_enable;
+        bool sensors_allow_launch = accel_locked || !slock_enable;
+
 		if(sensors_allow_launch){
-			if(aps){
-				set_aps_gpio(ROCKET_READY_PIN, (1<<ROCKET_READY_PORT));
-				arm_send_signal("ARM");
-				send_arm_response(ARM_response);
-			}
-			else{
-				arm_send_signal("ARM");
-				send_arm_response(ARM_response_no_aps);
-			}
+            arm_send_signal("ARM");
+			send_arm_response(ARM_response);
 		}
 		else{
 			send_arm_response(ARM_decline_sensors);
@@ -149,16 +103,8 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 	}
 	else if(COMPARE_BUFFER_TO_CMD(buffer, SAFE, len)){
 		//send safe
-		if(aps){
-			clear_aps_gpio(ROCKET_READY_PIN, (1<<ROCKET_READY_PORT));
-			arm_send_signal("SAFE");
-			send_arm_response(SAFE_response);
-		}
-		else{
-			arm_send_signal("SAFE");
-			send_arm_response(SAFE_response_no_aps);
-		}
-
+		arm_send_signal("SAFE");
+		send_arm_response(SAFE_response);
 	}
 	else if(COMPARE_BUFFER_TO_CMD(buffer, EN_SLOCK, len)){
 		//enable slock
@@ -178,13 +124,9 @@ void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
 
 void arm_init(void){
 	slock_enable = true;
-	char aps_name[] = "aps";
-	init_libusb(aps_name);
-	aps = open_device (aps_name, 0xFFFF, 0x0006);
 	sd = get_send_socket();
 }
 
 void arm_final(void){
 	close(sd);
-	close_device(aps);
 }
