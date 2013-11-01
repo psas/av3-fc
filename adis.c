@@ -28,14 +28,14 @@ int16_t fix_complement(uint16_t val, int bits) {
 }
 
 void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
-	if(len == sizeof(ADISMessage)){
+	if(len == sizeof(ADIS16405BurstData)){
 		// Build message header
 		ADISMessage packet ={
 				.ID={"ADIS"},
 				.timestamp={(uint8_t)timestamp[0], (uint8_t)timestamp[1],
 						    (uint8_t)timestamp[2], (uint8_t)timestamp[3],
 						    (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-				.data_length=buffer[10] << 8| buffer[11]
+				.data_length=sizeof(ADIS16405BurstData)
 		};
 		// Copy in data from socket
 		packet.data.adis_supply_out = buffer[12] | buffer[13] << 8;
@@ -54,6 +54,7 @@ void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
 //		memcpy(&packet.data, data_section, sizeof(ADIS16405BurstData));
 //		printf("%d, %d, %d\n", packet.data.adis_xgyro_out, packet.data.adis_xaccl_out, packet.data.adis_temp_out);
 		// Send data out
+
 		adis_data_out(&packet);
 	}
 	//TODO: else log error?

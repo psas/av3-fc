@@ -67,7 +67,6 @@ static void flush_log()
 	message_header header = { .ID="SEQN", .timestamp={0,0,0,0,0,0}, .data_length=htons(4) };
 	fwrite(&header, 1, sizeof(message_header), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
-
 	// Send current buffer to WiFi
 	sendto_socket(sd, log_buffer, log_buffer_size, WIFI_IP, WIFI_PORT);
 
@@ -131,7 +130,7 @@ void log_receive_mpl(MPLMessage* data){
 
 void log_receive_arm(char* code){
 	// single byte: arm if nonzero
-	log_message(code[0] ? "ARM" : "DISARM");
+	log_message(code);
 }
 void log_receive_rc(RollServoMessage* data){
 	data->data_length = htons(data->data_length);
