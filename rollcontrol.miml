@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: rollcontrol.h
-object: rollcontrol.o
+object: rollcontrol.o rollControlLibrary.o
 init: rollcontrol_init();
 
 senders:
