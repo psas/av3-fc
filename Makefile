@@ -6,7 +6,7 @@ OPTSPROF := -O3 -pg
 OPTS     := -ffast-math
 #WARNINGS := -Werror -Wall -Wextra -Wmissing-prototypes -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
 WARNINGS := -Wall
-CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(shell pkg-config --cflags libusb-1.0)
+CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing
 LDLIBS   := -lrt -lm $(shell pkg-config --libs libusb-1.0) -L . -lrc_library
 .DEFAULT_GOAL := all
 DOXYFILE := ./Doxyfile
