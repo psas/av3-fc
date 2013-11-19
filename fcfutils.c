@@ -26,7 +26,6 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <errno.h>
-#include <libusb-1.0/libusb.h>
 #include <signal.h>
 //#include "psas_packet.h"
 #include "fcfutils.h"

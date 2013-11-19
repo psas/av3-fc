@@ -53,15 +53,10 @@ For the project to complete all three steps.
 
 ## Installing
 
-
-You might need some packages
-
-    $ sudo apt-get install libusb-dev pkg-config
-
 The code generator runs on python3 using the pyyaml package. It's recomended to
 use a python virtual environment like this:
 
-    $ sudo apt-get install python3 python-pip virtualenvwrapper
+    $ sudo apt-get install python3 libyaml-0-2 python-pip virtualenvwrapper
     $ mkvirtualenv -p <path/to/python3/install> av3fc
     (av3fc)$ pip install -r requirements.txt
 
