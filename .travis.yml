@@ -8,3 +8,12 @@ install:
   - make all
 
 script: true
+
+notifications:
+  irc:
+    channels: "irc.psas.pdx.edu#psas"
+    template:
+      - "%{repository}@%{branch}: %{message} (%{build_url})"
+    on_success: change
+    on_failure: change
+    use_notice: true
