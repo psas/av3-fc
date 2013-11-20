@@ -1,22 +1,6 @@
-# PSAS Flight Computer Framework
+# PSAS Flight Computer
 
-The Flight Control Framework, or FCF, is a bit of a misnomer in and of itself.
-While it was originally developed to run on high-power rockets, the core
-framework itself is extendable to work with practically any two pieces of C
-code that exchange data. With minimal overhead, this lightweight framework was
-designed for fast and efficient data transfer between multiple, interrelated,
-but abstracted, pieces of code. This abstraction is created by allowing these
-different code fragments, called user modules, to pass data between each other
-without referencing one another explicitly. Instead, a relationship between any
-two or more user modules is set up in a language called MIML.
-
-
-## Framework Repository Structure
-
- - `/` - All the files that comprise the framework, code generator, modules, etc.
- - `/profiler` - External profiler that feeds input through sockets from a remote python script.
- - `/templates` - Basic templates for creating modules that connect to libusb or sockets. Read the in-file instructions for how to properly configure and save to a new module file.
-
+[![Build Status](https://travis-ci.org/psas/av3-fc.png)](https://travis-ci.org/psas/av3-fc)
 
 # The Framework
 
