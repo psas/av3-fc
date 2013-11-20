@@ -56,7 +56,6 @@ pdf:
 distclean: clean
 	rm -rf refman.pdf #./html 
 
-
 clean:
 	rm -f *.o *.d fc core
 	rm -f $(MIMLMK) fcfmain.c fcfmain.h
