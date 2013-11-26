@@ -37,7 +37,7 @@ fc: $(OBJECTS)
 miml: $(MIMLMK)
 
 $(MIMLMK): $(MAINMIML)
-	./codeGen.py -mch $^
+	python ./codeGen.py -mch $^
 
 
 .PHONY: html
