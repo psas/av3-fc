@@ -12,5 +12,5 @@ senders:
 receivers:
   mpu_raw_in:
   - [buffer, unsigned char*]
-  - [len, int]
+  - [len, unsigned int]
   - [timestamp, unsigned char*]

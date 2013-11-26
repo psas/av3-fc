@@ -80,7 +80,7 @@ void rc_receive_imu(ADISMessage * imu){
 	roll = scale_gyro(imu->data.adis_xgyro_out);
 }
 
-void rc_receive_arm(char * signal){
+void rc_receive_arm(const char * signal){
 	if(!strcmp(signal, "ARM")){
 		armed = true;
 		enable_servo = true;
@@ -91,7 +91,7 @@ void rc_receive_arm(char * signal){
 	}
 }
 
-void rc_raw_ld_in(unsigned char * signal, int len, unsigned char* timestamp){
+void rc_raw_ld_in(unsigned char * signal, unsigned int len, unsigned char* timestamp){
 	if(len > 0){
 		launch = (signal[0]) ? 1 : 0;
 	}
@@ -105,7 +105,7 @@ static void send_servo_response(const char * message){
 	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))
 
 
-void rc_raw_testrc(unsigned char * data, int len, unsigned char* timestamp){
+void rc_raw_testrc(unsigned char * data, unsigned int len, unsigned char* timestamp){
 	if(!armed){
 		if(COMPARE_BUFFER_TO_CMD(data, "ENABLE", len)){
 			enable_servo = true;

@@ -1,11 +1,8 @@
-# Wouldn't accept flto flag. Not sure why. Seems to work without it.
-# OPTSLIVE := -flto -O3
-OPTSLIVE := -O3 -D FCF_FC_NETWORK
-OPTSDEV  := -g
+OPTSLIVE := -flto -O3 -D FCF_FC_NETWORK
+OPTSDEV  := -flto -O3 -g
 OPTSPROF := -O3 -pg
 OPTS     := -ffast-math
-#WARNINGS := -Werror -Wall -Wextra -Wmissing-prototypes -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
-WARNINGS := -Wall
+WARNINGS := -Wall -Wextra -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
 CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing
 LDLIBS   := -lrt -lm
 .DEFAULT_GOAL := all

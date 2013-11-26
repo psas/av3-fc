@@ -37,7 +37,7 @@
 
 static FILE *fp = NULL;
 static char log_buffer[1500]; 		// Global so destructor can flush final data
-static int log_buffer_size = 0;
+static unsigned int log_buffer_size = 0;
 static int net_fd;
 
 // sequence number, each UDP packet gets a number
@@ -157,7 +157,7 @@ static void flush_log()
 	log_buffer_size += sizeof(uint32_t);
 }
 
-static void logg(void *data, size_t len)
+static void logg(const void *data, size_t len)
 {
 	// Check size of buffer, if big enough, we can send packet
 	if (log_buffer_size + len >= P_LIMIT)
@@ -177,7 +177,7 @@ static void log_timeout(struct pollfd * pfd){
     }
 }
 
-static void log_message(char *msg)
+static void log_message(const char *msg)
 {
 	int len = strlen(msg);
 	if (log_buffer_size + sizeof(message_header) + len > P_LIMIT)
@@ -209,7 +209,7 @@ void log_receive_mpl(MPLMessage* data){
 	logg(data, sizeof(MPLMessage));
 }
 
-void log_receive_arm(char* code){
+void log_receive_arm(const char* code){
 	log_message(code);
 }
 

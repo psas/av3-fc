@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include "mpl.h"
 
-void mpl_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
+void mpl_raw_in(unsigned char *buffer, unsigned int len, unsigned char* timestamp) {
 	if(len == sizeof(MPLMessage)){
 		// Build message header
 		MPLMessage packet ={

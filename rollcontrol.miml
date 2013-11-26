@@ -13,14 +13,14 @@ receivers:
   - [data, ADISMessage*]
   
   rc_receive_arm:
-  - [code, char*]
+  - [code, const char*]
   
   rc_raw_ld_in:
   - [code, unsigned char*]
-  - [len, int]
+  - [len, unsigned int]
   - [timestamp, unsigned char*]
   
   rc_raw_testrc:
   - [code, unsigned char*]
-  - [len, int]
+  - [len, unsigned int]
   - [timestamp, unsigned char*] 

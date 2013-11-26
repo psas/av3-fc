@@ -17,7 +17,7 @@ typedef struct {
 
 extern void mpl_data_out(MPLMessage*); // [miml:sender]
 
-extern void mpl_raw_in(unsigned char*, int, unsigned char*); // [miml:reciever]
+extern void mpl_raw_in(unsigned char*, unsigned int, unsigned char*); // [miml:reciever]
 
 
 #endif /* MPL_H_ */

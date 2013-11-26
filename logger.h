@@ -15,7 +15,7 @@ extern void log_receive_gps(GPSMessage*);
 extern void log_receive_mpu(MPUMessage*);
 extern void log_receive_mpl(MPLMessage*);
 extern void log_receive_rc(RollServoMessage*);
-extern void log_receive_arm(char*);
+extern void log_receive_arm(const char*);
 
 
 #endif

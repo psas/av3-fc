@@ -40,6 +40,13 @@ typedef void (*pollfd_callback)(struct pollfd *);
  * @return index value of newest file descriptor
  */
 extern int fcf_add_fd(int fd, short events, pollfd_callback cb);
+
+/*
+ *    Per poll loop file descriptor add
+ */
+extern int fcf_add_fd_ppc(int fd, short events, pollfd_callback cb);
+
+
 /**
  * @brief simply removes a specified file descriptor from the arrays
  * @details If the fd is in the arrays, the fd is removed from both the fds and fdx arrays.

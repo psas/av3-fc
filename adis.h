@@ -35,7 +35,7 @@ typedef struct {
 
 extern void adis_data_out(ADISMessage*); // [miml:sender]
 
-extern void adis_raw_in(unsigned char*, int, unsigned char*); // [miml:receiver]
+extern void adis_raw_in(unsigned char*, unsigned int, unsigned char*); // [miml:receiver]
 
 
 #endif /* ADIS_H_ */

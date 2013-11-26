@@ -7,12 +7,12 @@ final: arm_final();
 
 senders:
   arm_send_signal:
-  - [code, char*]
+  - [code, const char*]
   
 receivers:
   arm_raw_in:
   - [buffer, unsigned char*]
-  - [len, int]
+  - [len, unsigned int]
   - [timestamp, unsigned char*]
   
   arm_receive_imu:

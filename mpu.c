@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include "mpu.h"
 
-void mpu_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
+void mpu_raw_in(unsigned char *buffer, unsigned int len, unsigned char* timestamp) {
 	if(len == sizeof(MPUMessage)){
 		// Build message header
 		MPUMessage packet ={

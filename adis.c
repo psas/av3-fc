@@ -27,7 +27,7 @@ int16_t fix_complement(uint16_t val, int bits) {
 //	return ((int16_t)value << distance) >> distance;
 }
 
-void adis_raw_in(unsigned char *buffer, int len, unsigned char* timestamp) {
+void adis_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
 	//FIXME: this works right now, but is not actually right
 	if(len == sizeof(ADIS16405BurstData)){
 		// Build message header

@@ -23,7 +23,7 @@ receivers:
   - [data, MPLMessage*]
   
   log_receive_arm:
-  - [code, char*]
+  - [code, const char*]
   
   log_receive_rc:
   - [data, RollServoMessage*]

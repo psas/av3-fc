@@ -66,7 +66,7 @@ static void send_arm_response(const char * message){
 	sendto_socket(sd, message, strlen(message), ARM_IP, ARM_PORT);
 }
 
-void arm_raw_in(unsigned char *buffer, int len, unsigned char * timestamp){
+void arm_raw_in(unsigned char *buffer, int unsigned len, unsigned char * timestamp){
 	/* Commands:
 	 * #YOLO - (You Only Launch Once) Arm the rocket for launch
 	 * #SAFE - Disarm the rocket (default)

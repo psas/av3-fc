@@ -12,6 +12,6 @@ senders:
 receivers:
   adis_raw_in:
   - [ARG1, unsigned char*]
-  - [ARG2, int]
+  - [ARG2, unsigned int]
   - [ARG3, unsigned char*]
 

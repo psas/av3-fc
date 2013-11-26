@@ -14,9 +14,9 @@ typedef struct{
 void rollcontrol_init(void); // [miml:init]
 
 void rc_receive_imu(ADISMessage *); // [miml:receiver]
-void rc_receive_arm(char *); // [miml:receiver]
-void rc_raw_ld_in(unsigned char *, int, unsigned char*); // [miml:receiver]
-void rc_raw_testrc(unsigned char *, int, unsigned char*); // [miml:receiver]
+void rc_receive_arm(const char *); // [miml:receiver]
+void rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
+void rc_raw_testrc(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
 
 
 void rc_send_servo(RollServoMessage*); // [miml:sender]
