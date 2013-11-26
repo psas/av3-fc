@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: rollservo.h
-object: rollservo.o
+object: devices/rollservo.o
 init: rollservo_init();
 final: rollservo_final();
 

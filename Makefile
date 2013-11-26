@@ -1,9 +1,10 @@
+INCLUDE_DIRS := -Idevices -I.
 OPTSLIVE := -flto -O3 -D FCF_FC_NETWORK
 OPTSDEV  := -flto -O3 -g
 OPTSPROF := -O3 -pg
 OPTS     := -ffast-math
 WARNINGS := -Wall -Wextra -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
-CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing
+CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(INCLUDE_DIRS)
 LDLIBS   := -lrt -lm
 .DEFAULT_GOAL := all
 DOXYFILE := ./Doxyfile
@@ -36,7 +37,7 @@ fc: $(OBJECTS)
 miml: $(MIMLMK)
 
 $(MIMLMK): $(MAINMIML)
-	python ./codeGen.py -mch $^
+	./codeGen.py -mch $^
 
 
 .PHONY: html
