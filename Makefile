@@ -40,4 +40,5 @@ $(MIMLMK): $(MAINMIML)
 
 clean:
 	rm -f *.o *.d fc core
+	rm -f devices/*.o devices/*.d
 	rm -f $(MIMLMK) fcfmain.c fcfmain.h

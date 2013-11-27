@@ -11,8 +11,8 @@
 #include <termios.h>
 #include <sys/poll.h>
 
-#include "fcfutils.h"
-#include "utils_time.h"
+#include "../elderberry/fcfutils.h"
+#include "../utils_time.h"
 #include "gps.h"
 
 // cf 7.1  Crescent Integrators Manual
