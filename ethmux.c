@@ -8,9 +8,9 @@
 #include <linux/net_tstamp.h>
 #include <time.h>
 #include <string.h>
-#include "utils_sockets.h"
+#include "elderberry/utils_sockets.h"
 #include "utils_time.h"
-#include "fcfutils.h"
+#include "elderberry/fcfutils.h"
 #include "net_addrs.h"
 #include "ethmux.h"
 
