@@ -33,7 +33,11 @@
 #define LOGFILE_DIGITS 3
 #define LOGFILE_BASE "logfile-"
 
-#define P_LIMIT 1500
+#define LINK_MTU 1500
+#define UDP_HEADER_SIZE 8
+#define IPv4_MAX_HEADER_SIZE 60
+#define P_LIMIT LINK_MTU - UDP_HEADER_SIZE - IPv4_MAX_HEADER_SIZE - sizeof(uint32_t)
+
 #define LOG_TIMEOUT_NS 100e6 //100ms
 
 static FILE *fp = NULL;
@@ -100,6 +104,7 @@ static void open_socket(void)
 		exit(1);
 	}
 }
+
 static void log_timeout(struct pollfd * pfd);
 void logger_init() {
 	open_logfile();
@@ -133,7 +138,6 @@ void logger_final() {
 	}
 	fclose(fp);
 }
-
 
 static void flush_log()
 {

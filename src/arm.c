@@ -18,9 +18,6 @@
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
 	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))
 
-#define ROCKET_READY_PIN 8
-#define ROCKET_READY_PORT 0
-
 int sd;
 
 bool slock_enable;
@@ -76,11 +73,9 @@ void arm_raw_in(unsigned char *buffer, int unsigned len, unsigned char * timesta
 
 	char ARM[] = "#YOLO";
 	char ARM_response[] = "successful ARM";
-	//har ARM_response_no_aps[] = "successful ARM but RR not sent due to bad APS";
 	char ARM_decline_sensors[] = "ARM failed due to sensor lock";
 	char SAFE[] ="#SAFE";
 	char SAFE_response[] = "successful SAFE";
-	//char SAFE_response_no_aps[] = "successful SAFE but RR not unsent due to bad APS";
 	char EN_SLOCK []= "EN_SLOCK";
 	char EN_SLOCK_response[] = "successful EN_SLOCK";
 	char DI_SLOCK []= "DI_SLOCK";
