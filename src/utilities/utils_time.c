@@ -1,9 +1,10 @@
 /*
- * utils_time.c
+ * time.c
  *
  */
 #include <time.h>
 #include <stdint.h>
+#include "utilities/utils_time.h"
 
 struct timespec starttime; // TODO: timer module
 

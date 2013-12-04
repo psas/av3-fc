@@ -1,5 +1,5 @@
 /*
- * utils_sockets.h
+ * sockets.h
  *
  *  Created on: Jan 26, 2013
  */
@@ -9,10 +9,7 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
-/*typedef struct socksetup {
-	int fd;
-	struct sockaddr_in *addr;
-} socksetup;*/
+#include <time.h>
 
 int readsocket(int fd, unsigned char *buffer, int bufsize);
 int readsocketfrom(int fd, unsigned char *buffer, int bufsize, struct sockaddr *src, socklen_t *addrlen);

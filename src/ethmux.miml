@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: ethmux.h
-object: ethmux.o
+object: src/ethmux.o
 init: ethmux_init();
 final: ethmux_final();
 

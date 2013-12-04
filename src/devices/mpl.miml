@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: mpl.h
-object: devices/mpl.o
+object: src/devices/mpl.o
 
 senders:
   mpl_data_out:

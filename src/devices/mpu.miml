@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: mpu.h
-object: devices/mpu.o
+object: src/devices/mpu.o
 
 # Functions that handle outgoing data
 senders:

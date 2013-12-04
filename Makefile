@@ -1,4 +1,4 @@
-INCLUDE_DIRS := -Idevices -I.
+INCLUDE_DIRS := -Isrc -Isrc/devices -Isrc/utilities -I.
 OPTSLIVE := -flto -O3 -D FCF_FC_NETWORK
 OPTSDEV  := -flto -O3 -g
 OPTSPROF := -O3 -pg
@@ -14,7 +14,7 @@ MIMLMK   ?= miml.mk
 
 -include $(MIMLMK)
 
-all: miml fc
+all: miml fc cleanbuild
 
 live: CFLAGS += $(OPTSLIVE)
 live: miml fc
@@ -23,22 +23,22 @@ debug: CFLAGS  += $(OPTSDEV)
 debug: LDFLAGS += $(OPTSDEV)
 debug: miml fc
 
-
 prof: CFLAGS  += $(OPTSPROF)
 prof: LDFLAGS += $(OPTSPROF)
 prof: miml fc
 
-
 fc: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
-
 
 miml: $(MIMLMK)
 
 $(MIMLMK): $(MAINMIML)
 	python ./elderberry/codeGen.py -mch $^
 
-clean:
-	rm -f *.o *.d fc core
-	rm -f devices/*.o devices/*.d
+cleanbuild:
+	rm `find . -name '*.o'` -f
+	rm `find . -name '*.d'` -f
+
+clean: cleanbuild
 	rm -f $(MIMLMK) fcfmain.c fcfmain.h
+	rm -f fc

@@ -13,11 +13,12 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/timerfd.h>
-#include "elderberry/fcfutils.h"
-#include "psas_packet.h"
+#include "../elderberry/fcfutils.h"
+#include "utilities/utils_sockets.h"
+#include "utilities/psas_packet.h"
+#include "utilities/net_addrs.h"
 #include "logger.h"
-#include "utils_sockets.h"
-#include "net_addrs.h"
+
 
 /*
  * because of preprocessor shenanigans, macro defined constants need to pass

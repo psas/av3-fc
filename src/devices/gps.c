@@ -12,7 +12,7 @@
 #include <sys/poll.h>
 
 #include "../elderberry/fcfutils.h"
-#include "../utils_time.h"
+#include "utilities/utils_time.h"
 #include "gps.h"
 
 // cf 7.1  Crescent Integrators Manual

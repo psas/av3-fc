@@ -1,5 +1,0 @@
-%YAML 1.2
----
-include: utils_time.h
-object: utils_time.o
-init: utils_time_init();

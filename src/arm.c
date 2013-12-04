@@ -10,10 +10,10 @@
 #include <math.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include "net_addrs.h"
-#include "arm.h"
-#include "utils_sockets.h"
 #include "elderberry/fcfutils.h"
+#include "utilities/net_addrs.h"
+#include "utilities/utils_sockets.h"
+#include "arm.h"
 
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
 	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))

@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: arm.h
-object: arm.o
+object: src/arm.o
 init: arm_init();
 final: arm_final();
 

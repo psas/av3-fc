@@ -1,4 +1,4 @@
 %YAML 1.2
 ---
 include: utils_sockets.h
-object: utils_sockets.o
+object: src/utilities/utils_sockets.o

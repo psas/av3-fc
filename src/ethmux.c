@@ -8,10 +8,10 @@
 #include <linux/net_tstamp.h>
 #include <time.h>
 #include <string.h>
-#include "utils_sockets.h"
-#include "utils_time.h"
 #include "elderberry/fcfutils.h"
-#include "net_addrs.h"
+#include "utilities/utils_sockets.h"
+#include "utilities/utils_time.h"
+#include "utilities/net_addrs.h"
 #include "ethmux.h"
 
 static unsigned char buffer[1024]; // TODO: packet len

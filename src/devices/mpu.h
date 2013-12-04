@@ -19,7 +19,4 @@ extern void mpu_data_out(MPUMessage*); // [miml:sender]
 
 extern void mpu_raw_in(unsigned char*, unsigned int, unsigned char*); // [miml:reciever]
 
-
-
-
 #endif /* MPU_H_ */

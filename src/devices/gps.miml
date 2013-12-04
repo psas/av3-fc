@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: gps.h
-object: devices/gps.o
+object: src/devices/gps.o
 init: gps_init();
 final: gps_final();
 

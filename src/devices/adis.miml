@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: adis.h
-object: devices/adis.o
+object: src/devices/adis.o
 
 # Functions that handle outgoing data
 senders:

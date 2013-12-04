@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 include: logger.h
-object: logger.o
+object: src/logger.o
 init: logger_init();
 final: logger_final();
 
