@@ -2,18 +2,20 @@
 
 [![Build Status](https://travis-ci.org/psas/av3-fc.png)](https://travis-ci.org/psas/av3-fc)
 
-# The Framework
-
-The framework itself is simply a conduit for passing data between code modules.
-It's principally made up of the framework file, fcfutils.c, that includes the
-main loop and API functions and a collection of sender/receiver relationships,
-or intermodular data handlers, in the fcfmain.c file. 
-
-
-**Read more about the framework here: [github.com/psas/elderberry](https://github.com/psas/elderberry)**
-
 
 # Building the Flight Computer
+
+## Requirments 
+
+The code generator runs on python3 using the pyyaml package. It's recomended to
+use a python virtual environment like this:
+
+    $ sudo apt-get install python3 libyaml-0-2 python-pip virtualenvwrapper
+    $ mkvirtualenv -p <path/to/python3/install> av3fc
+    (av3fc)$ pip install -r requirements.txt
+
+
+## Building
 
 Due to the need for user module abstraction, the build process for the framework
 is a little more complicated than that of a typical C application. Here is the
@@ -34,20 +36,6 @@ that the user only needs to run:
 
 For the project to complete all three steps.
 
-
-## Installing
-
-The code generator runs on python3 using the pyyaml package. It's recomended to
-use a python virtual environment like this:
-
-    $ sudo apt-get install python3 libyaml-0-2 python-pip virtualenvwrapper
-    $ mkvirtualenv -p <path/to/python3/install> av3fc
-    (av3fc)$ pip install -r requirements.txt
-
-Then when you want to build the flight computer run
-
-    (av3fc)$ make
-
 ### Using the Makefile
 
 As discussed in the introduction to this section, the easiest way to use the
@@ -61,27 +49,30 @@ so that modules are added or removed, one would have to rebuild the Miml.mk
 manually by rerunning `make miml`.
 
 
-# Profiling
+## Avionics Network Information
 
-A special profiler module can be added to the system to check latency of the
-framework on a particular machine setup. The directions for installing and
-using the profiler are as follows:
+### Flight Computer:
 
- 1. Hook up the profile module: Edit Main.miml so that the source and messages
-    sections include the following lines:
+ - IP Addr: `10.0.0.10`
+ - MAC Addr: ?
+ - Listen Port: `36000`
 
-```YAML
-sources:
-- [PROFILE, module_profile.miml]
 
-messages:
-PROFILE.sendMessage_profile:
-  - PROFILE.getMessage_profile
+### Sensor Board:
 
-PROFILE.sendMessage_profile3:
-  - PROFILE.getMessage_profile3
-```
+ - IP Addr: `10.0.0.20`
+ - MAC Addr: `E6:10:20:30:40:11`
+ - Listen Port: `35001`
+ - Transmit Ports:
+   - ADIS: `35020`
+   - MPL: `35010`
+   - MPU: `35002`
 
- 1. Run the FC.
- 1. After a couple of seconds, the program prints a report message and terminates. The message is in the format: Finished with count: <X> in <Y> sec. <X>, where Y is the time it took to send X dummy messages.
- 1. The value of X can be configured by setting MAX_COUNT in module_profile.c. See module_profile.c for details.
+
+### Roll Board:
+
+ - IP Addr: `10.0.0.30`
+ - MAC Addr: `E6:10:20:30:40:aa`
+ - Listen Port: `35003`
+ - Transmit Port: `35004`
+

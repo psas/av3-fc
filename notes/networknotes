@@ -1,8 +1,0 @@
-This takes care of the issues Jamey wantet to take care of
--to tell the FC the permanent address of the Raspberry PI
---On  the flight computer in /etc/rc.local add line arp --file 
---created /etc/ethers: 00:c0:ca:32:59:ca	172.17.0.2
-
--On the PI in etc/rc.local
--- /home/pi/netforward/netforward -p 35001 -s 172.17.0.2 -d 192.168.128.255 &
-
