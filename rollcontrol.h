@@ -3,6 +3,8 @@
 
 #include "adis.h"
 
+#define NULL_SERVO_POSITION UINT16_MAX / 2
+
 typedef struct{
 	char     ID[4];
 	uint8_t  timestamp[6];

@@ -5,10 +5,9 @@
 #include <sys/timerfd.h>
 #include "utils_time.h"
 #include "elderberry/fcfutils.h"
-#include "rollcontrol.h"
-#include "rollControlLibrary.h"
 #include "net_addrs.h"
 #include "utils_sockets.h"
+#include "rollcontrol.h"
 
 int sd;
 
@@ -17,7 +16,7 @@ static bool enable_servo;
 static bool armed;
 static uint16_t accel;
 static uint16_t roll;
-static uint8_t prev_servo_disable;
+static bool prev_servo_disable;
 
 static uint16_t scale_accel(int16_t acc){
 	const double shift = 34500 + 1374.05;
@@ -34,20 +33,16 @@ static uint16_t scale_gyro(int16_t gyr){
 static void step(struct pollfd * pfd){
 	char buf[8];
 	read(pfd->fd, buf, 8); //clears timerfd
-	RC_INPUT_STRUCT_TYPE input;
-	RC_OUTPUT_STRUCT_TYPE output;
 
-	input.u16RawAccelerometerADC = accel;
-	input.u16RawRateGyroADC = roll;
-	input.u8IsLaunchDetected = launch;
+	// Do control algorithm here
 
-	rc_step(&input, &output);
 	RollServoMessage out = {
 			.ID = {"ROLL"},
 			.data_length = 3,
-			.u16ServoPulseWidthBin14 = output.u16ServoPulseWidthBin14,
-			.u8ServoDisableFlag = output.u8ServoDisableFlag || !enable_servo,
+			.u16ServoPulseWidthBin14 = NULL_SERVO_POSITION,
+			.u8ServoDisableFlag = !enable_servo,
 	};
+
 	get_psas_time(out.timestamp);
 
 	// Servo disable flag gets sent, and then stop sending packets
@@ -60,10 +55,10 @@ static void step(struct pollfd * pfd){
 void rollcontrol_init(void){
 	launch = false;
 	enable_servo = false;
-	prev_servo_disable = 0;
+	prev_servo_disable = false;
 	accel = scale_accel(0);
 	roll = scale_gyro(0);
-	rc_init();
+
 	int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
 	struct itimerspec  newval;
 	newval.it_interval.tv_sec = 0;
