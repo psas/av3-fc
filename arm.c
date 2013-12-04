@@ -12,8 +12,8 @@
 #include <stdbool.h>
 #include "net_addrs.h"
 #include "arm.h"
+#include "utils_sockets.h"
 #include "elderberry/fcfutils.h"
-#include "elderberry/utils_sockets.h"
 
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
 	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))

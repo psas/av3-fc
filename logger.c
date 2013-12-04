@@ -16,7 +16,7 @@
 #include "elderberry/fcfutils.h"
 #include "psas_packet.h"
 #include "logger.h"
-#include "elderberry/utils_sockets.h"
+#include "utils_sockets.h"
 #include "net_addrs.h"
 
 /*

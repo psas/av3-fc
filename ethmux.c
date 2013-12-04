@@ -8,7 +8,7 @@
 #include <linux/net_tstamp.h>
 #include <time.h>
 #include <string.h>
-#include "elderberry/utils_sockets.h"
+#include "utils_sockets.h"
 #include "utils_time.h"
 #include "elderberry/fcfutils.h"
 #include "net_addrs.h"

@@ -8,7 +8,7 @@
 #include "rollcontrol.h"
 #include "rollControlLibrary.h"
 #include "net_addrs.h"
-#include "elderberry/utils_sockets.h"
+#include "utils_sockets.h"
 
 int sd;
 
