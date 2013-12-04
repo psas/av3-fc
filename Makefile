@@ -7,7 +7,7 @@ WARNINGS := -Wall -Wextra -Wwrite-strings -Wno-missing-field-initializers -Wno-u
 CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(INCLUDE_DIRS)
 LDLIBS   := -lrt -lm
 .DEFAULT_GOAL := all
-OBJECTS  += elderberry/fcfutils.o fcfmain.o utils_sockets.o
+OBJECTS  += elderberry/fcfutils.o fcfmain.o
 
 MAINMIML ?= main.miml
 MIMLMK   ?= miml.mk
