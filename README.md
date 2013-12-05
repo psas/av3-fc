@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/psas/av3-fc.png)](https://travis-ci.org/psas/av3-fc)
 
+# Documentation
+
+[PSAS Flight computer documentation](http://psas-flight-computer.readthedocs.org/).
 
 # Building the Flight Computer
 
@@ -47,32 +50,3 @@ the project. If one of the ".miml" files changes, make automatically runs
 the code generator to rebuild fcfmain.c and fcfmain.h. If the miml files change
 so that modules are added or removed, one would have to rebuild the Miml.mk
 manually by rerunning `make miml`.
-
-
-## Avionics Network Information
-
-### Flight Computer:
-
- - IP Addr: `10.0.0.10`
- - MAC Addr: ?
- - Listen Port: `36000`
-
-
-### Sensor Board:
-
- - IP Addr: `10.0.0.20`
- - MAC Addr: `E6:10:20:30:40:11`
- - Listen Port: `35001`
- - Transmit Ports:
-   - ADIS: `35020`
-   - MPL: `35010`
-   - MPU: `35002`
-
-
-### Roll Board:
-
- - IP Addr: `10.0.0.30`
- - MAC Addr: `E6:10:20:30:40:aa`
- - Listen Port: `35003`
- - Transmit Port: `35004`
-
