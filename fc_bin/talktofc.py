@@ -1,25 +1,30 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from contextlib import contextmanager
 import socket
 
-class fctalk(object):
+FC_IP = b'127.0.0.1'
+FC_LISTEN_PORT = 36000
 
-    FC_IP = '127.0.0.1'
-    FC_LISTEN_PORT = 36000
 
-    def __init__(self, port):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('0.0.0.0', port))
+@contextmanager
+def udp(bind_ip, bind_port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((bind_ip, bind_port))
+    sock.settimeout(0.25)
+    yield sock
+    sock.close()
 
-    def send_cmd(self, message):
-        self.sock.sendto(message, (self.FC_IP, self.FC_LISTEN_PORT))
-        print "Sent", message, "To FCF"
-        data, remote_addr = self.sock.recvfrom(4096)
-        print "Received", repr(data)
 
-    def close(self):
-        self.sock.close()
+def talk(msg, from_port):
 
-def the_easy_way(msg, port):
-    talk = fctalk(port)
-    talk.send_cmd(msg)
-    talk.close()
+    with udp(b'0.0.0.0', from_port) as sock:
+        sock.sendto(msg.encode('ascii', 'ignore'), (FC_IP, FC_LISTEN_PORT))
+        print("Sent", msg, "To FCF")
+        
+        try:
+            data, remote_addr = sock.recvfrom(1024)
+            print("Received", repr(data))
+        except socket.timeout:
+            print ("No FC responce")
+

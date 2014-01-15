@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import talktofc
+from talktofc import talk
 
-talktofc.the_easy_way("#YOLO", 35666)
-
+talk("#YOLO", 35666)

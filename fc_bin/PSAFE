@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-import talktofc
+from talktofc import talk
 
-talktofc.the_easy_way("#SAFE", 35666)
+talk("#SAFE", 35666)

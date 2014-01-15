@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import talktofc
+from talktofc import talk
 
-talktofc.the_easy_way("DISABLE", 35667)
+talk("DISABLE", 35667)
 
