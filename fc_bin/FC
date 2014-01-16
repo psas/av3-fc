@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import argparse
+from contextlib import contextmanager
+import socket
+
+# Defines:
+FC_IP = b'127.0.0.1'
+FC_LISTEN_PORT = 36000
+ARM_PORT = 35666
+SERVO_PORT = 35667
+
+# List of FC commands. Stores a function pointer 'do' that can be called
+COMMANDS = {
+    'arm':           {'help': "Put FC in arm state",             'do': lambda: talk("#YOLO",   ARM_PORT)},
+    'safe':          {'help': "Safe the FC",                     'do': lambda: talk("#SAFE",   ARM_PORT)},
+    'disable-servo': {'help': "Disable the servo",               'do': lambda: talk("DISABLE", SERVO_PORT)},
+    'enable-servo':  {'help': "Enable the servo",                'do': lambda: talk("ENABLE",  SERVO_PORT)},
+    'override':      {'help': "Override the FC ARM sensor lock", 'do': lambda: talk("DI_SLOCK",  ARM_PORT)},
+    'slock':         {'help': "Enable FC ARM sensor lock",       'do': lambda: talk("EN_SLOCK",  ARM_PORT)},
+}
+
+
+@contextmanager
+def udp(bind_ip, bind_port):
+    """UDP Socket creator as a context."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((bind_ip, bind_port))
+    sock.settimeout(0.25)
+    yield sock
+    sock.close()
+
+
+def talk(msg, from_port):
+    """FC Talker. Binds a UDP socket and writes a message to it"""
+    with udp(b'0.0.0.0', from_port) as sock:
+        sock.sendto(msg.encode('ascii', 'ignore'), (FC_IP, FC_LISTEN_PORT))
+        print("Sent", msg, "To FCF")
+        
+        try:
+            data, remote_addr = sock.recvfrom(1024)
+            print("Received", repr(data))
+        except socket.timeout:
+            print ("No responce")
+
+
+# Create argparser
+parser = argparse.ArgumentParser(prog='FC')
+subparsers = parser.add_subparsers(title='Flight computer commands', dest="command")
+for command, data in COMMANDS.items():
+    subparsers.add_parser(command, help=data['help'])
+
+# Parse args
+args = parser.parse_args()
+
+# Run the command that was sent
+COMMANDS[args.command]['do']()
+
