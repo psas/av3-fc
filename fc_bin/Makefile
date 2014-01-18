@@ -1,3 +1,3 @@
 
 install:
-	cp ./FC /usr/bin/
+	cp ./FC /usr/local/bin/
