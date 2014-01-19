@@ -57,8 +57,15 @@ void demux(struct pollfd *pfd){
 static int fd;
 static int idx;
 
+/*
+ * because of preprocessor shenanigans, macro defined constants need to pass
+ * through two layers of macro function to correctly stringify.
+ */
+#define _STRINGIFY(x) #x
+#define STRINGIFY(x) _STRINGIFY(x)
+
 void ethmux_init(void){
-	fd = getsocket(FC_IP, FC_LISTEN_PORT_S, FC_LISTEN_PORT);
+	fd = getsocket(FC_IP, STRINGIFY(FC_LISTEN_PORT), FC_LISTEN_PORT);
 	idx = fcf_add_fd(fd, POLLIN, demux);
 }
 
