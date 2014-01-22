@@ -1,6 +1,5 @@
 /*
- * mpu.h
- *
+ * Interprets data from the MPU9150 IMU
  */
 
 #ifndef MPU_H_

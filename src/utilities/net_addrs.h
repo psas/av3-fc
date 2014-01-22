@@ -1,3 +1,7 @@
+/* Canonical definition of device addresses on the RocketNet
+ * This file should be synched across all projects that want
+ * to connect to the RocketNet
+ */
 #ifndef NET_ADDRS_H_
 #define NET_ADDRS_H_
 

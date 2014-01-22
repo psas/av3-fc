@@ -1,6 +1,5 @@
 /*
- * mpl.h
- *
+ * Interprets messages from the MPL311A52 pressure sensor
  */
 
 #ifndef MPL_H_

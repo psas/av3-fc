@@ -1,7 +1,5 @@
 /*
- * sockets.h
- *
- *  Created on: Jan 26, 2013
+ * Utilites for reducing boilerplate when dealing with sockets
  */
 
 #ifndef NETUTILS_H_

@@ -1,8 +1,3 @@
-/*
- * mpu.c
- *
- */
-
 #include <string.h>
 #include <stdint.h>
 #include "mpu.h"

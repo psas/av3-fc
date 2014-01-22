@@ -1,6 +1,6 @@
 /*
- * ethmux.h
- *
+ * Demuxes ethernet messages sent to the listen port by source and routes 
+ * them to the appropriate module. 
  */
 
 #ifndef ETHMUX_H_

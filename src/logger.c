@@ -1,7 +1,3 @@
-/**
- *  @file logger.c
- */
-
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>

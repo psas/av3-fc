@@ -1,3 +1,7 @@
+/*
+ * Handles handles formatting and logging messages to disk and over WiFi
+ */
+
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
