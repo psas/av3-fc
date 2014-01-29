@@ -3,7 +3,7 @@
 
 #include "adis.h"
 
-#define NULL_SERVO_POSITION UINT16_MAX / 2
+#define NULL_SERVO_POSITION 1500
 
 typedef struct{
 	char     ID[4];
