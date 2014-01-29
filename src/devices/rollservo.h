@@ -1,3 +1,7 @@
+/*
+ * Handles initializing and formatting messages for the roll servo board
+ */
+
 
 #ifndef ROLLSERVO_H_
 #define ROLLSERVO_H_

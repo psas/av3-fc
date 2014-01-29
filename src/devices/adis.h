@@ -1,6 +1,5 @@
 /*
- * adis.h
- *
+ * Interprets messages from the ADIS16405 IMU
  */
 
 #ifndef ADIS_H_

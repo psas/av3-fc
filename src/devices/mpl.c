@@ -1,8 +1,3 @@
-/*
- * mpl.c
- *
- */
-
 #include <string.h>
 #include <stdint.h>
 #include "mpl.h"

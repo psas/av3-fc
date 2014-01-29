@@ -1,3 +1,7 @@
+/*
+ * Handles the logic of turning sensor data into roll control fin position
+ */
+
 #ifndef ROLLCONTROL_H_
 #define ROLLCONTROL_H_
 

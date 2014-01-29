@@ -1,6 +1,3 @@
-/*
- *
- */
 #include <string.h>
 #include <stdio.h>
 #include "adis.h"
@@ -17,15 +14,6 @@
  *  30/31 = ZMAG - 14bit
  *  32/33 = TEMP - 12bit
 */
-
-int16_t fix_complement(uint16_t val, int bits) {
-	if((val&(1<<(bits-1))) != 0){
-		val = val - (1<<bits);
-	}
-	return val;
-//	int distance = 16 - bits;
-//	return ((int16_t)value << distance) >> distance;
-}
 
 void adis_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
 	//FIXME: this works right now, but is not actually right

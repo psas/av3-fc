@@ -1,10 +1,6 @@
 /*
- * gps.h
- *
- *  Created on: Jun 22, 2013
- *      Author: theo
+ * Manages and interprets messages from the Crescent GPS device
  */
-
 #ifndef GPS_H_
 #define GPS_H_
 
