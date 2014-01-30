@@ -6,6 +6,18 @@
 
 #include <stdint.h>
 
+
+/**
+ * GPS device name. For local laptop testing we can creatd a fake USB serial
+ * device.
+ */
+#ifdef FCF_FC_NETWORK
+#define GPS_USB_DEVICE "/dev/ttyUSB0"
+#else
+#define GPS_USB_DEVICE "/tmp/USBGPSTESTDEVICE"
+#endif
+
+
 /*! \typedef
  * Crescent GPS 1 message
  */
