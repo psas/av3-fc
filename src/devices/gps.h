@@ -1,14 +1,22 @@
 /*
- * gps.h
- *
- *  Created on: Jun 22, 2013
- *      Author: theo
+ * Manages and interprets messages from the Crescent GPS device
  */
-
 #ifndef GPS_H_
 #define GPS_H_
 
 #include <stdint.h>
+
+
+/**
+ * GPS device name. For local laptop testing we can creatd a fake USB serial
+ * device.
+ */
+#ifdef FCF_FC_NETWORK
+#define GPS_USB_DEVICE "/dev/ttyUSB0"
+#else
+#define GPS_USB_DEVICE "/tmp/USBGPSTESTDEVICE"
+#endif
+
 
 /*! \typedef
  * Crescent GPS 1 message

@@ -1,10 +1,3 @@
-/*
- * arm.c
- *
- *  Created on: Jun 22, 2013
- *      Author: theo
- */
-
 #include <stdio.h>
 #include <string.h>
 #include <math.h>

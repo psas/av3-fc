@@ -1,9 +1,19 @@
+/*
+ * Handles the logic of turning sensor data into roll control fin position
+ */
+
 #ifndef ROLLCONTROL_H_
 #define ROLLCONTROL_H_
 
 #include "adis.h"
 
-#define NULL_SERVO_POSITION UINT16_MAX / 2
+#define NULL_SERVO_POSITION 1500
+
+/// TODO: FIX
+#define MAX_SERVO_POSITION 3000.0 // PWM
+#define MIN_SERVO_POSITION 0.0    // PWM
+#define MAX_GRATE 50.0            // Degrees/s
+#define MIN_GRATE -50.0           // Degrees/s
 
 typedef struct{
 	char     ID[4];

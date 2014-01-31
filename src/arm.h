@@ -1,7 +1,6 @@
 /*
- * arm.h
- *
  * ARM = ARM Rocket Manager
+ * Manages global rocket state
  */
 
 #ifndef ARM_H_

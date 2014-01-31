@@ -1,7 +1,3 @@
-/*
- * ethmux.c
- *
- */
 #include <unistd.h>
 #include <stdio.h>
 #include <netinet/in.h>

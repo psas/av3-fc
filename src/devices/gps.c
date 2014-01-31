@@ -1,8 +1,3 @@
-/*
- * gps.c
- *
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -116,6 +111,9 @@ static int get_packet(struct msg *m)
 }
 
 
+/**
+ * Entry point for USB data
+ */
 static void data_callback(struct pollfd *pfd){
 	int act_len = sizeof(buffer) - (end-buffer);
 	struct msg m;
@@ -134,7 +132,7 @@ static void data_callback(struct pollfd *pfd){
 int fd;
 void gps_init(void) {
 	struct termios attrib;
-	fd = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY);
+	fd = open(GPS_USB_DEVICE, O_RDONLY | O_NOCTTY);
 	if (fd < 0) {
 		perror("GPS can't open device");
 		return;
