@@ -14,65 +14,45 @@ int sd;
 static bool launch;
 static bool enable_servo;
 static bool armed;
-static uint16_t accel;
-static uint16_t roll;
-static bool prev_servo_disable;
-
-static uint16_t scale_accel(int16_t acc){
-	const double shift = 34500 + 1374.05;
-	const double scale = 4.57559; // (0.003 g/adis_lsb) * (1374.05 rc_counts/g)
-	return (uint16_t)(((double)-acc)*scale + shift);
-}
-
-static uint16_t scale_gyro(int16_t gyr){
-	const double shift = 29400;
-	const double scale = 2.1845;// (0.05 deg/sec/adislsb) * (43.69 rc_counts/deg/sec)
-	return (uint16_t)(((double)-gyr)*scale + shift);
-}
-
-static void step(struct pollfd * pfd){
-	char buf[8];
-	read(pfd->fd, buf, 8); //clears timerfd
-
-	// Do control algorithm here
-
-	RollServoMessage out = {
-			.ID = {"ROLL"},
-			.data_length = 3,
-			.u16ServoPulseWidthBin14 = NULL_SERVO_POSITION,
-			.u8ServoDisableFlag = !enable_servo,
-	};
-
-	get_psas_time(out.timestamp);
-
-	// Servo disable flag gets sent, and then stop sending packets
-	if(!prev_servo_disable || !out.u8ServoDisableFlag){
-		rc_send_servo(&out);
-		prev_servo_disable = out.u8ServoDisableFlag;
-	}
-}
 
 void rollcontrol_init(void){
 	launch = false;
 	enable_servo = false;
-	prev_servo_disable = false;
-	accel = scale_accel(0);
-	roll = scale_gyro(0);
 
-	int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-	struct itimerspec  newval;
-	newval.it_interval.tv_sec = 0;
-	newval.it_interval.tv_nsec = 1000000; //1 ms
-	newval.it_value.tv_sec = 0;
-	newval.it_value.tv_nsec = 1000000;
-	timerfd_settime(tfd, 0, &newval, NULL);
-	fcf_add_fd(tfd, POLLIN, step);
 	sd = get_send_socket();
 }
 
+/**
+ *
+ */
 void rc_receive_imu(ADISMessage * imu){
-	accel = scale_accel(imu->data.adis_xaccl_out);
-	roll = scale_gyro(imu->data.adis_xgyro_out);
+
+	if (!enable_servo)
+		return;
+
+	int16_t rate = imu->data.adis_xgyro_out;
+	double rate_deg = 0.05 *  rate;
+
+	// Slope
+	double a = (MAX_SERVO_POSITION - MIN_SERVO_POSITION) / (MAX_GRATE - MIN_GRATE);
+	// Inercept
+	double b = MIN_SERVO_POSITION - (a * MIN_GRATE);
+
+	double servo = a*rate_deg + b;
+	if (servo > MAX_SERVO_POSITION)
+		servo = MAX_SERVO_POSITION;
+	if (servo < MIN_SERVO_POSITION)
+		servo = MIN_SERVO_POSITION;
+
+	RollServoMessage out = {
+			.ID = {"ROLL"},
+			.data_length = 3,
+			.u16ServoPulseWidthBin14 = servo,
+			.u8ServoDisableFlag = !enable_servo,
+	};
+	get_psas_time(out.timestamp);
+
+	rc_send_servo(&out);
 }
 
 void rc_receive_arm(const char * signal){
@@ -83,6 +63,7 @@ void rc_receive_arm(const char * signal){
 	}else if(!strcmp(signal, "SAFE")){
 		armed = false;
 		enable_servo = false;
+		// TODO: Send final message
 	}
 }
 
