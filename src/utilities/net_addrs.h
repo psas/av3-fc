@@ -11,7 +11,7 @@
 
 // WIFI
 #ifdef FCF_FC_NETWORK
-#define WIFI_IP "172.17.0.255"
+#define WIFI_IP "10.0.0.255"
 #else
 #define WIFI_IP "127.0.0.1"
 #endif
