@@ -219,3 +219,24 @@ void log_receive_rc(RollServoMessage* data){
 	logg(data, sizeof(RollServoMessage));
 }
 
+void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
+
+	printf("recv RNH message");
+
+	if (len == sizeof(RNH_Health_Data)) {
+		printf("RNH size correct");
+
+		RNHMessage packet = {
+			.ID={"RNHH"},
+			.timestamp={
+				(uint8_t)timestamp[0], (uint8_t)timestamp[1],
+				(uint8_t)timestamp[2], (uint8_t)timestamp[3],
+				(uint8_t)timestamp[4], (uint8_t)timestamp[5]},
+			.data_length=htons(sizeof(RNH_Health_Data))
+		};
+		// Copy in data from socket
+		memcpy(&packet.data, buffer, sizeof(RNH_Health_Data));
+
+		logg(&packet, sizeof(RNHMessage));
+	}
+}

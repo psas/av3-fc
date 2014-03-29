@@ -35,4 +35,10 @@ senders:
   - [data, unsigned char*]
   - [len, unsigned int]
   - [timestamp, unsigned char*]
+
+  demuxed_RNH:
+  - [data, unsigned char*]
+  - [len, unsigned int]
+  - [timestamp, unsigned char*]
+
 receivers:

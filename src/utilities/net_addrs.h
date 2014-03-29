@@ -5,6 +5,17 @@
 #ifndef NET_ADDRS_H_
 #define NET_ADDRS_H_
 
+// RNH
+#ifdef FCF_FC_NETWORK
+#define RNH_IP "10.0.0.5"
+#else
+#define RNH_IP "127.0.0.1"
+#endif
+#define RNH_LISTEN_PORT 36100
+#define RNH_DATA_PORT 36101
+
+
+
 // FLIGHT COMPUTER
 #ifdef FCF_FC_NETWORK
 #define FC_IP "10.0.0.10"

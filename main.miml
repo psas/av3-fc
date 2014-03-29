@@ -31,6 +31,9 @@ messages:
   ETH.demuxed_RC:
    - RC.rc_raw_testrc
 
+  ETH.demuxed_RNH:
+   - LOG.log_receive_rnh
+
   ADIS.adis_data_out:
     - ARM.arm_receive_imu
     - RC.rc_receive_imu
