@@ -48,6 +48,13 @@ typedef struct {
     RNH_Health_Data      data;
 } __attribute__((packed)) RNHMessage;
 
+typedef struct {
+    char                 ID[4];         // "RNHP"
+    uint8_t              timestamp[6];
+    uint16_t             data_length;
+    uint16_t             data[8];
+} __attribute__((packed)) RNHPortMessage;
+
 
 #endif
 //! @}

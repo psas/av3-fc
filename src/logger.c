@@ -240,3 +240,26 @@ void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* tim
 		logg(&packet, sizeof(RNHMessage));
 	}
 }
+
+void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
+    unsigned RNH_PORT_SIZE = 2*8;
+
+    printf("recv RNH message");
+
+    if (len == RNH_PORT_SIZE) {
+        printf("RNH size correct");
+
+        RNHPortMessage packet = {
+            .ID={"RNHP"},
+            .timestamp={
+                (uint8_t)timestamp[0], (uint8_t)timestamp[1],
+                (uint8_t)timestamp[2], (uint8_t)timestamp[3],
+                (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
+            .data_length=htons(RNH_PORT_SIZE)
+        };
+        // Copy in data from socket
+        memcpy(&packet.data, buffer, RNH_PORT_SIZE);
+
+        logg(&packet, sizeof(RNHMessage));
+    }
+}

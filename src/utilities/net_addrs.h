@@ -12,7 +12,8 @@
 #define RNH_IP "127.0.0.1"
 #endif
 #define RNH_LISTEN_PORT 36100
-#define RNH_DATA_PORT 36101
+#define RNH_BATTERY_PORT 36101
+#define RNH_PORT_PORT 36102
 
 
 

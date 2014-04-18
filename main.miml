@@ -33,6 +33,9 @@ messages:
 
   ETH.demuxed_RNH:
    - LOG.log_receive_rnh
+   
+  ETH.demuxed_RNHPORT:
+   - LOG.log_receive_rnhport
 
   ADIS.adis_data_out:
     - ARM.arm_receive_imu

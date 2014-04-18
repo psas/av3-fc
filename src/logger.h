@@ -20,6 +20,7 @@ extern void log_receive_mpu(MPUMessage*);
 extern void log_receive_mpl(MPLMessage*);
 extern void log_receive_rc(RollServoMessage*);
 extern void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
+extern void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
 
 extern void log_receive_arm(const char*);
 
