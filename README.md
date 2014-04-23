@@ -14,9 +14,18 @@ The code generator runs on python3 using the pyyaml package. It's recomended to
 use a python virtual environment like this:
 
     $ sudo apt-get install python3 libyaml-0-2 python-pip virtualenvwrapper
-    $ mkvirtualenv -p <path/to/python3/install> av3fc
+    # Close the tab and re-open it if virtualenvwrapper was installed.
+    $ mkvirtualenv -p `which python3` av3fc
+    $ 
     (av3fc)$ pip install -r requirements.txt
 
+Use `deactivate` to get out of the virtual environmnet. To get back into the virtual environment:
+
+    $ workon av3fc
+
+Don't forget to initialize your submodules:
+
+    $ git submodule update --init
 
 ## Building
 
@@ -37,7 +46,7 @@ that the user only needs to run:
 
     $ make
 
-For the project to complete all three steps.
+BUT don't forget you need to be in your virtual environment for this to work (`workon av3fc`).
 
 ### Using the Makefile
 
