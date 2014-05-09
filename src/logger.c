@@ -260,6 +260,6 @@ void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char*
         // Copy in data from socket
         memcpy(&packet.data, buffer, RNH_PORT_SIZE);
 
-        logg(&packet, sizeof(RNHMessage));
+        logg(&packet, sizeof(RNHPortMessage));
     }
 }
