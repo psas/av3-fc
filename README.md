@@ -2,15 +2,46 @@
 
 [![Build Status](https://travis-ci.org/psas/av3-fc.png)](https://travis-ci.org/psas/av3-fc)
 
+[Portland State Aerospace Society](http://psas.pdx.edu/) is an open source
+"space program" in Portland Oregon.  We build and fly state-of-the-art
+rocket avionics systems. We've been testing ways to fly code on small-ish
+rockets for over 15 years.
+
+This repo contains our current primary flight computer (an Intel Atom processor
+at the heart of a full stack of sensors, batteries, radios, and other electronics. This
+all fits in our 5.5 inch diameter, 12 foot tall, high power rocket that flies
+over straight up over 4 kilometers.
+
+We've been refining the code to fly a roll control experiment in July 2014.
+
+ - [More information about upcoming launch](https://github.com/psas/Launch-11)
+ - [Watch a video from past launches](https://www.youtube.com/user/psasrockets)
+ - [Follow us on twitter @pdxaerospace](https://twitter.com/pdxaerospace)
+
+
 # Documentation
 
-[PSAS Flight computer documentation](http://psas-flight-computer.readthedocs.org/).
+The flight code is written in C, and features a generated `main` function and a
+callback-based event loop. The [event loop code generator was written by a senior
+CS student group in 2013](https://github.com/psas/elderberry).
+
+This abstraction lets us write small pieces of behavior with very little
+boilerplate. The goal is to be able to hand out well defined projects such as
+"write the parser for the GPS messages" to members without having to expect them
+to maintain the complicated interconnections to the rest of the system.
+
+ - [PSAS Flight computer documentation (WIP)](http://psas-flight-computer.readthedocs.org/).
+
+This idea is very similar system to NASA's
+'[Core Flight Executive](http://code.nasa.gov/project/core-flight-executive-cfe/)'
+system for spacecraft software abstraction.
+
 
 # Building the Flight Computer
 
-## Requirments 
+## Requirements 
 
-The code generator runs on python3 using the pyyaml package. It's recomended to
+The code generator runs on python3 using the pyyaml package. It's recommended to
 use a python virtual environment like this:
 
     $ sudo apt-get install python3 libyaml-0-2 python-pip virtualenvwrapper
@@ -19,7 +50,7 @@ use a python virtual environment like this:
     $ 
     (av3fc)$ pip install -r requirements.txt
 
-Use `deactivate` to get out of the virtual environmnet. To get back into the virtual environment:
+Use `deactivate` to get out of the virtual environment. To get back into the virtual environment:
 
     $ workon av3fc
 
