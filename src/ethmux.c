@@ -46,9 +46,9 @@ void demux(struct pollfd *pfd){
 		case RNH_BATTERY_PORT:
 			demuxed_RNH(buffer, bytes, timestamp);
 			break;
-        case RNH_PORT_PORT:
-            demuxed_RNHPORT(buffer, bytes, timestamp);
-            break;
+		case RNH_PORT_PORT:
+			demuxed_RNHPORT(buffer, bytes, timestamp);
+			break;
 		default:
 			break;
 			// TODO: add a counter or debug logging of unknown ports

@@ -11,6 +11,7 @@
 #include <sys/timerfd.h>
 #include "../elderberry/fcfutils.h"
 #include "utilities/utils_sockets.h"
+#include "utilities/utils_time.h"
 #include "utilities/psas_packet.h"
 #include "utilities/net_addrs.h"
 #include "logger.h"
@@ -139,7 +140,8 @@ static void flush_log()
 {
 	// Send current buffer to disk
 	// for the log file, convert the sequence number to a SEQN message
-	message_header header = { .ID="SEQN", .timestamp={0,0,0,0,0,0}, .data_length=htons(4) };
+	message_header header = { .ID="SEQN", .data_length=htons(4) };
+	get_psas_time(header.timestamp);
 	fwrite(&header, 1, sizeof(message_header), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 	// Send current buffer to WiFi
@@ -184,7 +186,8 @@ static void log_message(const char *msg)
 	if (log_buffer_size + sizeof(message_header) + len > P_LIMIT)
 		flush_log();
 
-	message_header header = { .ID = "MESG", .timestamp = {0,0,0,0,0,0}, .data_length=htons(len) };
+	message_header header = { .ID = "MESG", .data_length=htons(len) };
+	get_psas_time(header.timestamp);
 	logg(&header, sizeof(message_header));
 	logg(msg, len);
 }
@@ -220,11 +223,7 @@ void log_receive_rc(RollServoMessage* data){
 }
 
 void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-
-	printf("recv RNH message");
-
 	if (len == sizeof(RNH_Health_Data)) {
-		printf("RNH size correct");
 
 		RNHMessage packet = {
 			.ID={"RNHH"},
@@ -243,11 +242,7 @@ void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* tim
 
 void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
     unsigned RNH_PORT_SIZE = 2*8;
-
-    printf("recv RNH message");
-
     if (len == RNH_PORT_SIZE) {
-        printf("RNH size correct");
 
         RNHPortMessage packet = {
             .ID={"RNHP"},
