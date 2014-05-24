@@ -26,9 +26,9 @@ int about(double a, double b){
 void arm_receive_imu(ADISMessage * data){
 	// does the acceleration vector == -1g over the last 100 samples?
 	// 3.3mg per bit
-	double x = data->data.adis_xaccl_out * 0.00333;
-	double y = data->data.adis_yaccl_out * 0.00333;
-	double z = data->data.adis_zaccl_out * 0.00333;
+	double x = data->data.adis_acc_x * 0.00333;
+	double y = data->data.adis_acc_y * 0.00333;
+	double z = data->data.adis_acc_z * 0.00333;
 	if(!about(x, -1) || !about(y, 0) || !about(z, 0)){
 		upright = 0;
 	}

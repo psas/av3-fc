@@ -30,7 +30,7 @@ void rc_receive_imu(ADISMessage * imu){
 	if (!enable_servo)
 		return;
 
-	int16_t rate = imu->data.adis_xgyro_out;
+	int16_t rate = imu->data.adis_gyro_x;
 	double rate_deg = 0.05 *  rate;
 
 	// Slope

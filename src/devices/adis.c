@@ -17,17 +17,17 @@
 
 void adis_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
 	//FIXME: this works right now, but is not actually right
-	if(len == sizeof(ADIS16405BurstData)){
+	if(len == sizeof(ADIS16405Data)){
 		// Build message header
 		ADISMessage packet ={
 				.ID={"ADIS"},
 				.timestamp={(uint8_t)timestamp[0], (uint8_t)timestamp[1],
 						    (uint8_t)timestamp[2], (uint8_t)timestamp[3],
 						    (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-				.data_length=sizeof(ADIS16405BurstData)
+				.data_length=sizeof(ADIS16405Data)
 		};
 		// Copy in data from socket
-		memcpy(&packet.data, buffer, sizeof(ADIS16405BurstData));
+		memcpy(&packet.data, buffer, sizeof(ADIS16405Data));
 
 		adis_data_out(&packet);
 	}

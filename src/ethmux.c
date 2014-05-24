@@ -49,6 +49,9 @@ void demux(struct pollfd *pfd){
 		case RNH_PORT_PORT:
 			demuxed_RNHPORT(buffer, bytes, timestamp);
 			break;
+		case FCF_HEALTH_PORT:
+			demuxed_FCFH(buffer, bytes, timestamp);
+			break;
 		default:
 			break;
 			// TODO: add a counter or debug logging of unknown ports

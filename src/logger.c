@@ -140,9 +140,13 @@ static void flush_log()
 {
 	// Send current buffer to disk
 	// for the log file, convert the sequence number to a SEQN message
-	message_header header = { .ID="SEQN", .data_length=htons(4) };
+	SEQNMessage header = {
+	        .ID={"SEQN"},
+	        .data_length=htons(sizeof(SequenceNoData))
+    };
 	get_psas_time(header.timestamp);
-	fwrite(&header, 1, sizeof(message_header), fp);
+    //TODO: fix the -4 which accounts for the sequence number size in a ugly way
+	fwrite(&header, 1, sizeof(header)-sizeof(SequenceNoData), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 	// Send current buffer to WiFi
 	if(write(net_fd, log_buffer, log_buffer_size) != log_buffer_size)
@@ -198,10 +202,11 @@ void log_receive_adis(ADISMessage *data) {
 }
 
 void log_receive_gps(GPSMessage* data){
-	uint16_t len = data->data_length;
-	data->data_length = htons(data->data_length);
+	//TODO: Fix logging GPS data
+	//uint16_t len = data->data_length;
+	//data->data_length = htons(data->data_length);
 	// different GPS packets have different lengths
-	logg(data, sizeof(message_header) + len);
+    //logg(data, sizeof(message_header) + len);
 }
 
 void log_receive_mpu(MPUMessage* data){
@@ -223,38 +228,58 @@ void log_receive_rc(RollServoMessage* data){
 }
 
 void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-	if (len == sizeof(RNH_Health_Data)) {
+	if (len == sizeof(RNHHealthData)) {
 
-		RNHMessage packet = {
+		RNHHMessage packet = {
 			.ID={"RNHH"},
 			.timestamp={
 				(uint8_t)timestamp[0], (uint8_t)timestamp[1],
 				(uint8_t)timestamp[2], (uint8_t)timestamp[3],
 				(uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-			.data_length=htons(sizeof(RNH_Health_Data))
+			.data_length=htons(sizeof(RNHHealthData))
 		};
 		// Copy in data from socket
-		memcpy(&packet.data, buffer, sizeof(RNH_Health_Data));
+		memcpy(&packet.data, buffer, sizeof(RNHHealthData));
 
-		logg(&packet, sizeof(RNHMessage));
+		logg(&packet, sizeof(RNHHMessage));
 	}
 }
 
 void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-    unsigned RNH_PORT_SIZE = 2*8;
-    if (len == RNH_PORT_SIZE) {
 
-        RNHPortMessage packet = {
+    if (len == sizeof(RNHPowerData)) {
+
+        RNHPMessage packet = {
             .ID={"RNHP"},
             .timestamp={
                 (uint8_t)timestamp[0], (uint8_t)timestamp[1],
                 (uint8_t)timestamp[2], (uint8_t)timestamp[3],
                 (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-            .data_length=htons(RNH_PORT_SIZE)
+            .data_length=htons(sizeof(RNHHealthData))
         };
         // Copy in data from socket
-        memcpy(&packet.data, buffer, RNH_PORT_SIZE);
+        memcpy(&packet.data, buffer, sizeof(RNHHealthData));
 
-        logg(&packet, sizeof(RNHPortMessage));
+        logg(&packet, sizeof(RNHPMessage));
     }
+}
+
+void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
+
+    if (len == sizeof(FCFHealthData)) {
+
+        FCFHMessage message = {
+            .ID={"FCFH"},
+            .timestamp={
+                (uint8_t)timestamp[0], (uint8_t)timestamp[1],
+                (uint8_t)timestamp[2], (uint8_t)timestamp[3],
+                (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
+            .data_length=htons(sizeof(FCFHealthData))
+        };
+        // Copy in data from socket
+        memcpy(&message.data, buffer, sizeof(FCFHealthData));
+
+        logg(&message, sizeof(FCFHMessage));
+    }
+
 }

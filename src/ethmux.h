@@ -17,5 +17,6 @@ extern void demuxed_MPL(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_RC(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_RNH(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_RNHPORT(unsigned char*, unsigned int, unsigned char*);
+extern void demuxed_FCFH(unsigned char*, unsigned int, unsigned char*);
 
 #endif /* ETHMUX_H_ */

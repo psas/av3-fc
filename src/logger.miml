@@ -33,12 +33,12 @@ receivers:
   - [ARG2, unsigned int]
   - [ARG3, unsigned char*]
   
-  log_receive_rnh:
+  log_receive_rnhport:
   - [ARG1, unsigned char*]
   - [ARG2, unsigned int]
   - [ARG3, unsigned char*]
 
-  log_receive_rnhport:
+  log_receive_fcfh:
   - [ARG1, unsigned char*]
   - [ARG2, unsigned int]
   - [ARG3, unsigned char*]

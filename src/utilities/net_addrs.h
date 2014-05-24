@@ -24,6 +24,8 @@
 #define FC_IP "127.0.0.1"
 #endif
 #define FC_LISTEN_PORT 36000
+#define FCF_HEALTH_PORT 36201
+
 
 // WIFI
 #ifdef FCF_FC_NETWORK
