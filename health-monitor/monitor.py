@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import psutil
 import time
+from psas_packet import messages
+from psas_packet import network
 
 # setup
 rate = 0.5  # 2 Hz
@@ -18,48 +20,48 @@ def read():
     disk = psutil.disk_io_counters()
     nics = psutil.net_io_counters(pernic=True)
 
-    pack['CPU_User'] = cpu.user
-    pack['CPU_System'] = cpu.system
-    pack['CPU_Nice'] = cpu.nice
-    pack['CPU_IOWait'] = cpu.iowait
-    pack['CPU_IRQ'] = cpu.irq
-    pack['CPU_SoftIRQ'] = cpu.softirq
+    pack['CPU_User'] = float(cpu.user)
+    pack['CPU_System'] = float(cpu.system)
+    pack['CPU_Nice'] = float(cpu.nice)
+    pack['CPU_IOWait'] = float(cpu.iowait)
+    pack['CPU_IRQ'] = float(cpu.irq)
+    pack['CPU_SoftIRQ'] = float(cpu.softirq)
 
-    pack['RAM_Used'] = ram.used
-    pack['RAM_Buffer'] = ram.buffers
-    pack['RAM_Cached'] = ram.cached
+    pack['RAM_Used'] = int(ram.used)
+    pack['RAM_Buffer'] = int(ram.buffers)
+    pack['RAM_Cached'] = int(ram.cached)
 
     pack['PID'] = pids
 
-    pack['Disk_Used'] = disk_used
+    pack['Disk_Used'] = int(disk_used)
 
     # Since last interval
-    pack['Disk_Read'] = disk.read_bytes - last_disk.read_bytes
-    pack['Disk_Write'] = disk.write_bytes - last_disk.write_bytes
+    pack['Disk_Read'] = int(disk.read_bytes - last_disk.read_bytes)
+    pack['Disk_Write'] = int(disk.write_bytes - last_disk.write_bytes)
 
     lo = nics.get('lo')
     last_lo = last_nics.get('lo')
     if lo is not None and last_lo is not None:
-        pack['IO_lo_Bytes_Sent'] = lo.bytes_sent - last_lo.bytes_sent
-        pack['IO_lo_Bytes_Recv'] = lo.bytes_recv - last_lo.bytes_recv
-        pack['IO_lo_Packets_Sent'] = lo.packets_sent - last_lo.packets_sent
-        pack['IO_lo_Packets_Recv'] = lo.packets_recv - last_lo.packets_recv
+        pack['IO_lo_Bytes_Sent'] = int(lo.bytes_sent - last_lo.bytes_sent)
+        pack['IO_lo_Bytes_Recv'] = int(lo.bytes_recv - last_lo.bytes_recv)
+        pack['IO_lo_Packets_Sent'] = int(lo.packets_sent - last_lo.packets_sent)
+        pack['IO_lo_Packets_Recv'] = int(lo.packets_recv - last_lo.packets_recv)
 
     eth0 = nics.get('eth0')
     last_eth0 = last_nics.get('eth0')
     if eth0 is not None and last_eth0 is not None:
-        pack['IO_eth0_Bytes_Sent'] = eth0.bytes_sent - last_eth0.bytes_sent
-        pack['IO_eth0_Bytes_Recv'] = eth0.bytes_recv - last_eth0.bytes_recv
-        pack['IO_eth0_Packets_Sent'] = eth0.packets_sent - last_eth0.packets_sent
-        pack['IO_eth0_Packets_Recv'] = eth0.packets_recv - last_eth0.packets_recv
+        pack['IO_eth0_Bytes_Sent'] = int(eth0.bytes_sent - last_eth0.bytes_sent)
+        pack['IO_eth0_Bytes_Recv'] = int(eth0.bytes_recv - last_eth0.bytes_recv)
+        pack['IO_eth0_Packets_Sent'] = int(eth0.packets_sent - last_eth0.packets_sent)
+        pack['IO_eth0_Packets_Recv'] = int(eth0.packets_recv - last_eth0.packets_recv)
 
     wlan0 = nics.get('wlan0')
     last_wlan0 = last_nics.get('wlan0')
     if wlan0 is not None and last_wlan0 is not None:
-        pack['IO_wlan0_Bytes_Sent'] = wlan0.bytes_sent - last_wlan0.bytes_sent
-        pack['IO_wlan0_Bytes_Recv'] = wlan0.bytes_recv - last_wlan0.bytes_recv
-        pack['IO_wlan0_Packets_Sent'] = wlan0.packets_sent - last_wlan0.packets_sent
-        pack['IO_wlan0_Packets_Recv'] = wlan0.packets_recv - last_wlan0.packets_recv
+        pack['IO_wlan0_Bytes_Sent'] = int(wlan0.bytes_sent - last_wlan0.bytes_sent)
+        pack['IO_wlan0_Bytes_Recv'] = int(wlan0.bytes_recv - last_wlan0.bytes_recv)
+        pack['IO_wlan0_Packets_Sent'] = int(wlan0.packets_sent - last_wlan0.packets_sent)
+        pack['IO_wlan0_Packets_Recv'] = int(wlan0.packets_recv - last_wlan0.packets_recv)
 
     # temp
     try:
@@ -69,12 +71,16 @@ def read():
     except:
         pass
 
-    print pack
     last_disk = disk
     last_nics = nics
+
+    return pack
 
 
 if __name__ == '__main__':
     time.sleep(rate)
-    while True:
-        read()
+
+    with network.SendUDP('127.0.0.1', 36000, from_port=36201) as udp:
+        while True:
+            # Includes a blocking read so it should run at globally defined rate
+            udp.send_message(messages.FCFH, read())
