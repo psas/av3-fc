@@ -1,6 +1,7 @@
 sources:
   - [TIME, utils_time.miml]     # Time utilities
   - [SOCK, utils_sockets.miml]  # Socket utilities
+  - [ADDR, net_addrs.miml]      # RocketNet addresses
   - [ADIS, adis.miml]           # ADIS Sensor
   - [LOG, logger.miml]          # Logger code Module
   - [GPS, gps.miml]             # GPS Sensor

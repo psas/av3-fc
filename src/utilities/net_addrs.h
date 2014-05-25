@@ -4,57 +4,58 @@
  */
 #ifndef NET_ADDRS_H_
 #define NET_ADDRS_H_
+#include <netinet/in.h>
 
-// RNH
 #ifdef FCF_FC_NETWORK
-#define RNH_IP "10.0.0.5"
+#define RNH_IP    IPv4(10,0,0,5)
+#define FC_IP     IPv4(10,0,0,10)
+#define SENSOR_IP IPv4(10,0,0,20)
+#define ROLL_IP   IPv4(10,0,0,30)
+#define WIFI_IP   IPv4(10,0,0,255)
 #else
-#define RNH_IP "127.0.0.1"
+#define RNH_IP    IPv4(127,0,0,1)
+#define FC_IP     IPv4(127,0,0,1)
+#define SENSOR_IP IPv4(127,0,0,1)
+#define ROLL_IP   IPv4(127,0,0,1)
+#define WIFI_IP   IPv4(127,0,0,1)
 #endif
-#define RNH_LISTEN_PORT 36100
-#define RNH_BATTERY_PORT 36101
-#define RNH_PORT_PORT 36102
 
+/* Rocket Net Hub */
+#define RNH_RCI 36100     // RCI listener
+#define RNH_BATTERY 36101 // Battery data
+#define RNH_PORT 36102    // Port data
+extern const struct sockaddr * RNH_RCI_ADDR;
+extern const struct sockaddr * RNH_BATTERY_ADDR;
+extern const struct sockaddr * RNH_PORT_ADDR;
 
+/* Flight Computer */
+#define FC_LISTEN_PORT 36000 // FC device listener
+#define FCF_HEALTH_PORT 36201 // FC health monitor
+extern const struct sockaddr * FC_ADDR;
 
-// FLIGHT COMPUTER
-#ifdef FCF_FC_NETWORK
-#define FC_IP "10.0.0.10"
-#else
-#define FC_IP "127.0.0.1"
-#endif
-#define FC_LISTEN_PORT 36000
-#define FCF_HEALTH_PORT 36201
+/* Sensor Node */
+#define ADIS_PORT 35020 // ADIS16405
+#define MPU_PORT 35002  // MPU1950
+#define MPL_PORT 35010  // MPL3115A2
+extern const struct sockaddr * ADIS_ADDR;
+extern const struct sockaddr * MPU_ADDR;
+extern const struct sockaddr * MPL_ADDR;
 
+/* Roll Control */
+#define ROLL_PORT 35003    // Servo control
+#define TEATHER_PORT 35004 // Launch detect
+extern const struct sockaddr * ROLL_ADDR;
+extern const struct sockaddr * TEATHER_ADDR;
 
-// WIFI
-#ifdef FCF_FC_NETWORK
-#define WIFI_IP "10.0.0.255"
-#else
-#define WIFI_IP "127.0.0.1"
-#endif
+/* WiFi */
 #define WIFI_PORT 35001
+extern const struct sockaddr * WIFI_ADDR;
 
-// Sensor Node
-#define SENSOR_IP "10.0.0.20"
-#define ADIS_RX_PORT 35020 // ADIS
-#define MPU_RX_PORT 35002  // MPU1950
-#define MPL_RX_PORT 35010  // MPL3115A2
-
-// ROLL
-#ifdef FCF_FC_NETWORK
-#define ROLL_IP "10.0.0.30"
-#else
-#define ROLL_IP "127.0.0.1"
-#endif
-#define ROLL_TX_PORT 35003
-#define ROLL_RX_PORT 35004
-#define TEATHER_PORT 35004 // ROLL TEATHER SIGNAL
-
-// ARM SIGNAL
-#define ARM_IP "127.0.0.1"
+/* ARM Signal */
+#define ARM_IP IPv4(127,0,0,1)
 #define ARM_PORT 35666
-
 #define RC_SERVO_ENABLE_PORT 35667
+extern const struct sockaddr * ARM_ADDR;
+extern const struct sockaddr * RC_SERVO_ENABLE_ADDR;
 
 #endif /* NET_ADDRS_H_ */

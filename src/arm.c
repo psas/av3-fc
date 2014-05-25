@@ -43,7 +43,7 @@ void arm_receive_gps(GPSMessage * data){
 		switch(data->gps1.nav_mode) {
 		case 2:   // 3D fix
 		case 4:   // 3D + diff
-		case 6:	  // 3D + diff + rtk
+		case 6:   // 3D + diff + rtk
 			GPS_locked = true; break;
 		default:
 			GPS_locked = false; break;
@@ -53,7 +53,9 @@ void arm_receive_gps(GPSMessage * data){
 }
 
 static void send_arm_response(const char * message){
-	sendto_socket(sd, message, strlen(message), ARM_IP, ARM_PORT);
+	if(write(sd, message, strlen(message)) < 0){
+		perror("send_arm_response: write() failed");
+	}
 }
 
 void arm_raw_in(unsigned char *buffer, int unsigned len, unsigned char * timestamp){
@@ -111,7 +113,14 @@ void arm_raw_in(unsigned char *buffer, int unsigned len, unsigned char * timesta
 
 void arm_init(void){
 	slock_enable = true;
-	sd = get_send_socket();
+	sd = udp_socket();
+	if(sd < 0){
+		return;
+	}
+	if(connect(sd, ARM_ADDR, sizeof(struct sockaddr_in)) < 0){
+		perror("arm_init: connect() failed");
+		close(sd);
+	}
 }
 
 void arm_final(void){

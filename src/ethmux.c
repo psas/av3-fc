@@ -10,7 +10,7 @@
 #include "utilities/net_addrs.h"
 #include "ethmux.h"
 
-static unsigned char buffer[1024]; // TODO: packet len
+static unsigned char buffer[ETH_MTU];
 
 void demux(struct pollfd *pfd){
 
@@ -25,7 +25,7 @@ void demux(struct pollfd *pfd){
 
 	if(bytes > 0){
 		switch(port){
-		case ADIS_RX_PORT:
+		case ADIS_PORT:
 			demuxed_ADIS(buffer, bytes, timestamp);
 			break;
 		case ARM_PORT:
@@ -34,19 +34,19 @@ void demux(struct pollfd *pfd){
 		case TEATHER_PORT:
 			demuxed_LD(buffer, bytes, timestamp);
 			break;
-		case MPU_RX_PORT:
+		case MPU_PORT:
 			demuxed_MPU(buffer, bytes, timestamp);
 			break;
-		case MPL_RX_PORT:
+		case MPL_PORT:
 			demuxed_MPL(buffer, bytes, timestamp);
 			break;
 		case RC_SERVO_ENABLE_PORT:
 			demuxed_RC(buffer, bytes, timestamp);
 			break;
-		case RNH_BATTERY_PORT:
+		case RNH_BATTERY:
 			demuxed_RNH(buffer, bytes, timestamp);
 			break;
-		case RNH_PORT_PORT:
+		case RNH_PORT:
 			demuxed_RNHPORT(buffer, bytes, timestamp);
 			break;
 		case FCF_HEALTH_PORT:
@@ -62,15 +62,11 @@ void demux(struct pollfd *pfd){
 static int fd;
 static int idx;
 
-/*
- * because of preprocessor shenanigans, macro defined constants need to pass
- * through two layers of macro function to correctly stringify.
- */
-#define _STRINGIFY(x) #x
-#define STRINGIFY(x) _STRINGIFY(x)
-
 void ethmux_init(void){
-	fd = getsocket(FC_IP, STRINGIFY(FC_LISTEN_PORT), FC_LISTEN_PORT);
+	fd = timestamped_bound_udp_socket(FC_LISTEN_PORT);
+	if(fd < 0){
+		return;
+	}
 	idx = fcf_add_fd(fd, POLLIN, demux);
 }
 

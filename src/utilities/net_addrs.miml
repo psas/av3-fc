@@ -1,0 +1,4 @@
+%YAML 1.2
+---
+include: net_addrs.h
+object: src/utilities/net_addrs.o

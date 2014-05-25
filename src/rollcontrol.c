@@ -19,12 +19,17 @@ void rollcontrol_init(void){
 	launch = false;
 	enable_servo = false;
 
-	sd = get_send_socket();
+	sd = udp_socket();
+	if(sd < 0){
+		return;
+	}
+	if(connect(sd, RC_SERVO_ENABLE_ADDR, sizeof(struct sockaddr_in)) < 0){
+		perror("rollcontrol_init: connect() failed");
+		close(sd);
+	}
+
 }
 
-/**
- *
- */
 void rc_receive_imu(ADISMessage * imu){
 
 	if (!enable_servo)
@@ -74,8 +79,12 @@ void rc_raw_ld_in(unsigned char * signal, unsigned int len, unsigned char* times
 }
 
 static void send_servo_response(const char * message){
-	sendto_socket(sd, message, strlen(message), ARM_IP, RC_SERVO_ENABLE_PORT);
+	int len = strlen(message);
+	if(write(sd, message, len) != len){
+		perror("send_servo_response: write failed");
+	}
 }
+
 
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
 	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))

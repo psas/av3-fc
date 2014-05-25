@@ -38,7 +38,7 @@
 #define LOG_TIMEOUT_NS 100e6 //100ms
 
 static FILE *fp = NULL;
-static char log_buffer[1500]; 		// Global so destructor can flush final data
+static char log_buffer[LINK_MTU];  // Global so destructor can flush final data
 static unsigned int log_buffer_size = 0;
 static int net_fd;
 
@@ -87,17 +87,9 @@ static void open_socket(void)
 	/* ignore errors from allowing broadcast addresses; we'll detect the error at connect, below */
 	setsockopt(net_fd, SOL_SOCKET, SO_BROADCAST, &broadcast_flag, sizeof(broadcast_flag));
 
-	struct sockaddr_in remote = { AF_INET };
-	remote.sin_port = htons(WIFI_PORT);
-	if(!inet_aton(WIFI_IP, &remote.sin_addr))
+	if(connect(net_fd, WIFI_ADDR, sizeof(struct sockaddr_in)) < 0)
 	{
-		fprintf(stderr, "inet_aton(\"" WIFI_IP "\") failed\n");
-		exit(1);
-	}
-
-	if(connect(net_fd, (struct sockaddr *) &remote, sizeof(struct sockaddr)) < 0)
-	{
-		perror("could not connect to " WIFI_IP ":" STRINGIFY(WIFI_PORT));
+		perror("could not connect to WIFI");
 		exit(1);
 	}
 }
@@ -173,15 +165,16 @@ static void logg(const void *data, size_t len)
 	// Copy data into packet buffer
 	memcpy(log_buffer + log_buffer_size, data, len);
 	log_buffer_size += len;
-//	printf("-");
 }
 
 static void log_timeout(struct pollfd * pfd){
-    char buf[8];
-    read(pfd->fd, buf, 8); //clears timerfd
-    if(log_buffer_size > sizeof(uint32_t)){ //sequence number
-        flush_log();
-    }
+	char buf[8];
+	if(read(pfd->fd, buf, 8)<0){ //clears timerfd
+		perror("log_timeout: read() failed");
+	}
+	if(log_buffer_size > sizeof(uint32_t)){ //sequence number
+		flush_log();
+	}
 }
 
 static void log_message(const char *msg)
