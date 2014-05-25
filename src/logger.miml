@@ -15,28 +15,28 @@ receivers:
 
   log_receive_gps:
   - [data, GPSMessage*]
-  
+
   log_receive_mpu:
   - [data, MPUMessage*]
-  
+
   log_receive_mpl:
   - [data, MPLMessage*]
-  
+
   log_receive_arm:
   - [code, const char*]
-  
+
   log_receive_rc:
   - [data, RollServoMessage*]
 
-  log_receive_rnh:
-  - [ARG1, unsigned char*]
+  log_receive_rnhh:
+  - [ARG1, RNHHMessage*]
+
+  log_receive_rnhp:
+  - [ARG1, RNHPMessage*]
+
+  log_receive_rnh_version:
+  - [ARG1, uint8_t*]
   - [ARG2, unsigned int]
-  - [ARG3, unsigned char*]
-  
-  log_receive_rnhport:
-  - [ARG1, unsigned char*]
-  - [ARG2, unsigned int]
-  - [ARG3, unsigned char*]
 
   log_receive_fcfh:
   - [ARG1, unsigned char*]

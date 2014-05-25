@@ -11,7 +11,7 @@ sources:
   - [ETH, ethmux.miml]          # Central Ethernet receiver
   - [MPU, mpu.miml]             # MPU module
   - [MPL, mpl.miml]             # MPL module
-
+  - [RNH, rnh.miml]             # RocketNet Hub
 
 messages:
   ETH.demuxed_ADIS:
@@ -33,10 +33,10 @@ messages:
    - RC.rc_raw_testrc
 
   ETH.demuxed_RNH:
-   - LOG.log_receive_rnh
-   
+   - RNH.rnhh_raw_in
+
   ETH.demuxed_RNHPORT:
-   - LOG.log_receive_rnhport
+   - RNH.rnhp_raw_in
 
   ETH.demuxed_FCFH:
    - LOG.log_receive_fcfh
@@ -63,3 +63,13 @@ messages:
 
   MPL.mpl_data_out:
     - LOG.log_receive_mpl
+
+  RNH.rnhh_data_out:
+    - LOG.log_receive_rnhh
+
+  RNH.rnhp_data_out:
+    - LOG.log_receive_rnhp
+
+  RNH.rnh_version_out:
+    - LOG.log_receive_rnh_version
+

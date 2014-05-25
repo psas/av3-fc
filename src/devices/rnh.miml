@@ -1,0 +1,27 @@
+%YAML 1.2
+---
+include: rnh.h
+object: src/devices/rnh.o
+init: rnh_init();
+
+# Functions that handle outgoing data
+senders:
+  rnhh_data_out:
+  - [ARG1, RNHHMessage*]
+  rnhp_data_out:
+  - [ARG1, RNHPMessage*]
+  rnh_version_out:
+  - [ARG1, uint8_t*]
+  - [ARG2, unsigned int]
+
+# Functions that handle incoming data
+receivers:
+  rnhh_raw_in:
+  - [ARG1, unsigned char*]
+  - [ARG2, unsigned int]
+  - [ARG3, unsigned char*]
+  rnhp_raw_in:
+  - [ARG1, unsigned char*]
+  - [ARG2, unsigned int]
+  - [ARG3, unsigned char*]
+

@@ -10,6 +10,7 @@
 #include "mpl.h"
 #include "mpu.h"
 #include "rollcontrol.h"
+#include "rnh.h"
 
 typedef struct{
 	char     ID[4];
@@ -20,16 +21,17 @@ typedef struct{
 void logger_init(void); // [miml:init]
 void logger_final(void); // [miml:final]
 
-extern void log_receive_adis(ADISMessage *); // [miml:receiver]
-extern void log_receive_gps(GPSMessage*);
-extern void log_receive_mpu(MPUMessage*);
-extern void log_receive_mpl(MPLMessage*);
-extern void log_receive_rc(RollServoMessage*);
-extern void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
-extern void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
-extern void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
+void log_receive_adis(ADISMessage *); // [miml:receiver]
+void log_receive_gps(GPSMessage*);
+void log_receive_mpu(MPUMessage*);
+void log_receive_mpl(MPLMessage*);
+void log_receive_rc(RollServoMessage*);
+void log_receive_rnhh(RNHHMessage * packet);
+void log_receive_rnhp(RNHPMessage * packet);
+void log_receive_rnh_version(uint8_t * buffer, unsigned int length);
+void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
+void log_receive_arm(const char*);
 
-extern void log_receive_arm(const char*);
 
 
 #endif

@@ -220,41 +220,16 @@ void log_receive_rc(RollServoMessage* data){
 	logg(data, sizeof(RollServoMessage));
 }
 
-void log_receive_rnh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-	if (len == sizeof(RNHHealthData)) {
-
-		RNHHMessage packet = {
-			.ID={"RNHH"},
-			.timestamp={
-				(uint8_t)timestamp[0], (uint8_t)timestamp[1],
-				(uint8_t)timestamp[2], (uint8_t)timestamp[3],
-				(uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-			.data_length=htons(sizeof(RNHHealthData))
-		};
-		// Copy in data from socket
-		memcpy(&packet.data, buffer, sizeof(RNHHealthData));
-
-		logg(&packet, sizeof(RNHHMessage));
-	}
+void log_receive_rnhh(RNHHMessage * packet) {
+	logg(packet, sizeof(RNHHMessage));
 }
 
-void log_receive_rnhport(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
+void log_receive_rnhp(RNHPMessage * packet) {
+	logg(packet, sizeof(RNHPMessage));
+}
 
-    if (len == sizeof(RNHPowerData)) {
-
-        RNHPMessage packet = {
-            .ID={"RNHP"},
-            .timestamp={
-                (uint8_t)timestamp[0], (uint8_t)timestamp[1],
-                (uint8_t)timestamp[2], (uint8_t)timestamp[3],
-                (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-            .data_length=htons(sizeof(RNHHealthData))
-        };
-        // Copy in data from socket
-        memcpy(&packet.data, buffer, sizeof(RNHHealthData));
-
-        logg(&packet, sizeof(RNHPMessage));
-    }
+void log_receive_rnh_version(uint8_t * message, unsigned int length){
+	logg(message, length);
 }
 
 void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
@@ -276,3 +251,4 @@ void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* ti
     }
 
 }
+
