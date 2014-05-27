@@ -8,7 +8,7 @@
 #define UTILS_TIME_H_
 #include <time.h>
 
-void utils_time_init(void);
+void MIML_INIT utils_time_init(void);
 
 void to_psas_time(struct timespec* ts, unsigned char* out);
 void get_psas_time(unsigned char* out);

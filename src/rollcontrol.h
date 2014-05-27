@@ -23,15 +23,12 @@ typedef struct{
 	uint8_t u8ServoDisableFlag;
 }__attribute__((packed)) RollServoMessage;
 
-void rollcontrol_init(void); // [miml:init]
-
-void rc_receive_imu(ADISMessage *); // [miml:receiver]
-void rc_receive_arm(const char *); // [miml:receiver]
-void rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
-void rc_raw_testrc(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
-
-
-void rc_send_servo(RollServoMessage*); // [miml:sender]
+void MIML_INIT rollcontrol_init(void);
+void MIML_RECEIVER rc_receive_imu(ADISMessage *);
+void MIML_RECEIVER rc_receive_arm(const char *);
+void MIML_RECEIVER rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*);
+void MIML_RECEIVER rc_raw_testrc(unsigned char *, unsigned int, unsigned char*);
+void MIML_SENDER rc_send_servo(RollServoMessage*);
 
 #endif /* ROLLCONTROL_H_ */
 

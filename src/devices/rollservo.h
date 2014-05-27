@@ -8,10 +8,9 @@
 
 #include "rollcontrol.h"
 
-void rollservo_init(void);
-void rollservo_final(void);
-
-void rs_receive_adj(RollServoMessage*);
+void MIML_INIT rollservo_init(void);
+void MIML_FINAL rollservo_final(void);
+void MIML_RECEIVER rs_receive_adj(RollServoMessage*);
 
 
 

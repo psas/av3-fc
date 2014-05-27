@@ -14,8 +14,7 @@ typedef struct {
 	unsigned char * data;
 }__attribute__((packed)) MPUMessage;
 
-extern void mpu_data_out(MPUMessage*); // [miml:sender]
-
-extern void mpu_raw_in(unsigned char*, unsigned int, unsigned char*); // [miml:reciever]
+void MIML_SENDER mpu_data_out(MPUMessage*);
+void MIML_RECEIVER mpu_raw_in(unsigned char*, unsigned int, unsigned char*);
 
 #endif /* MPU_H_ */

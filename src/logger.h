@@ -18,19 +18,19 @@ typedef struct{
 	uint16_t data_length;
 } __attribute__((packed)) message_header;
 
-void logger_init(void); // [miml:init]
-void logger_final(void); // [miml:final]
+void MIML_INIT logger_init(void);
+void MIML_FINAL logger_final(void);
 
-void log_receive_adis(ADISMessage *); // [miml:receiver]
-void log_receive_gps(GPSMessage*);
-void log_receive_mpu(MPUMessage*);
-void log_receive_mpl(MPLMessage*);
-void log_receive_rc(RollServoMessage*);
-void log_receive_rnhh(RNHHMessage * packet);
-void log_receive_rnhp(RNHPMessage * packet);
-void log_receive_rnh_version(uint8_t * buffer, unsigned int length);
-void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
-void log_receive_arm(const char*);
+void MIML_RECEIVER log_receive_adis(ADISMessage *);
+void MIML_RECEIVER log_receive_gps(GPSMessage*);
+void MIML_RECEIVER log_receive_mpu(MPUMessage*);
+void MIML_RECEIVER log_receive_mpl(MPLMessage*);
+void MIML_RECEIVER log_receive_rc(RollServoMessage*);
+void MIML_RECEIVER log_receive_rnhh(RNHHMessage * packet);
+void MIML_RECEIVER log_receive_rnhp(RNHPMessage * packet);
+void MIML_RECEIVER log_receive_rnh_version(uint8_t * buffer, unsigned int length);
+void MIML_RECEIVER log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
+void MIML_RECEIVER log_receive_arm(const char*);
 
 
 

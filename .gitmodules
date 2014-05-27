@@ -1,3 +1,3 @@
 [submodule "elderberry"]
 	path = elderberry
-	url = https://github.com/psas/elderberry.git
+	url = file:///home/theo/workspace/psas/elderberry

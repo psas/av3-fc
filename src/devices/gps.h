@@ -94,9 +94,9 @@ typedef struct{
 } __attribute__((packed)) GPSMessage;
 
 
-void gps_init(void);
-void gps_final(void);
+void MIML_INIT gps_init(void);
+void MIML_FINAL gps_final(void);
 
-void gps_data_out(GPSMessage *);
+void MIML_SENDER gps_data_out(GPSMessage *);
 
 #endif /* GPS_H_ */
