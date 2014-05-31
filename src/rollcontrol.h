@@ -5,6 +5,7 @@
 #ifndef ROLLCONTROL_H_
 #define ROLLCONTROL_H_
 
+#include <ev.h>
 #include "adis.h"
 
 #define NULL_SERVO_POSITION 1500
@@ -23,7 +24,7 @@ typedef struct{
 	uint8_t u8ServoDisableFlag;
 }__attribute__((packed)) RollServoMessage;
 
-void MIML_INIT rollcontrol_init(void);
+void MIML_INIT rollcontrol_init(struct ev_loop * loop);
 void MIML_RECEIVER rc_receive_imu(ADISMessage *);
 void MIML_RECEIVER rc_receive_arm(const char *);
 void MIML_RECEIVER rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*);

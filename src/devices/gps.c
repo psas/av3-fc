@@ -5,8 +5,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <sys/poll.h>
-
-#include "../elderberry/fcfutils.h"
+#include <ev.h>
 #include "utilities/utils_time.h"
 #include "gps.h"
 
@@ -14,7 +13,7 @@
 struct msg {
 	char 		magic[4];		// "$BIN"
 	uint16_t	type;			//  1,  2, 80, 93-99
-	uint16_t	len;			// 52, 16, 40, 56, 96, 128, 300, 28, 68, 304 
+	uint16_t	len;			// 52, 16, 40, 56, 96, 128, 300, 28, 68, 304
 	union {
 		char raw[304];
 		struct msg1 m1;
@@ -114,11 +113,11 @@ static int get_packet(struct msg *m)
 /**
  * Entry point for USB data
  */
-static void data_callback(struct pollfd *pfd){
-	int act_len = sizeof(buffer) - (end-buffer);
+static void data_callback(struct ev_loop * loop, ev_io * w, int revents){
+	int act_len = sizeof(buffer)-(end-buffer);
 	struct msg m;
 
-	act_len = read(pfd->fd, end, act_len);
+	act_len = read(w->fd, end, act_len);
 	if (act_len <= 0) {
 		perror("GPS read failed");
 		return;
@@ -129,8 +128,9 @@ static void data_callback(struct pollfd *pfd){
 		handle_packet(&m);
 }
 
-int fd;
-void gps_init(void) {
+static int fd;
+static  ev_io gps_watcher;
+void gps_init(struct ev_loop * loop) {
 	struct termios attrib;
 	fd = open(GPS_USB_DEVICE, O_RDONLY | O_NOCTTY);
 	if (fd < 0) {
@@ -142,7 +142,8 @@ void gps_init(void) {
 	cfmakeraw(&attrib);
         tcsetattr(fd, TCSANOW, &attrib);
 
-	fcf_add_fd(fd, POLLIN, data_callback);
+	ev_io_init(&gps_watcher, data_callback, fd, EV_READ);
+	ev_io_start(loop, &gps_watcher);
 }
 
 void gps_final(void) {

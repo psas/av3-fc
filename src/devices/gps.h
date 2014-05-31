@@ -5,7 +5,7 @@
 #define GPS_H_
 
 #include <stdint.h>
-
+#include <ev.h>
 
 /**
  * GPS device name. For local laptop testing we can creatd a fake USB serial
@@ -94,7 +94,7 @@ typedef struct{
 } __attribute__((packed)) GPSMessage;
 
 
-void MIML_INIT gps_init(void);
+void MIML_INIT gps_init(struct ev_loop * loop);
 void MIML_FINAL gps_final(void);
 
 void MIML_SENDER gps_data_out(GPSMessage *);

@@ -11,6 +11,7 @@
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include <error.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -130,19 +131,15 @@ int readsocketfromts(int fd, unsigned char *buffer, int bufsize, struct sockaddr
 }
 
 int udp_socket(){
-	int s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	int s = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, IPPROTO_UDP);
 	if (s < 0){
-		perror("udp_socket: socket() failed");
+		error(EXIT_FAILURE, errno, "udp_socket: socket() failed");
 	}
-
 	return s;
 }
 
 int bound_udp_socket(int port) {
 	int s = udp_socket();
-	if (s < 0){
-		return s;
-	}
 
 	struct sockaddr_in sin = {};
 	sin.sin_family      = AF_INET;
@@ -152,7 +149,7 @@ int bound_udp_socket(int port) {
 	if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) < 0){
 		perror("bound_udp_socket: bind() failed");
 		close(s);
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	return s;
@@ -160,9 +157,6 @@ int bound_udp_socket(int port) {
 
 int timestamped_bound_udp_socket(int port) {
 	int s = bound_udp_socket(port);
-	if (s < 0){
-		return s;
-	}
 
 	int opts = SOF_TIMESTAMPING_RX_HARDWARE
 	         | SOF_TIMESTAMPING_RX_SOFTWARE
@@ -170,7 +164,7 @@ int timestamped_bound_udp_socket(int port) {
 	if(setsockopt(s, SOL_SOCKET, SO_TIMESTAMPNS, &opts, sizeof(opts)) < 0){
 		perror("timestamped_bound_udp_socket: setsockopt failed");
 		close(s);
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	return s;

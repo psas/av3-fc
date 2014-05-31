@@ -6,9 +6,10 @@
 #ifndef ROLLSERVO_H_
 #define ROLLSERVO_H_
 
+#include <ev.h>
 #include "rollcontrol.h"
 
-void MIML_INIT rollservo_init(void);
+void MIML_INIT rollservo_init(struct ev_loop * loop);
 void MIML_FINAL rollservo_final(void);
 void MIML_RECEIVER rs_receive_adj(RollServoMessage*);
 

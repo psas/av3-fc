@@ -1,10 +1,11 @@
 #include <time.h>
 #include <stdint.h>
+#include <ev.h>
 #include "utilities/utils_time.h"
 
 struct timespec starttime; // TODO: timer module
 
-void utils_time_init(){
+void utils_time_init(struct ev_loop * loop){
 	clock_gettime(CLOCK_REALTIME, &starttime);
 }
 

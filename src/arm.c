@@ -1,9 +1,10 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include "elderberry/fcfutils.h"
+#include <ev.h>
 #include "utilities/net_addrs.h"
 #include "utilities/utils_sockets.h"
 #include "arm.h"
@@ -111,15 +112,13 @@ void arm_raw_in(unsigned char *buffer, int unsigned len, unsigned char * timesta
 	}
 }
 
-void arm_init(void){
+void arm_init(struct ev_loop * loop){
 	slock_enable = true;
 	sd = udp_socket();
-	if(sd < 0){
-		return;
-	}
 	if(connect(sd, ARM_ADDR, sizeof(struct sockaddr_in)) < 0){
 		perror("arm_init: connect() failed");
 		close(sd);
+		exit(EXIT_FAILURE);
 	}
 }
 

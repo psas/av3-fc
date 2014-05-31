@@ -1,9 +1,10 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/timerfd.h>
-#include "elderberry/fcfutils.h"
+#include <ev.h>
 #include "utilities/utils_time.h"
 #include "utilities/net_addrs.h"
 #include "utilities/utils_sockets.h"
@@ -15,17 +16,15 @@ static bool launch;
 static bool enable_servo;
 static bool armed;
 
-void rollcontrol_init(void){
+void rollcontrol_init(struct ev_loop * loop){
 	launch = false;
 	enable_servo = false;
 
 	sd = udp_socket();
-	if(sd < 0){
-		return;
-	}
 	if(connect(sd, RC_SERVO_ENABLE_ADDR, sizeof(struct sockaddr_in)) < 0){
 		perror("rollcontrol_init: connect() failed");
 		close(sd);
+		exit(EXIT_FAILURE);
 	}
 
 }

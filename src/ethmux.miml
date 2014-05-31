@@ -2,8 +2,8 @@
 ---
 include: ethmux.h
 object: src/ethmux.o
-init: ethmux_init();
-final: ethmux_final();
+init: ethmux_init
+final: ethmux_final
 
 senders:
   demuxed_ARM:

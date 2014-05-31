@@ -2,8 +2,8 @@
 ---
 include: arm.h
 object: src/arm.o
-init: arm_init();
-final: arm_final();
+init: arm_init
+final: arm_final
 
 senders:
   arm_send_signal:

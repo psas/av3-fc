@@ -2,7 +2,7 @@
 ---
 include: rollcontrol.h
 object: src/rollcontrol.o
-init: rollcontrol_init();
+init: rollcontrol_init
 
 senders:
   rc_send_servo:

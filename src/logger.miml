@@ -2,8 +2,8 @@
 ---
 include: logger.h
 object: src/logger.o
-init: logger_init();
-final: logger_final();
+init: logger_init
+final: logger_final
 
 # Functions that handle outgoing data
 senders:

@@ -2,7 +2,7 @@
 ---
 include: rnh.h
 object: src/devices/rnh.o
-init: rnh_init();
+init: rnh_init
 
 # Functions that handle outgoing data
 senders:

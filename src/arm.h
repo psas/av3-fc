@@ -5,10 +5,11 @@
 
 #ifndef ARM_H_
 #define ARM_H_
+#include <ev.h>
 #include "gps.h"
 #include "adis.h"
 
-void MIML_INIT arm_init(void);
+void MIML_INIT arm_init(struct ev_loop * loop);
 void MIML_FINAL arm_final(void);
 
 void MIML_RECEIVER arm_receive_imu(ADISMessage*);

@@ -5,8 +5,9 @@
 
 #ifndef ETHMUX_H_
 #define ETHMUX_H_
+#include <ev.h>
 
-void MIML_INIT ethmux_init(void);
+void MIML_INIT ethmux_init(struct ev_loop * loop);
 void MIML_FINAL ethmux_final(void);
 //senders:
 void MIML_SENDER demuxed_ARM(unsigned char*, unsigned int, unsigned char*);

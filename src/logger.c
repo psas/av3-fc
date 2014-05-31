@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/timerfd.h>
-#include "../elderberry/fcfutils.h"
+#include <ev.h>
 #include "utilities/utils_sockets.h"
 #include "utilities/utils_time.h"
 #include "utilities/psas_packet.h"
@@ -35,7 +35,7 @@
 #define IPv4_MAX_HEADER_SIZE 60
 #define P_LIMIT LINK_MTU - UDP_HEADER_SIZE - IPv4_MAX_HEADER_SIZE - sizeof(uint32_t)
 
-#define LOG_TIMEOUT_NS 100e6 //100ms
+#define LOG_TIMEOUT 0.1 //100ms
 
 static FILE *fp = NULL;
 static char log_buffer[LINK_MTU];  // Global so destructor can flush final data
@@ -94,8 +94,10 @@ static void open_socket(void)
 	}
 }
 
-static void log_timeout(struct pollfd * pfd);
-void logger_init() {
+static void log_timeout(struct ev_loop * loop, ev_timer * timer, int revents);
+static ev_timer log_timer;
+static struct ev_loop * mainloop;
+void logger_init(struct ev_loop * loop) {
 	open_logfile();
 	setbuf(fp, NULL);
 
@@ -109,15 +111,9 @@ void logger_init() {
 	memcpy(&log_buffer[log_buffer_size], &sequence, sizeof(uint32_t));
 	log_buffer_size += sizeof(uint32_t);
 
-
-    int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-    struct itimerspec  newval;
-    newval.it_interval.tv_sec = 0;
-    newval.it_interval.tv_nsec = LOG_TIMEOUT_NS;
-    newval.it_value.tv_sec = 0;
-    newval.it_value.tv_nsec = LOG_TIMEOUT_NS;
-    timerfd_settime(tfd, 0, &newval, NULL);
-    fcf_add_fd(tfd, POLLIN, log_timeout);
+	ev_timer_init(&log_timer, log_timeout, LOG_TIMEOUT, 0);
+	ev_timer_again(loop, &log_timer);
+	mainloop = loop;
 }
 
 
@@ -135,9 +131,8 @@ static void flush_log()
 	SEQNMessage header = {
 	        .ID={"SEQN"},
 	        .data_length=htons(sizeof(SequenceNoData))
-    };
+	};
 	get_psas_time(header.timestamp);
-    //TODO: fix the -4 which accounts for the sequence number size in a ugly way
 	fwrite(&header, 1, sizeof(header)-sizeof(SequenceNoData), fp);
 	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
 	// Send current buffer to WiFi
@@ -154,6 +149,7 @@ static void flush_log()
 	uint32_t s  = htonl(sequence);
 	memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
 	log_buffer_size += sizeof(uint32_t);
+	ev_timer_again(mainloop, &log_timer);
 }
 
 static void logg(const void *data, size_t len)
@@ -167,11 +163,7 @@ static void logg(const void *data, size_t len)
 	log_buffer_size += len;
 }
 
-static void log_timeout(struct pollfd * pfd){
-	char buf[8];
-	if(read(pfd->fd, buf, 8)<0){ //clears timerfd
-		perror("log_timeout: read() failed");
-	}
+static void log_timeout(struct ev_loop * loop, ev_timer * timer, int revents){
 	if(log_buffer_size > sizeof(uint32_t)){ //sequence number
 		flush_log();
 	}

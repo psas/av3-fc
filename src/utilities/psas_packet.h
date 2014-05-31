@@ -7,7 +7,7 @@
 
 #ifndef _PSAS_PACKET_H
 #define _PSAS_PACKET_H
-
+#include <stdint.h>
 
 /*! \typedef
  * SequenceNo Data

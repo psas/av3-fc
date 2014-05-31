@@ -1,20 +1,20 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <ev.h>
 #include "net_addrs.h"
 #include "utilities/utils_sockets.h"
 #include "rollservo.h"
 
 int sd;
 
-void rollservo_init(void){
+void rollservo_init(struct ev_loop * loop){
 	sd = udp_socket();
-	if(sd < 0){
-		return;
-	}
 
 	if(connect(sd, ROLL_ADDR, sizeof(struct sockaddr_in)) < 0){
 		perror("rollservo_init: connect() failed");
 		close(sd);
+		exit(EXIT_FAILURE);
 	}
 }
 

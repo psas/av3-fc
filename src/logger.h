@@ -5,6 +5,7 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
+#include <ev.h>
 #include "adis.h"
 #include "gps.h"
 #include "mpl.h"
@@ -18,7 +19,7 @@ typedef struct{
 	uint16_t data_length;
 } __attribute__((packed)) message_header;
 
-void MIML_INIT logger_init(void);
+void MIML_INIT logger_init(struct ev_loop * loop);
 void MIML_FINAL logger_final(void);
 
 void MIML_RECEIVER log_receive_adis(ADISMessage *);

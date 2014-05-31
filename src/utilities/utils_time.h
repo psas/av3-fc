@@ -7,8 +7,9 @@
 #ifndef UTILS_TIME_H_
 #define UTILS_TIME_H_
 #include <time.h>
+#include <ev.h>
 
-void MIML_INIT utils_time_init(void);
+void MIML_INIT utils_time_init(struct ev_loop * loop);
 
 void to_psas_time(struct timespec* ts, unsigned char* out);
 void get_psas_time(unsigned char* out);

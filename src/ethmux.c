@@ -4,7 +4,7 @@
 #include <linux/net_tstamp.h>
 #include <time.h>
 #include <string.h>
-#include "elderberry/fcfutils.h"
+#include <ev.h>
 #include "utilities/utils_sockets.h"
 #include "utilities/utils_time.h"
 #include "utilities/net_addrs.h"
@@ -12,12 +12,12 @@
 
 static unsigned char buffer[ETH_MTU];
 
-void demux(struct pollfd *pfd){
+void demux(struct ev_loop *loop, ev_io *w, int revents){
 
 	struct sockaddr_in packet_info;
 	struct timespec ts;
 	socklen_t len = sizeof(packet_info);
-	int bytes = readsocketfromts(pfd->fd, buffer, sizeof(buffer), &packet_info, len, &ts);
+	int bytes = readsocketfromts(w->fd, buffer, sizeof(buffer), &packet_info, len, &ts);
 
 	int port = ntohs(packet_info.sin_port);
 	unsigned char timestamp[6];
@@ -59,20 +59,16 @@ void demux(struct pollfd *pfd){
 	}
 }
 
-static int fd;
-static int idx;
+static int s;
+static ev_io listen_watcher;
 
-void ethmux_init(void){
-	fd = timestamped_bound_udp_socket(FC_LISTEN_PORT);
-	if(fd < 0){
-		return;
-	}
-	idx = fcf_add_fd(fd, POLLIN, demux);
+void ethmux_init(struct ev_loop * loop){
+	s = timestamped_bound_udp_socket(FC_LISTEN_PORT);
+	ev_io_init (&listen_watcher, demux, s, EV_READ);
+	ev_io_start (loop, &listen_watcher);
 }
 
 void ethmux_final(void){
-	//We really don't need to do this but just to be pedantic
-	fcf_remove_fd(idx);
-	close(fd);
+	close(s);
 }
 

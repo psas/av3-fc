@@ -2,8 +2,8 @@
 ---
 include: rollservo.h
 object: src/devices/rollservo.o
-init: rollservo_init();
-final: rollservo_final();
+init: rollservo_init
+final: rollservo_final
 
 receivers:
   rs_receive_adj:

@@ -1,17 +1,17 @@
 sources:
-  - [TIME, utils_time.miml]     # Time utilities
-  - [SOCK, utils_sockets.miml]  # Socket utilities
-  - [ADDR, net_addrs.miml]      # RocketNet addresses
-  - [ADIS, adis.miml]           # ADIS Sensor
-  - [LOG, logger.miml]          # Logger code Module
-  - [GPS, gps.miml]             # GPS Sensor
-  - [ARM, arm.miml]             # Arm Code Module
-  - [RC, rollcontrol.miml]      # Roll Control Code Module
-  - [RS, rollservo.miml]        # Roll Servo Control Interface
-  - [ETH, ethmux.miml]          # Central Ethernet receiver
-  - [MPU, mpu.miml]             # MPU module
-  - [MPL, mpl.miml]             # MPL module
-  - [RNH, rnh.miml]             # RocketNet Hub
+  - [TIME, src/utilities/utils_time.miml]     # Time utilities
+  - [SOCK, src/utilities/utils_sockets.miml]  # Socket utilities
+  - [ADDR, src/utilities/net_addrs.miml]      # RocketNet addresses
+  - [ADIS, src/devices/adis.miml]           # ADIS Sensor
+  - [LOG, src/logger.miml]          # Logger code Module
+  - [GPS, src/devices/gps.miml]             # GPS Sensor
+  - [ARM, src/arm.miml]             # Arm Code Module
+  - [RC, src/rollcontrol.miml]      # Roll Control Code Module
+  - [RS, src/devices/rollservo.miml]        # Roll Servo Control Interface
+  - [ETH, src/ethmux.miml]          # Central Ethernet receiver
+  - [MPU, src/devices/mpu.miml]             # MPU module
+  - [MPL, src/devices/mpl.miml]             # MPL module
+  - [RNH, src/devices/rnh.miml]             # RocketNet Hub
 
 messages:
   ETH.demuxed_ADIS:

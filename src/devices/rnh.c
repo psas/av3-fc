@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <poll.h>
-#include "elderberry/fcfutils.h"
+#include <ev.h>
 #include "utilities/utils_sockets.h"
 #include "utilities/psas_packet.h"
 #include "utilities/net_addrs.h"
@@ -44,27 +43,29 @@ void rnhp_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timesta
 	}
 }
 
-int s, idx;
+int s;
+static ev_io version_watcher;
 uint8_t buffer[50];
-static void version_callback(struct pollfd *pfd){
+static void version_callback(struct ev_loop *loop, ev_io *w, int revent){
 
-	int length = read(pfd->fd, buffer, sizeof(buffer));
+	int length = read(w->fd, buffer, sizeof(buffer));
 	if(length < 0){
 		perror("rnh version callback: read() failed");
 	} else {
 		rnh_version_out(buffer, length);
 	}
-	fcf_remove_fd(idx);
+	ev_io_stop(loop, w);
 	close(s);
 }
 
-void rnh_init(void){
+void rnh_init(struct ev_loop * loop){
 	s = bound_udp_socket(0);
 	if(connect(s, RNH_RCI_ADDR, sizeof(struct sockaddr_in)) < 0){
 		perror("rnh_init: connect() failed");
 		close(s);
 	}
-	idx = fcf_add_fd(s, POLLIN, version_callback);
+	ev_io_init(&version_watcher, version_callback, s, EV_READ);
+	ev_io_start(loop, &version_watcher);
 	if(write(s, "#VERS", 5) < 0){
 		perror("rnh_init: write failed");
 	}
