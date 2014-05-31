@@ -1,5 +1,5 @@
-/**	starting point for the socket code was:
-*	http://publib.boulder.ibm.com/infocenter/iseries/v6r1m0/index.jsp?topic=/rzab6/poll.htm
+/** starting point for the socket code was:
+*   http://publib.boulder.ibm.com/infocenter/iseries/v6r1m0/index.jsp?topic=/rzab6/poll.htm
 */
 
 #include <stdio.h>
@@ -21,157 +21,169 @@
 
 
 int readsocket(int fd, unsigned char *buffer, int bufsize) {
-	/**
-	* Receive data on this connection until the
-	* recv fails with EWOULDBLOCK. If any other
-	* failure occurs, we will close the
-	* connection.
-	*/
-	int rc = recv(fd, buffer, bufsize, 0);
-	if (rc < 0){
-		if (errno != EWOULDBLOCK){
-			perror("readsocket: recv() failed");
-			return -2;
-		}
-		return 0;
-	}
+    /**
+    * Receive data on this connection until the
+    * recv fails with EWOULDBLOCK. If any other
+    * failure occurs, we will close the
+    * connection.
+    */
+    int rc = recv(fd, buffer, bufsize, 0);
+    if (rc < 0){
+        if (errno != EWOULDBLOCK){
+            perror("readsocket: recv() failed");
+            return -2;
+        }
+        return 0;
+    }
 
-	/**
-	* Check to see if the connection has been
-	* closed by the client
-	*/
-	if (rc == 0){
-		return -1;
-	}
+    /**
+    * Check to see if the connection has been
+    * closed by the client
+    */
+    if (rc == 0){
+        return -1;
+    }
 
-	// Data was received
-	//printf("  %d bytes received\n", rc);
+    // Data was received
+    //printf("  %d bytes received\n", rc);
 
-	return rc;
+    return rc;
 }
 
 int readsocketfrom(int fd, unsigned char *buffer, int bufsize, struct sockaddr *sender, socklen_t *addrlen) {
-	/**
-	* Receive data packet on this socket,
-	* and also return the sender's address.
-	*/
-	int rc = recvfrom(fd, buffer, bufsize, 0, sender, addrlen);
-	if (rc < 0){
-		if (errno != EWOULDBLOCK){
-			perror("readsocket: recv() failed");
-			return -2;
-		}
-		return 0;
-	}
+    /**
+    * Receive data packet on this socket,
+    * and also return the sender's address.
+    */
+    int rc = recvfrom(fd, buffer, bufsize, 0, sender, addrlen);
+    if (rc < 0){
+        if (errno != EWOULDBLOCK){
+            perror("readsocket: recv() failed");
+            return -2;
+        }
+        return 0;
+    }
 
-	/**
-	* Check to see if the connection has been
-	* closed by the client
-	*/
-	if (rc == 0){
-		return -1;
-	}
+    /**
+    * Check to see if the connection has been
+    * closed by the client
+    */
+    if (rc == 0){
+        return -1;
+    }
 
-	return rc;
+    return rc;
 }
 
 
 int readsocketfromts(int fd, unsigned char *buffer, int bufsize, struct sockaddr_in *sender, socklen_t addrlen, struct timespec *ts){
-	struct msghdr msg;
-	struct cmsghdr *cmsg;
-	struct iovec entry;
-	struct {
-	struct cmsghdr cm;
-		char control[512];
-	} control;
+    struct msghdr msg;
+    struct cmsghdr *cmsg;
+    struct iovec entry;
+    struct {
+    struct cmsghdr cm;
+        char control[512];
+    } control;
 
-	memset(&msg, 0, sizeof(msg));
-	msg.msg_iov = &entry;
-	msg.msg_iovlen = 1;
-	entry.iov_base = buffer;
-	entry.iov_len = bufsize;
-	msg.msg_name = (caddr_t)sender;
-	msg.msg_namelen = addrlen;
-	msg.msg_control = &control;
-	msg.msg_controllen = sizeof(control);
+    memset(&msg, 0, sizeof(msg));
+    msg.msg_iov = &entry;
+    msg.msg_iovlen = 1;
+    entry.iov_base = buffer;
+    entry.iov_len = bufsize;
+    msg.msg_name = (caddr_t)sender;
+    msg.msg_namelen = addrlen;
+    msg.msg_control = &control;
+    msg.msg_controllen = sizeof(control);
 
-	int rc = recvmsg(fd, &msg, 0);
-	if (rc < 0){
-		if (errno != EWOULDBLOCK){
-			perror("readsocketfromts: recvmsg() failed");
-			return -2;
-		}
-		return 0;
-	}
+    int rc = recvmsg(fd, &msg, 0);
+    if (rc < 0){
+        if (errno != EWOULDBLOCK){
+            perror("readsocketfromts: recvmsg() failed");
+            return -2;
+        }
+        return 0;
+    }
 
-	/**
-	* Check to see if the connection has been
-	* closed by the client
-	*/
-	if (rc == 0){
-		fprintf(stderr, "readsocketfromts: Connection closed\n");
-		return -1;
-	}
+    /**
+    * Check to see if the connection has been
+    * closed by the client
+    */
+    if (rc == 0){
+        fprintf(stderr, "readsocketfromts: Connection closed\n");
+        return -1;
+    }
 
-	/** Extract info from msg **/
-	//timestamp info
-	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)){
-		if(cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPNS){
-			ts->tv_nsec = ((struct timespec *)CMSG_DATA(cmsg))->tv_nsec;
-			ts->tv_sec = ((struct timespec *)CMSG_DATA(cmsg))->tv_sec;
-		}
-	}
-	//data
-	if(msg.msg_iovlen > 1){
-		printf("utils_sockets rsft: iovlen greater than 1\n");
-	}
+    /** Extract info from msg **/
+    //timestamp info
+    for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)){
+        if(cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPNS){
+            ts->tv_nsec = ((struct timespec *)CMSG_DATA(cmsg))->tv_nsec;
+            ts->tv_sec = ((struct timespec *)CMSG_DATA(cmsg))->tv_sec;
+        }
+    }
+    //data
+    if(msg.msg_iovlen > 1){
+        printf("utils_sockets rsft: iovlen greater than 1\n");
+    }
 
-	return rc;
+    return rc;
 }
 
 int udp_socket(){
-	int s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s < 0){
-		perror("udp_socket: socket() failed");
-	}
+    int s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (s < 0){
+        perror("udp_socket: socket() failed");
+    }
 
-	return s;
+    return s;
 }
 
 int bound_udp_socket(int port) {
-	int s = udp_socket();
-	if (s < 0){
-		return s;
-	}
+    int s = udp_socket();
+    if (s < 0){
+        return s;
+    }
 
-	struct sockaddr_in sin = {};
-	sin.sin_family      = AF_INET;
-	sin.sin_addr.s_addr = htonl(INADDR_ANY);
-	sin.sin_port        = htons(port);
+    struct sockaddr_in sin = {};
+    sin.sin_family      = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_ANY);
+    sin.sin_port        = htons(port);
 
-	if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) < 0){
-		perror("bound_udp_socket: bind() failed");
-		close(s);
-		return -1;
-	}
+    if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) < 0){
+        perror("bound_udp_socket: bind() failed");
+        close(s);
+        return -1;
+    }
 
-	return s;
+    return s;
 }
 
 int timestamped_bound_udp_socket(int port) {
-	int s = bound_udp_socket(port);
-	if (s < 0){
-		return s;
-	}
+    int s = bound_udp_socket(port);
+    if (s < 0){
+        return s;
+    }
 
-	int opts = SOF_TIMESTAMPING_RX_HARDWARE
-	         | SOF_TIMESTAMPING_RX_SOFTWARE
-	         | SOF_TIMESTAMPING_SYS_HARDWARE;
-	if(setsockopt(s, SOL_SOCKET, SO_TIMESTAMPNS, &opts, sizeof(opts)) < 0){
-		perror("timestamped_bound_udp_socket: setsockopt failed");
-		close(s);
-		return -1;
-	}
+    int opts = SOF_TIMESTAMPING_RX_HARDWARE
+             | SOF_TIMESTAMPING_RX_SOFTWARE
+             | SOF_TIMESTAMPING_SYS_HARDWARE;
+    if(setsockopt(s, SOL_SOCKET, SO_TIMESTAMPNS, &opts, sizeof(opts)) < 0){
+        perror("timestamped_bound_udp_socket: setsockopt failed");
+        close(s);
+        return -1;
+    }
 
-	return s;
+    return s;
+}
+
+void print_SeqError(enum SeqError error, unsigned long expected, unsigned long rcvd) {
+    if (error == SEQ_noseq) {
+        fprintf(stderr, "Sequenced socket error: received packet was too small to hold a sequence number\n");
+    } else if (error == SEQ_backward) {
+        fprintf(stderr, "Sequenced socket error: received a sequence number (%lu) smaller than expected (%lu); discarding\n", rcvd, expected);
+    } else if (error == SEQ_skip) {
+        fprintf(stderr, "Sequenced socket error: received a sequence number (%lu) larger than expected (%lu); processing\n", rcvd, expected);
+    } else {
+        fprintf(stderr, "Sequenced socket error: unknown error (%d)\n", error);
+    }
 }
