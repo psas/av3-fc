@@ -13,29 +13,29 @@
 typedef void (*demux_handler)(unsigned char* buffer, unsigned int bytes, unsigned char* timestamp);
 
 static unsigned char buffer[ETH_MTU];
-static unsigned long seq_ADIS;
-static unsigned long seq_ARM;
-static unsigned long seq_LD;
-static unsigned long seq_MPU;
-static unsigned long seq_MPL;
-static unsigned long seq_RC;
-static unsigned long seq_RNH;
-static unsigned long seq_RNHPORT;
-static unsigned long seq_FCFH;
+static uint32_t seq_ADIS;
+static uint32_t seq_ARM;
+static uint32_t seq_LD;
+static uint32_t seq_MPU;
+static uint32_t seq_MPL;
+static uint32_t seq_RC;
+static uint32_t seq_RNH;
+static uint32_t seq_RNHPORT;
+static uint32_t seq_FCFH;
 
-static void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, enum SeqError error, unsigned long expected, unsigned long rcvd);
-static void sequenced_receive(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, unsigned long* seq, demux_handler handler);
+static void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, enum SeqError error, uint32_t expected, uint32_t rcvd);
+static void sequenced_receive(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, uint32_t* seq, demux_handler handler);
 
-void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, enum SeqError error, unsigned long expected, unsigned long rcvd) {
+void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, enum SeqError error, uint32_t expected, uint32_t rcvd) {
 }
 
-void sequenced_receive(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, unsigned long* seq, demux_handler handler) {
-    if (bytes < sizeof(unsigned long)) {
+void sequenced_receive(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, uint32_t* seq, demux_handler handler) {
+    if (bytes < sizeof(uint32_t)) {
         sequenced_error(port, buffer, bytes, timestamp, SEQ_noseq, 0, 0);
     } else {
-        unsigned long   rcvseq;
+        uint32_t	rcvseq;
 
-        rcvseq = ntohl(*(unsigned long*)buffer);
+        rcvseq = ntohl(*(uint32_t*)buffer);
 
         if (rcvseq < *seq) {
             sequenced_error(port, buffer, bytes, timestamp, SEQ_backward, *seq, rcvseq);
@@ -48,7 +48,7 @@ void sequenced_receive(int port, unsigned char* buffer, unsigned int bytes, unsi
 
             *seq = rcvseq + 1;
 
-            handler(buffer + sizeof(unsigned long), bytes - sizeof(unsigned long), timestamp);
+            handler(buffer + sizeof(uint32_t), bytes - sizeof(uint32_t), timestamp);
         }
     }
 }
