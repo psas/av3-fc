@@ -23,7 +23,7 @@ static unsigned long seq_RNH;
 static unsigned long seq_RNHPORT;
 static unsigned long seq_FCFH;
 
-static void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, const char* error, unsigned long expected, unsigned long rcvd);
+static void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, enum SeqError error, unsigned long expected, unsigned long rcvd);
 static void sequenced_receive(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, unsigned long* seq, demux_handler handler);
 
 void sequenced_error(int port, unsigned char* buffer, unsigned int bytes, unsigned char* timestamp, enum SeqError error, unsigned long expected, unsigned long rcvd) {
