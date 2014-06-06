@@ -54,7 +54,7 @@ static void version_callback(struct pollfd *pfd){
 	} else {
 		rnh_version_out(buffer, length);
 	}
-	fcf_remove_fd(idx);
+	fcf_remove_fd(s);
 	close(s);
 }
 

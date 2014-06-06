@@ -72,7 +72,7 @@ void ethmux_init(void){
 
 void ethmux_final(void){
 	//We really don't need to do this but just to be pedantic
-	fcf_remove_fd(idx);
+	fcf_remove_fd(fd);
 	close(fd);
 }
 
