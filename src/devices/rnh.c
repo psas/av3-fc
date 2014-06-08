@@ -44,7 +44,7 @@ void rnhp_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timesta
 	}
 }
 
-int s, idx;
+int s;
 uint8_t buffer[50];
 static void version_callback(struct pollfd *pfd){
 
@@ -64,7 +64,7 @@ void rnh_init(void){
 		perror("rnh_init: connect() failed");
 		close(s);
 	}
-	idx = fcf_add_fd(s, POLLIN, version_callback);
+	fcf_add_fd(s, POLLIN, version_callback);
 	if(write(s, "#VERS", 5) < 0){
 		perror("rnh_init: write failed");
 	}

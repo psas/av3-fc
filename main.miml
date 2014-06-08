@@ -41,6 +41,9 @@ messages:
   ETH.demuxed_FCFH:
    - LOG.log_receive_fcfh
 
+  ETH.sequenced_error:
+   - LOG.log_receive_seqpacket_err
+
   ADIS.adis_data_out:
     - ARM.arm_receive_imu
     - RC.rc_receive_imu

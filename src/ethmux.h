@@ -1,6 +1,6 @@
 /*
- * Demuxes ethernet messages sent to the listen port by source and routes 
- * them to the appropriate module. 
+ * Demuxes ethernet messages sent to the listen port by source and routes
+ * them to the appropriate module.
  */
 
 #ifndef ETHMUX_H_
@@ -18,5 +18,6 @@ extern void demuxed_RC(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_RNH(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_RNHPORT(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_FCFH(unsigned char*, unsigned int, unsigned char*);
+void sequenced_error(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received);
 
 #endif /* ETHMUX_H_ */

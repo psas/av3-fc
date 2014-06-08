@@ -31,7 +31,7 @@ void log_receive_rnhp(RNHPMessage * packet);
 void log_receive_rnh_version(uint8_t * buffer, unsigned int length);
 void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
 void log_receive_arm(const char*);
-
+void log_receive_seqpacket_err(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received);
 
 
 #endif

@@ -252,3 +252,32 @@ void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* ti
 
 }
 
+//FIXME: move to psas_packet
+struct seqerror {
+	char ID[4];
+	uint8_t timestamp[6];
+	uint16_t data_length;
+	unsigned short port;
+	uint32_t expected;
+	uint32_t received;
+} __attribute__((packed));
+
+void log_receive_seqpacket_err(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received){
+	uint16_t data_length = htons(sizeof(unsigned short) + sizeof(uint32_t)*2 + len);
+	struct seqerror err = {
+		.ID={"SEQE"},
+		.timestamp={
+			(uint8_t)timestamp[0], (uint8_t)timestamp[1],
+			(uint8_t)timestamp[2], (uint8_t)timestamp[3],
+			(uint8_t)timestamp[4], (uint8_t)timestamp[5]
+		},
+		.data_length=data_length,
+		.port = port,
+		.expected = expected,
+		.received = received
+	};
+	uint8_t message[sizeof(struct seqerror) + len];
+	memcpy(message, &err, sizeof(struct seqerror));
+	memcpy(message + sizeof(struct seqerror), buffer, len);
+	logg(&message, sizeof(struct seqerror) + len);
+}

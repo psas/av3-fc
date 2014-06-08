@@ -51,4 +51,12 @@ senders:
   - [len, unsigned int]
   - [timestamp, unsigned char*]
 
+  sequenced_error:
+  - [port, unsigned short]
+  - [buffer, uint8_t*]
+  - [len, unsigned int]
+  - [timestamp, uint8_t *]
+  - [expected, uint32_t]
+  - [received, uint32_t]
+
 receivers:
