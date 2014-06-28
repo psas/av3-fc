@@ -7,11 +7,11 @@
 #include <netinet/in.h>
 
 #ifdef FCF_FC_NETWORK
-#define RNH_IP    IPv4(10,0,0,5)
-#define FC_IP     IPv4(10,0,0,10)
-#define SENSOR_IP IPv4(10,0,0,20)
-#define ROLL_IP   IPv4(10,0,0,30)
-#define WIFI_IP   IPv4(10,0,0,255)
+#define RNH_IP    IPv4(10,10,10,5)
+#define FC_IP     IPv4(10,10,10,10)
+#define SENSOR_IP IPv4(10,10,10,20)
+#define ROLL_IP   IPv4(10,10,10,30)
+#define WIFI_IP   IPv4(172,17,0,2)
 #else
 #define RNH_IP    IPv4(127,0,0,1)
 #define FC_IP     IPv4(127,0,0,1)
