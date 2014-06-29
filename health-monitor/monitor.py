@@ -80,7 +80,9 @@ def read():
 if __name__ == '__main__':
     time.sleep(rate)
 
+    seq = 0
     with network.SendUDP('127.0.0.1', 36000, from_port=36201) as udp:
         while True:
             # Includes a blocking read so it should run at globally defined rate
-            udp.send_message(messages.FCFH, read())
+            udp.send_seq_message(messages.FCFH, seq, read())
+            seq = seq + 1
