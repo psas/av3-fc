@@ -5,7 +5,7 @@
 struct timespec starttime; // TODO: timer module
 
 void utils_time_init(){
-	clock_gettime(CLOCK_REALTIME, &starttime);
+	clock_gettime(CLOCK_MONOTONIC, &starttime);
 }
 
 void to_psas_time(struct timespec* ts, unsigned char* out){
@@ -23,7 +23,7 @@ void to_psas_time(struct timespec* ts, unsigned char* out){
 
 void get_psas_time(unsigned char* out){
 	struct timespec ts;
-	clock_gettime(CLOCK_REALTIME, &ts);
+	clock_gettime(CLOCK_MONOTONIC, &ts);
 	to_psas_time(&ts, out);
 }
 
