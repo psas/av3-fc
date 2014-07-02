@@ -4,7 +4,7 @@
 #include "utilities/utils_sockets.h"
 #include "rollservo.h"
 
-int sd;
+static int sd;
 
 void rollservo_init(void){
 	sd = udp_socket();

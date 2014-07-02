@@ -11,7 +11,7 @@
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
 	!strncmp((char*)a, b, sizeof(b) > len? len: sizeof(b))
 
-int sd;
+static int sd;
 
 bool slock_enable;
 bool GPS_locked;

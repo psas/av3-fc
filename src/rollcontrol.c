@@ -9,7 +9,7 @@
 #include "utilities/utils_sockets.h"
 #include "rollcontrol.h"
 
-int sd;
+static int sd;
 
 static bool launch;
 static bool enable_servo;
