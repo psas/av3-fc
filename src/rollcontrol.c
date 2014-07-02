@@ -15,9 +15,20 @@ static bool launch;
 static bool enable_servo;
 static bool armed;
 
+static void set_servo_enable(bool enable)
+{
+	enable_servo = enable;
+}
+
+static void set_armed(bool arm)
+{
+	armed = arm;
+	set_servo_enable(arm);
+}
+
 void rollcontrol_init(void){
 	launch = false;
-	enable_servo = false;
+	set_armed(false);
 
 	sd = udp_socket();
 	if(sd < 0){
@@ -67,12 +78,10 @@ void rc_receive_imu(ADISMessage * imu){
 
 void rc_receive_arm(const char * signal){
 	if(!strcmp(signal, "ARM")){
-		armed = true;
-		enable_servo = true;
+		set_armed(true);
 		launch = true;
 	}else if(!strcmp(signal, "SAFE")){
-		armed = false;
-		enable_servo = false;
+		set_armed(false);
 		// TODO: Send final message
 	}
 }
@@ -98,11 +107,11 @@ static void send_servo_response(const char * message){
 void rc_raw_testrc(unsigned char * data, unsigned int len, unsigned char* timestamp){
 	if(!armed){
 		if(COMPARE_BUFFER_TO_CMD(data, "ENABLE", len)){
-			enable_servo = true;
+			set_servo_enable(true);
 			send_servo_response("Roll control servos enabled");
 		}
 		else if(COMPARE_BUFFER_TO_CMD(data, "DISABLE", len)){
-			enable_servo = false;
+			set_servo_enable(false);
 			send_servo_response("Roll control servos disabled");
 		}
 		else{
