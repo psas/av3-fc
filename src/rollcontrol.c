@@ -30,20 +30,14 @@ void rollcontrol_init(void){
 
 }
 
-void rc_receive_imu(ADISMessage * imu){
+static void set_canard_angle(double degrees)
+{
+	/* Slope */
+	const double CANARD_PWM_PER_DEGREE = (MAX_SERVO_POSITION - MIN_SERVO_POSITION) / (MAX_CANARD_ANGLE - MIN_CANARD_ANGLE);
+	/* Intercept */
+	const double CANARD_PWM_CENTER = MIN_SERVO_POSITION - CANARD_PWM_PER_DEGREE * MIN_CANARD_ANGLE;
 
-	if (!enable_servo)
-		return;
-
-	int16_t rate = imu->data.adis_gyro_x;
-	double rate_deg = 0.05 *  rate;
-
-	// Slope
-	double a = (MAX_SERVO_POSITION - MIN_SERVO_POSITION) / (MAX_GRATE - MIN_GRATE);
-	// Inercept
-	double b = MIN_SERVO_POSITION - (a * MIN_GRATE);
-
-	double servo = a*rate_deg + b;
+	double servo = CANARD_PWM_PER_DEGREE * degrees + CANARD_PWM_CENTER;
 	if (servo > MAX_SERVO_POSITION)
 		servo = MAX_SERVO_POSITION;
 	if (servo < MIN_SERVO_POSITION)
@@ -58,6 +52,17 @@ void rc_receive_imu(ADISMessage * imu){
 	get_psas_time(out.timestamp);
 
 	rc_send_servo(&out);
+}
+
+void rc_receive_imu(ADISMessage * imu){
+
+	if (!enable_servo)
+		return;
+
+	/* ADIS fixed-to-float conversion */
+	double rate_deg = 0.05 * imu->data.adis_gyro_x;
+
+	set_canard_angle(rate_deg);
 }
 
 void rc_receive_arm(const char * signal){
