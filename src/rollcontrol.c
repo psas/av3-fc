@@ -15,8 +15,15 @@ static bool launch;
 static bool enable_servo;
 static bool armed;
 
+static struct timespec last_time;
+static double last_roll_error;
+static double roll_error_integral;
+
 static void set_servo_enable(bool enable)
 {
+	last_time = (struct timespec) { 0, 0 };
+	last_roll_error = 0;
+	roll_error_integral = 0;
 	enable_servo = enable;
 }
 
@@ -70,10 +77,30 @@ void rc_receive_imu(ADISMessage * imu){
 	if (!enable_servo)
 		return;
 
-	/* ADIS fixed-to-float conversion */
-	double rate_deg = 0.05 * imu->data.adis_gyro_x;
+	struct timespec now;
+	clock_gettime(CLOCK_MONOTONIC, &now);
 
-	set_canard_angle(rate_deg);
+	/* ADIS fixed-to-float conversion */
+	const double rate_deg = 0.05 * imu->data.adis_gyro_x;
+
+	const double Kp = 1;
+	const double Ki = 0;
+	const double Kd = 0;
+
+	const double roll_error = rate_deg;
+	double output = Kp * roll_error;
+
+	if (last_time.tv_sec || last_time.tv_nsec) {
+		double dt = now.tv_sec - last_time.tv_sec + now.tv_nsec / 1e9 - last_time.tv_nsec / 1e9;
+		roll_error_integral += roll_error * dt;
+		double roll_error_derivative = (roll_error - last_roll_error) / dt;
+		output += Ki * roll_error_integral + Kd * roll_error_derivative;
+	}
+
+	set_canard_angle(output);
+
+	last_time = now;
+	last_roll_error = roll_error;
 }
 
 void rc_receive_arm(const char * signal){
