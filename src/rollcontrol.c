@@ -64,7 +64,7 @@ static void set_canard_angle(double degrees)
 	RollServoMessage out = {
 			.ID = {"ROLL"},
 			.data_length = 3,
-			.u16ServoPulseWidthBin14 = servo,
+			.u16ServoPulseWidthBin14 = htons(servo),
 			.u8ServoDisableFlag = !enable_servo,
 	};
 	get_psas_time(out.timestamp);
@@ -81,7 +81,7 @@ void rc_receive_imu(ADISMessage * imu){
 	clock_gettime(CLOCK_MONOTONIC, &now);
 
 	/* ADIS fixed-to-float conversion */
-	const double rate_deg = 0.05 * imu->data.adis_gyro_x;
+	const double rate_deg = 0.05 * (int16_t) ntohs(imu->data.adis_gyro_x);
 
 	const double Kp = 1;
 	const double Ki = 0;
