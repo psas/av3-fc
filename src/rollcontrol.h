@@ -7,11 +7,10 @@
 
 #include "adis.h"
 
-/// TODO: FIX
-#define MAX_SERVO_POSITION 3000.0 // PWM
-#define MIN_SERVO_POSITION 0.0    // PWM
-#define MAX_CANARD_ANGLE 50.0            // Canard position in Degrees
-#define MIN_CANARD_ANGLE -50.0           // Canard position in Degrees
+#define MAX_SERVO_POSITION 1900.0 // PWM
+#define MIN_SERVO_POSITION 1100.0    // PWM
+#define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
+#define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
 typedef struct{
 	char     ID[4];
