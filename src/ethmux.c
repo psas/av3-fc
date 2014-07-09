@@ -43,7 +43,6 @@ void demux(struct pollfd *pfd){
 	static uint32_t seq_LD = 0;
 	static uint32_t seq_MPU = 0;
 	static uint32_t seq_MPL = 0;
-	static uint32_t seq_RC = 0;
 	static uint32_t seq_RNH = 0;
 	static uint32_t seq_RNHPORT = 0;
 	static uint32_t seq_FCFH = 0;
@@ -62,7 +61,7 @@ void demux(struct pollfd *pfd){
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_ADIS, demuxed_ADIS);
 			break;
 		case ARM_PORT:
-            demuxed_ARM(buffer, bytes, timestamp);
+			demuxed_ARM(buffer, bytes, timestamp);
 			break;
 		case TEATHER_PORT:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_LD, demuxed_LD);
@@ -74,7 +73,7 @@ void demux(struct pollfd *pfd){
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPL, demuxed_MPL);
 			break;
 		case RC_SERVO_ENABLE_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_RC, demuxed_RC);
+			demuxed_RC(buffer, bytes, timestamp);
 			break;
 		case RNH_BATTERY:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNH, demuxed_RNH);
