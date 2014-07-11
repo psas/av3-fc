@@ -14,7 +14,7 @@
 struct msg {
 	char 		magic[4];		// "$BIN"
 	uint16_t	type;			//  1,  2, 80, 93-99
-	uint16_t	len;			// 52, 16, 40, 56, 96, 128, 300, 28, 68, 304 
+	uint16_t	len;			// 52, 16, 40, 56, 96, 128, 300, 28, 68, 304
 	union {
 		char raw[304];
 		struct msg1 m1;
@@ -129,22 +129,8 @@ static void data_callback(struct pollfd *pfd){
 		handle_packet(&m);
 }
 
-int fd;
 void gps_init(void) {
-	struct termios attrib;
-	fd = open(GPS_USB_DEVICE, O_RDONLY | O_NOCTTY);
-	if (fd < 0) {
-		perror("GPS can't open device");
-		return;
-	}
-        tcgetattr(fd, &attrib);
-        cfsetispeed(&attrib, B115200);
-	cfmakeraw(&attrib);
-        tcsetattr(fd, TCSANOW, &attrib);
-
-	fcf_add_fd(fd, POLLIN, data_callback);
 }
 
 void gps_final(void) {
-	close(fd);
 }
