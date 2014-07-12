@@ -9,7 +9,7 @@
 #include "../elderberry/fcfutils.h"
 #include "utilities/utils_time.h"
 #include "gps.h"
-
+#if 0
 // cf 7.1  Crescent Integrators Manual
 struct msg {
 	char 		magic[4];		// "$BIN"
@@ -114,6 +114,7 @@ static int get_packet(struct msg *m)
 /**
  * Entry point for USB data
  */
+#if 0
 static void data_callback(struct pollfd *pfd){
 	int act_len = sizeof(buffer) - (end-buffer);
 	struct msg m;
@@ -128,7 +129,8 @@ static void data_callback(struct pollfd *pfd){
 	while (get_packet(&m))
 		handle_packet(&m);
 }
-
+#endif
+#endif
 void gps_init(void) {
 }
 
