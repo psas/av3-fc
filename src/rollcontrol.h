@@ -16,7 +16,7 @@ typedef struct{
 	uint16_t data_length;
 	double   finangle;
 	uint8_t  servoDisableFlag;
-} RollServoMessage;
+} __attribute__((packed)) RollServoMessage;
 
 void rollcontrol_init(void); // [miml:init]
 

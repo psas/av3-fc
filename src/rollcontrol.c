@@ -54,7 +54,7 @@ static void set_canard_angle(double degrees)
 	degrees = CLAMP(degrees, MIN_CANARD_ANGLE, MAX_CANARD_ANGLE);
 	RollServoMessage out = {
 			.ID = {"ROLL"},
-			.data_length = 3,
+			.data_length = 9,
 			.finangle = degrees,
 			.servoDisableFlag = !enable_servo,
 	};

@@ -215,8 +215,16 @@ void log_receive_arm(const char* code){
 	log_message(code);
 }
 
-void log_receive_rc(RollServoMessage* data){
+void log_receive_rc(RollServoMessage* data) {
 	data->data_length = htons(data->data_length);
+	union {
+		uint64_t uint;
+		double doub;
+	} convert;
+
+	convert.doub = data->finangle;
+	convert.uint = __builtin_bswap64(convert.uint);
+	data->finangle = convert.doub;
 	logg(data, sizeof(RollServoMessage));
 }
 
