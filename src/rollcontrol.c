@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/timerfd.h>
 #include "elderberry/fcfutils.h"
+#include "utilities/utils.h"
 #include "utilities/utils_time.h"
 #include "utilities/net_addrs.h"
 #include "utilities/utils_sockets.h"
@@ -50,22 +51,12 @@ void rollcontrol_init(void){
 
 static void set_canard_angle(double degrees)
 {
-	/* Slope */
-	const double CANARD_PWM_PER_DEGREE = (MAX_SERVO_POSITION - MIN_SERVO_POSITION) / (MAX_CANARD_ANGLE - MIN_CANARD_ANGLE);
-	/* Intercept */
-	const double CANARD_PWM_CENTER = MIN_SERVO_POSITION - CANARD_PWM_PER_DEGREE * MIN_CANARD_ANGLE;
-
-	double servo = CANARD_PWM_PER_DEGREE * degrees + CANARD_PWM_CENTER;
-	if (servo > MAX_SERVO_POSITION)
-		servo = MAX_SERVO_POSITION;
-	if (servo < MIN_SERVO_POSITION)
-		servo = MIN_SERVO_POSITION;
-
+	CLAMP(degrees, MAX_CANARD_ANGLE, MIN_CANARD_ANGLE);
 	RollServoMessage out = {
 			.ID = {"ROLL"},
 			.data_length = 3,
-			.u16ServoPulseWidthBin14 = htons(servo),
-			.u8ServoDisableFlag = !enable_servo,
+			.finangle = degrees,
+			.servoDisableFlag = !enable_servo,
 	};
 	get_psas_time(out.timestamp);
 

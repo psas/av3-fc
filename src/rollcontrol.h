@@ -7,8 +7,6 @@
 
 #include "adis.h"
 
-#define MAX_SERVO_POSITION 1900.0 // PWM
-#define MIN_SERVO_POSITION 1100.0    // PWM
 #define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
@@ -16,9 +14,9 @@ typedef struct{
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	uint16_t u16ServoPulseWidthBin14;
-	uint8_t u8ServoDisableFlag;
-}__attribute__((packed)) RollServoMessage;
+	double   finangle;
+	uint8_t  servoDisableFlag;
+} RollServoMessage;
 
 void rollcontrol_init(void); // [miml:init]
 
