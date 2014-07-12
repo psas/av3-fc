@@ -51,7 +51,7 @@ void rollcontrol_init(void){
 
 static void set_canard_angle(double degrees)
 {
-	CLAMP(degrees, MAX_CANARD_ANGLE, MIN_CANARD_ANGLE);
+	degrees = CLAMP(degrees, MIN_CANARD_ANGLE, MAX_CANARD_ANGLE);
 	RollServoMessage out = {
 			.ID = {"ROLL"},
 			.data_length = 3,

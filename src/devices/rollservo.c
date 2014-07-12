@@ -47,7 +47,7 @@ void rs_receive_adj(RollServoMessage* adj){
 	const double PWM_TICKS_CENTER = MIN_SERVO_POSITION_TICKS - PWM_TICKS_PER_DEGREE * MIN_CANARD_ANGLE;
 
 	uint16_t ticks = PWM_TICKS_PER_DEGREE * adj->finangle + PWM_TICKS_CENTER;
-	CLAMP(ticks, MAX_SERVO_POSITION_TICKS, MIN_SERVO_POSITION_TICKS);
+	ticks = CLAMP(ticks, MIN_SERVO_POSITION_TICKS, MAX_SERVO_POSITION_TICKS);
 
 	char data[7];
 	data[0] = seq >> 24;
