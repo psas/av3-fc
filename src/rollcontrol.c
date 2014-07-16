@@ -1,8 +1,8 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/timerfd.h>
 #include "elderberry/fcfutils.h"
 #include "utilities/utils.h"
 #include "utilities/utils_time.h"
@@ -15,15 +15,13 @@ static int sd;
 static bool enable_servo;
 static bool armed;
 
-static struct timespec last_time;
-static double last_roll_error;
-static double roll_error_integral;
+static double time_since_launch;
+static double velocity;
 
 static void set_servo_enable(bool enable)
 {
-	last_time = (struct timespec) { 0, 0 };
-	last_roll_error = 0;
-	roll_error_integral = 0;
+	time_since_launch = 0;
+	velocity = 0;
 	enable_servo = enable;
 }
 
@@ -66,30 +64,44 @@ void rc_receive_imu(ADISMessage * imu){
 	if (!enable_servo)
 		return;
 
-	struct timespec now;
-	clock_gettime(CLOCK_MONOTONIC, &now);
+	/* ADIS fixed-to-float conversion to m/s/s */
+	const double accel = (0.00333 * 9.80665) * (int16_t) ntohs(imu->data.adis_acc_x);
 
-	/* ADIS fixed-to-float conversion */
-	const double rate_deg = 0.05 * (int16_t) ntohs(imu->data.adis_gyro_x);
+	/* don't start integrating until it looks like we've launched */
+	if (time_since_launch <= 0 && accel < 20)
+		return;
 
-	const double Kp = 1;
-	const double Ki = 0;
-	const double Kd = 0;
+	const double dt = 1 / 819.2;
+	time_since_launch += dt;
+	velocity += accel * dt;
 
-	const double roll_error = rate_deg;
-	double output = Kp * roll_error;
+	/*
+	 * f(v) = SWEEP_COEFFICIENT / v**2 + SWEEP_MIN
+	 *
+	 * Desired limits:
+	 * f(40 m/s) = 15 degrees # sweep at slow speeds
+	 * f(338 m/s) = 0.5 degrees # sweep at predicted peak velocity
+	 *
+	 * The following values were fitted to the above constraints.
+	 */
+	const double SWEEP_COEFFICIENT = 23529.5;
+	const double SWEEP_MIN = 0.294041;
 
-	if (last_time.tv_sec || last_time.tv_nsec) {
-		double dt = now.tv_sec - last_time.tv_sec + now.tv_nsec / 1e9 - last_time.tv_nsec / 1e9;
-		roll_error_integral += roll_error * dt;
-		double roll_error_derivative = (roll_error - last_roll_error) / dt;
-		output += Ki * roll_error_integral + Kd * roll_error_derivative;
-	}
+	/* for these purposes, we'll pretend speeds below 40 m/s don't exist */
+	const double sweep_vel = MAX(40, fabs(velocity));
+	const double sweep_amplitude = SWEEP_COEFFICIENT / (sweep_vel * sweep_vel) + SWEEP_MIN;
+
+	/* sweep the canards through a sweep_amplitude-modulated triangle wave */
+	const double CYCLES_PER_SECOND = 1;
+	const double half_cycles = time_since_launch * CYCLES_PER_SECOND * 2 + 0.5;
+	const int integer_half_cycles = floor(half_cycles);
+	const double fractional_half_cycles = half_cycles - integer_half_cycles;
+	const int reverse = integer_half_cycles & 1 ? -1 : 1; /* odd-numbered half-cycles go the opposite direction */
+	const double sweep_position = fractional_half_cycles * 2 - 1; /* transform [0,1] to [-1,1] */
+
+	const double output = sweep_amplitude * sweep_position * reverse;
 
 	set_canard_angle(output);
-
-	last_time = now;
-	last_roll_error = roll_error;
 }
 
 void rc_receive_arm(const char * signal){
