@@ -68,12 +68,12 @@ void rc_receive_imu(ADISMessage * imu){
 	const double accel = (0.00333 * 9.80665) * (int16_t) ntohs(imu->data.adis_acc_x);
 
 	/* don't start integrating until it looks like we've launched */
-	if (time_since_launch <= 0 && accel < 20)
+	if (time_since_launch <= 0 && fabs(accel - 9.80665) < 20 )
 		return;
 
 	const double dt = 1 / 819.2;
 	time_since_launch += dt;
-	velocity += accel * dt;
+	velocity += (accel - 9.80665) * dt;
 
 	/*
 	 * f(v) = SWEEP_COEFFICIENT / v**2 + SWEEP_MIN

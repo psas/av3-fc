@@ -16,7 +16,6 @@
 */
 
 void adis_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-	//FIXME: this works right now, but is not actually right
 	if(len == sizeof(ADIS16405Data)){
 		// Build message header
 		ADISMessage packet ={
