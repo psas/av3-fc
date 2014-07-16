@@ -12,7 +12,6 @@
 
 static int sd;
 
-static bool launch;
 static bool enable_servo;
 static bool armed;
 
@@ -35,7 +34,6 @@ static void set_armed(bool arm)
 }
 
 void rollcontrol_init(void){
-	launch = false;
 	set_armed(false);
 
 	sd = udp_socket();
@@ -97,7 +95,6 @@ void rc_receive_imu(ADISMessage * imu){
 void rc_receive_arm(const char * signal){
 	if(!strcmp(signal, "ARM")){
 		set_armed(true);
-		launch = true;
 	}else if(!strcmp(signal, "SAFE")){
 		set_armed(false);
 		// TODO: Send final message
@@ -105,9 +102,7 @@ void rc_receive_arm(const char * signal){
 }
 
 void rc_raw_ld_in(unsigned char * signal, unsigned int len, unsigned char* timestamp){
-	if(len > 0){
-		launch = (signal[0]) ? 1 : 0;
-	}
+	/* we're ignoring launch detect for this launch */
 }
 
 static void send_servo_response(const char * message){
