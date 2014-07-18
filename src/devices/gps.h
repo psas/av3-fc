@@ -15,7 +15,12 @@
 #define STATUS99_CHANNEL_RESET	0x20
 #define STATUS99_PHASE_LOCK	0x40
 
-#define GPSMessage GPS1Message
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	uint8_t  raw[304];
+} __attribute__((packed)) GPSMessage;
 
 void cots_raw_in(unsigned char*, unsigned int, unsigned char*);
 void gps_data_out(GPSMessage *);

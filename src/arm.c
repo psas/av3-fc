@@ -38,19 +38,18 @@ void arm_receive_imu(ADISMessage * data){
 }
 
 void arm_receive_gps(GPSMessage * d){
+	if (memcmp(d->ID, "GPS\x01", 4))
+		return;
+
 	GPS1Message * data = (GPS1Message *)d;
-	// check for GPS lock
-	if (data->ID[3] == '1') {
-		switch(data->data.gps1_nav_mode) {
-		case 2:   // 3D fix
-		case 4:   // 3D + diff
-		case 6:   // 3D + diff + rtk
-			GPS_locked = true; break;
-		default:
-			GPS_locked = false; break;
-		}
+	switch(data->data.gps1_nav_mode) {
+	case 2:   // 3D fix
+	case 4:   // 3D + diff
+	case 6:   // 3D + diff + rtk
+		GPS_locked = true; break;
+	default:
+		GPS_locked = false; break;
 	}
-	return;
 }
 
 static void send_arm_response(const char * message){
