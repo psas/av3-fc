@@ -2,9 +2,14 @@
 ---
 include: gps.h
 object: src/devices/gps.o
-init: gps_init();
-final: gps_final();
 
 senders:
   gps_data_out:
   - [data, GPSMessage*]
+
+receivers:
+  cots_raw_in:
+  - [ARG1, unsigned char*]
+  - [ARG2, unsigned int]
+  - [ARG3, unsigned char*]
+

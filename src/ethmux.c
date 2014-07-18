@@ -46,6 +46,7 @@ void demux(struct pollfd *pfd){
 	static uint32_t seq_RNH = 0;
 	static uint32_t seq_RNHPORT = 0;
 	static uint32_t seq_FCFH = 0;
+	static uint32_t seq_GPS_COTS = 0;
 	struct sockaddr_in packet_info;
 	struct timespec ts;
 	socklen_t len = sizeof(packet_info);
@@ -83,6 +84,9 @@ void demux(struct pollfd *pfd){
 			break;
 		case FCF_HEALTH_PORT:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_FCFH, demuxed_FCFH);
+			break;
+		case GPS_COTS:
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_GPS_COTS, demuxed_COTS);
 			break;
 		default:
 			break;

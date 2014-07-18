@@ -51,6 +51,11 @@ senders:
   - [len, unsigned int]
   - [timestamp, unsigned char*]
 
+  demuxed_COTS:
+  - [data, unsigned char*]
+  - [len, unsigned int]
+  - [timestamp, unsigned char*]
+
   sequenced_error:
   - [port, unsigned short]
   - [buffer, uint8_t*]

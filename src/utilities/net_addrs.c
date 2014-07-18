@@ -51,4 +51,5 @@ const struct sockaddr * WIFI_ADDR = make_addr(WIFI_IP, WIFI_PORT);
 const struct sockaddr * ARM_ADDR = make_addr(ARM_IP, ARM_PORT);
 const struct sockaddr * RC_SERVO_ENABLE_ADDR = make_addr(ARM_IP, RC_SERVO_ENABLE_PORT);
 
+const struct sockaddr * GPS_COTS_ADDR = make_addr(GPS_IP, GPS_COTS);
 

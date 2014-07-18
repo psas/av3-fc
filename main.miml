@@ -41,6 +41,15 @@ messages:
   ETH.demuxed_FCFH:
    - LOG.log_receive_fcfh
 
+  ETH.demuxed_COTS:
+   - GPS.cots_raw_in
+
+  ETH.demuxed_RNHUMBDET:
+   - RNH.rnh_raw_in
+
+  ETH.demuxed_RNHALARM:
+   - RNH.rnh_raw_in
+
   ETH.sequenced_error:
    - LOG.log_receive_seqpacket_err
 

@@ -37,10 +37,11 @@ void arm_receive_imu(ADISMessage * data){
 	}
 }
 
-void arm_receive_gps(GPSMessage * data){
+void arm_receive_gps(GPSMessage * d){
+	GPS1Message * data = (GPS1Message *)d;
 	// check for GPS lock
 	if (data->ID[3] == '1') {
-		switch(data->gps1.nav_mode) {
+		switch(data->data.gps1_nav_mode) {
 		case 2:   // 3D fix
 		case 4:   // 3D + diff
 		case 6:   // 3D + diff + rtk
