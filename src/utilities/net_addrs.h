@@ -11,12 +11,15 @@
 #define FC_IP     IPv4(10,10,10,10)
 #define SENSOR_IP IPv4(10,10,10,20)
 #define ROLL_IP   IPv4(10,10,10,30)
+#define GPS_IP    IPv4(10,10,10,50)
 #define WIFI_IP   IPv4(172,17,0,2)
+
 #else
 #define RNH_IP    IPv4(127,0,0,1)
 #define FC_IP     IPv4(127,0,0,1)
 #define SENSOR_IP IPv4(127,0,0,1)
 #define ROLL_IP   IPv4(127,0,0,1)
+#define GPS_IP    IPv4(127,0,0,1)
 #define WIFI_IP   IPv4(127,0,0,1)
 #endif
 
