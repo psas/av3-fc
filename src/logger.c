@@ -195,11 +195,10 @@ void log_receive_adis(ADISMessage *data) {
 }
 
 void log_receive_gps(GPSMessage* data){
-	//TODO: Fix logging GPS data
-	//uint16_t len = data->data_length;
-	//data->data_length = htons(data->data_length);
+	uint16_t len = data->data_length;
+	data->data_length = htons(data->data_length);
 	// different GPS packets have different lengths
-    //logg(data, sizeof(message_header) + len);
+	logg(data, sizeof(message_header) + len);
 }
 
 void log_receive_mpu(MPUMessage* data){
