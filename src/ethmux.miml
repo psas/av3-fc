@@ -41,11 +41,6 @@ senders:
   - [len, unsigned int]
   - [timestamp, unsigned char*]
 
-  demuxed_RNHPORT:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
-
   demuxed_FCFH:
   - [data, unsigned char*]
   - [len, unsigned int]

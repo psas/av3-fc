@@ -28,11 +28,8 @@ receivers:
   log_receive_rc:
   - [data, RollServoMessage*]
 
-  log_receive_rnhh:
-  - [ARG1, RNHHMessage*]
-
-  log_receive_rnhp:
-  - [ARG1, RNHPMessage*]
+  log_receive_rnh:
+  - [ARG1, RNHMessage*]
 
   log_receive_rnh_version:
   - [ARG1, uint8_t*]

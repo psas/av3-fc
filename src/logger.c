@@ -228,12 +228,8 @@ void log_receive_rc(RollServoMessage* data) {
 	logg(data, sizeof(RollServoMessage));
 }
 
-void log_receive_rnhh(RNHHMessage * packet) {
-	logg(packet, sizeof(RNHHMessage));
-}
-
-void log_receive_rnhp(RNHPMessage * packet) {
-	logg(packet, sizeof(RNHPMessage));
+void log_receive_rnh(RNHMessage * packet) {
+	logg(packet, sizeof(RNHMessage));
 }
 
 void log_receive_rnh_version(uint8_t * message, unsigned int length){

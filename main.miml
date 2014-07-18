@@ -33,22 +33,13 @@ messages:
    - RC.rc_raw_testrc
 
   ETH.demuxed_RNH:
-   - RNH.rnhh_raw_in
-
-  ETH.demuxed_RNHPORT:
-   - RNH.rnhp_raw_in
+   - RNH.rnh_raw_in
 
   ETH.demuxed_FCFH:
    - LOG.log_receive_fcfh
 
   ETH.demuxed_COTS:
    - GPS.cots_raw_in
-
-#  ETH.demuxed_RNHUMBDET:
-#   - RNH.rnh_raw_in
-
-#  ETH.demuxed_RNHALARM:
-#   - RNH.rnh_raw_in
 
   ETH.sequenced_error:
    - LOG.log_receive_seqpacket_err
@@ -76,11 +67,8 @@ messages:
   MPL.mpl_data_out:
     - LOG.log_receive_mpl
 
-  RNH.rnhh_data_out:
-    - LOG.log_receive_rnhh
-
-  RNH.rnhp_data_out:
-    - LOG.log_receive_rnhp
+  RNH.rnh_data_out:
+    - LOG.log_receive_rnh
 
   RNH.rnh_version_out:
     - LOG.log_receive_rnh_version

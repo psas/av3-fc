@@ -36,6 +36,8 @@
 const struct sockaddr * RNH_RCI_ADDR = make_addr(RNH_IP, RNH_RCI);
 const struct sockaddr * RNH_BATTERY_ADDR = make_addr(RNH_IP, RNH_BATTERY);
 const struct sockaddr * RNH_PORT_ADDR = make_addr(RNH_IP, RNH_PORT);
+const struct sockaddr * RNH_ALARM_ADDR = make_addr(RNH_IP, RNH_ALARM);
+const struct sockaddr * RNH_UMBDET_ADDR = make_addr(RNH_IP, RNH_UMBDET);
 
 const struct sockaddr * FC_ADDR = make_addr(FC_IP, FC_LISTEN_PORT);
 

@@ -28,8 +28,12 @@
 #define RNH_BATTERY 36101 // Battery data
 #define RNH_PORT 36102    // Port data
 extern const struct sockaddr * RNH_RCI_ADDR;
+#define RNH_ALARM 36103   // Battery alarm
+#define RNH_UMBDET 36104  // Umbilical detect
 extern const struct sockaddr * RNH_BATTERY_ADDR;
 extern const struct sockaddr * RNH_PORT_ADDR;
+extern const struct sockaddr * RNH_ALARM_ADDR;
+extern const struct sockaddr * RNH_UMBDET_ADDR;
 
 /* Flight Computer */
 #define FC_LISTEN_PORT 36000 // FC device listener

@@ -45,10 +45,13 @@ void demux(struct pollfd *pfd){
 	static uint32_t seq_MPL = 0;
 	static uint32_t seq_RNH = 0;
 	static uint32_t seq_RNHPORT = 0;
+	static uint32_t seq_RNHALARM = 0;
+	static uint32_t seq_RNHUMBDET = 0;
 	static uint32_t seq_FCFH = 0;
 	static uint32_t seq_GPS_COTS = 0;
 	struct sockaddr_in packet_info;
 	struct timespec ts;
+
 	socklen_t len = sizeof(packet_info);
 	int bytes = readsocketfromts(pfd->fd, buffer, sizeof(buffer), &packet_info, len, &ts);
 
@@ -80,7 +83,13 @@ void demux(struct pollfd *pfd){
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNH, demuxed_RNH);
 			break;
 		case RNH_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHPORT, demuxed_RNHPORT);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHPORT, demuxed_RNH);
+			break;
+		case RNH_ALARM:
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHALARM, demuxed_RNH);
+			break;
+		case RNH_UMBDET:
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHUMBDET, demuxed_RNH);
 			break;
 		case FCF_HEALTH_PORT:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_FCFH, demuxed_FCFH);
