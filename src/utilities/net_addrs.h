@@ -23,11 +23,18 @@
 #define WIFI_IP   IPv4(127,0,0,1)
 #endif
 
+
+/* RCI */
+#define RCI_PORT 23
+extern const struct sockaddr * RCI_ADDR;
+extern const struct sockaddr * RNH_RCI_ADDR;
+extern const struct sockaddr * SENSOR_RCI_ADDR;
+extern const struct sockaddr * GPS_RCI_ADDR;
+extern const struct sockaddr * ROLL_RCI_ADDR;
+
 /* Rocket Net Hub */
-#define RNH_RCI 36100     // RCI listener
 #define RNH_BATTERY 36101 // Battery data
 #define RNH_PORT 36102    // Port data
-extern const struct sockaddr * RNH_RCI_ADDR;
 #define RNH_ALARM 36103   // Battery alarm
 #define RNH_UMBDET 36104  // Umbilical detect
 extern const struct sockaddr * RNH_BATTERY_ADDR;

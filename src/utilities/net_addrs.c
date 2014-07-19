@@ -33,7 +33,26 @@
 	.sin_addr = { (addr) } \
 }
 
-const struct sockaddr * RNH_RCI_ADDR = make_addr(RNH_IP, RNH_RCI);
+
+#ifdef FCF_FC_NETWORK
+#define RNH_RCI_PORT RCI_PORT
+#define SENSOR_RCI_PORT RCI_PORT
+#define GPS_RCI_PORT RCI_PORT
+#define ROLL_RCI_PORT RCI_PORT
+
+#else
+#define RNH_RCI_PORT 37001
+#define SENSOR_RCI_PORT 37002
+#define GPS_RCI_PORT 37003
+#define ROLL_RCI_PORT 37004
+#endif
+
+const struct sockaddr * RCI_ADDR = make_addr(FC_IP, RCI_PORT);
+const struct sockaddr * RNH_RCI_ADDR = make_addr(RNH_IP, RNH_RCI_PORT);
+const struct sockaddr * SENSOR_RCI_ADDR = make_addr(SENSOR_IP, SENSOR_RCI_PORT);
+const struct sockaddr * GPS_RCI_ADDR = make_addr(GPS_IP, GPS_RCI_PORT);
+const struct sockaddr * ROLL_RCI_ADDR = make_addr(ROLL_IP, ROLL_RCI_PORT);
+
 const struct sockaddr * RNH_BATTERY_ADDR = make_addr(RNH_IP, RNH_BATTERY);
 const struct sockaddr * RNH_PORT_ADDR = make_addr(RNH_IP, RNH_PORT);
 const struct sockaddr * RNH_ALARM_ADDR = make_addr(RNH_IP, RNH_ALARM);

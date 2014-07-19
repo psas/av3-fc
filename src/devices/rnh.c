@@ -42,9 +42,8 @@ void rnh_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestam
 	rnh_data_out(&packet);
 }
 
-static int s;
-static uint8_t buffer[50];
 static void version_callback(struct pollfd *pfd){
+	uint8_t buffer[50];
 
 	int length = read(pfd->fd, buffer, sizeof(buffer));
 	if(length < 0){
@@ -52,19 +51,23 @@ static void version_callback(struct pollfd *pfd){
 	} else {
 		rnh_version_out(buffer, length);
 	}
-	fcf_remove_fd(s);
-	close(s);
+	fcf_remove_fd(pfd->fd);
+	close(pfd->fd);
 }
 
 void rnh_init(void){
-	s = socket(AF_INET, SOCK_STREAM, SOCK_NONBLOCK);
+	int s = socket(AF_INET, SOCK_STREAM, 0);
+	if(s < 0){
+		perror("Couldn't get rnh socket");
+		return;
+	}
 	if(connect(s, RNH_RCI_ADDR, sizeof(struct sockaddr_in)) < 0){
 		perror("rnh_init: connect() failed");
 		close(s);
 		return;
 	}
 	fcf_add_fd(s, POLLIN, version_callback);
-	if(write(s, "#VERS", 5) < 0){
+	if(write(s, "#VERS\r\n", 7) < 0){
 		perror("rnh_init: write failed");
 	}
 

@@ -231,8 +231,22 @@ void log_receive_rnh(RNHMessage * packet) {
 	logg(packet, sizeof(message_header) + ntohs(packet->data_length));
 }
 
+//FIXME: move to psas_packet
+struct VERSMessage {
+	message_header header;
+	uint8_t data[50];
+} __attribute__((packed));
+
 void log_receive_rnh_version(uint8_t * message, unsigned int length){
-	logg(message, length);
+	struct VERSMessage vers = {
+		.header = {
+			.ID = {"VERS"},
+			.timestamp = {0},
+			.data_length = length
+		}
+	};
+	memcpy(vers.data, message, length);
+	logg(&vers, sizeof(message_header) + length);
 }
 
 void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
