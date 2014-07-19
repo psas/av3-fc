@@ -68,7 +68,7 @@ void rc_receive_imu(ADISMessage * imu){
 	const double accel = (0.00333 * 9.80665) * (int16_t) ntohs(imu->data.adis_acc_x);
 
 	/* don't start integrating until it looks like we've launched */
-	if (time_since_launch <= 0 && fabs(accel - 9.80665) < 20 )
+	if (armed && (time_since_launch <= 0 && fabs(accel - 9.80665) < 20 ))
 		return;
 
 	const double dt = 1 / 819.2;
@@ -109,7 +109,7 @@ void rc_receive_arm(const char * signal){
 		set_armed(true);
 	}else if(!strcmp(signal, "SAFE")){
 		set_armed(false);
-		// TODO: Send final message
+		set_canard_angle(0);
 	}
 }
 
@@ -137,6 +137,7 @@ void rc_raw_testrc(unsigned char * data, unsigned int len, unsigned char* timest
 		}
 		else if(COMPARE_BUFFER_TO_CMD(data, "DISABLE", len)){
 			set_servo_enable(false);
+			set_canard_angle(0);
 			send_servo_response("Roll control servos disabled");
 		}
 		else{
