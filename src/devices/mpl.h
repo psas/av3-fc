@@ -9,7 +9,7 @@
 
 typedef struct {
 	uint32_t pressure;
-	uint16_t temperature;
+	int16_t temperature;
 } __attribute__((packed)) MPLData;
 
 typedef struct {
