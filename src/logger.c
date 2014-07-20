@@ -241,10 +241,10 @@ void log_receive_rnh_version(uint8_t * message, unsigned int length){
 	struct VERSMessage vers = {
 		.header = {
 			.ID = {"VERS"},
-			.timestamp = {0},
 			.data_length = length
 		}
 	};
+	get_psas_time(vers.header.timestamp);
 	memcpy(vers.data, message, length);
 	logg(&vers, sizeof(message_header) + length);
 }
