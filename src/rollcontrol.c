@@ -59,6 +59,51 @@ static void set_canard_angle(double degrees)
 	rc_send_servo(&out);
 }
 
+/**
+ * Given a correction from control system, estimate correct angle of attack for canard
+ */
+double estimate_alpha(double set_aa, double x, double v, double t);
+double estimate_alpha(double set_aa, double x, double v, double t) {
+
+	// obvious cases (and avoid divide by 0):
+	if ((fabs(set_aa) < 1)  || (v < 1))
+		return 0;
+
+	double aa = fabs(degreesToRadians(set_aa));
+
+	double I = 0.08; 	//TODO: lookup based on time since launch
+	double rd = 1.2250 * exp((-9.80665 * 0.0289644 * x)/(8.31432*288.15)); 
+
+	double output = sqrt(fabs(2*aa*I*FINFIT_A)/(rd*v*v*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
+    output = output / (2*FINFIT_A);
+
+	/* TODO: implement supersonic
+    def _supersonic():
+        alpha = (aa*I)/(2*rd*v*v*fin_area*fin_arm*Cl_base)
+        return degrees(alpha)
+
+    output = 0
+    if v <= 265:
+        output =  _subsonic()
+    elif v < 330:
+        # Intepolate between super and subsonic
+        y0 = _subsonic()
+        y1 = _supersonic()
+        x0 = 265
+        x1 = 330
+        cl = y0 + (y1-y0)*(v - x0)/(x1-x0)
+        output =  cl
+    else:
+        output =  _supersonic()
+
+	*/
+
+
+    if (set_aa < 0)
+        return -output;
+    return output;
+}
+
 void rc_receive_imu(ADISMessage * imu){
 
 	if (!enable_servo)
@@ -75,31 +120,18 @@ void rc_receive_imu(ADISMessage * imu){
 	time_since_launch += dt;
 	velocity += (accel - 9.80665) * dt;
 
-	/*
-	 * f(v) = SWEEP_COEFFICIENT / v**2 + SWEEP_MIN
-	 *
-	 * Desired limits:
-	 * f(40 m/s) = 15 degrees # sweep at slow speeds
-	 * f(338 m/s) = 0.5 degrees # sweep at predicted peak velocity
-	 *
-	 * The following values were fitted to the above constraints.
-	 */
-	const double SWEEP_COEFFICIENT = 23529.5;
-	const double SWEEP_MIN = 0.294041;
+	/* Proportional Controller */
+	// Roll rate:
+	const double roll_rate = 0.05 * (int16_t) ntohs(imu->data.adis_gyro_x);
 
-	/* for these purposes, we'll pretend speeds below 40 m/s don't exist */
-	const double sweep_vel = MAX(40, fabs(velocity));
-	const double sweep_amplitude = SWEEP_COEFFICIENT / (sweep_vel * sweep_vel) + SWEEP_MIN;
 
-	/* sweep the canards through a sweep_amplitude-modulated triangle wave */
-	const double CYCLES_PER_SECOND = 1;
-	const double half_cycles = time_since_launch * CYCLES_PER_SECOND * 2 + 0.5;
-	const int integer_half_cycles = floor(half_cycles);
-	const double fractional_half_cycles = half_cycles - integer_half_cycles;
-	const int reverse = integer_half_cycles & 1 ? -1 : 1; /* odd-numbered half-cycles go the opposite direction */
-	const double sweep_position = fractional_half_cycles * 2 - 1; /* transform [0,1] to [-1,1] */
+	// Error amd PID Constants
+	double error = 0 - roll_rate;
+	double proportional = KP * error;
+	double correction = proportional;  // TODO: expand to PI or PID
 
-	const double output = sweep_amplitude * sweep_position * reverse;
+	// Look normilized fin angle based on correctio
+	double output = estimate_alpha(correction, 3000, velocity, 0);
 
 	set_canard_angle(output);
 }

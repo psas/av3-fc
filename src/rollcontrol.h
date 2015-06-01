@@ -10,6 +10,22 @@
 #define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
+/* PID */
+#define KP 10.0
+
+/* Fin charachterization constants */
+#define FINFIT_A 0.0006
+#define FINFIT_B 0.045
+#define FIN_AREA 1.13e-3
+#define FIN_ARM 0.085
+
+// Converts degrees to radians.
+#define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
+ 
+// Converts radians to degrees.
+#define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
+
+
 typedef struct{
 	char     ID[4];
 	uint8_t  timestamp[6];
