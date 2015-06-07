@@ -17,11 +17,13 @@ static bool armed;
 
 static double time_since_launch;
 static double velocity;
+static double altitude;
 
 static void set_servo_enable(bool enable)
 {
 	time_since_launch = 0;
 	velocity = 0;
+	altitude = LAUNCH_ALTITUDE;
 	enable_servo = enable;
 }
 
@@ -59,46 +61,66 @@ static void set_canard_angle(double degrees)
 	rc_send_servo(&out);
 }
 
+
+/**
+ * Subsonic fin estimation
+ */
+double subsonic_fin(double set_aa, double I, double rd);
+double subsonic_fin(double set_aa_rad, double I, double rd) {
+	double alpha = sqrt(fabs(2*set_aa_rad*I*FINFIT_A)/(rd*velocity*velocity*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
+	alpha = alpha / (2*FINFIT_A);
+	return alpha;
+}
+
+/**
+ * Supersonic fin estimation
+ */
+double supersonic_fin(double set_aa, double I, double rd);
+double supersonic_fin(double set_aa, double I, double rd) {
+	double alpha = (set_aa*I)/(2*rd*velocity*velocity*FIN_AREA*FIN_ARM*FIN_CBASE);
+	return radiansToDegrees(alpha);
+}
+
+
 /**
  * Given a correction from control system, estimate correct angle of attack for canard
  */
-double estimate_alpha(double set_aa, double x, double v, double t);
-double estimate_alpha(double set_aa, double x, double v, double t) {
+double estimate_alpha(double set_aa);
+double estimate_alpha(double set_aa) {
 
 	// obvious cases (and avoid divide by 0):
-	if ((fabs(set_aa) < 1)  || (v < 1))
+	if ((fabs(set_aa) < 1)  || (velocity < 1))
 		return 0;
 
 	double aa = fabs(degreesToRadians(set_aa));
 
-	double I = 0.08; 	//TODO: lookup based on time since launch
-	double rd = 1.2250 * exp((-9.80665 * 0.0289644 * x)/(8.31432*288.15)); 
+	// Compute inertia
+	double I = I_INIT;
+	if (time_since_launch < EXPECTED_BURN_TIME) {
+		I = I_INIT + (I_BO - I_INIT)*(time_since_launch / EXPECTED_BURN_TIME);
+	} else {
+		I = I_BO;
+	}
 
-	double output = sqrt(fabs(2*aa*I*FINFIT_A)/(rd*v*v*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
-    output = output / (2*FINFIT_A);
-
-	/* TODO: implement supersonic
-    def _supersonic():
-        alpha = (aa*I)/(2*rd*v*v*fin_area*fin_arm*Cl_base)
-        return degrees(alpha)
-
-    output = 0
-    if v <= 265:
-        output =  _subsonic()
-    elif v < 330:
-        # Intepolate between super and subsonic
-        y0 = _subsonic()
-        y1 = _supersonic()
-        x0 = 265
-        x1 = 330
-        cl = y0 + (y1-y0)*(v - x0)/(x1-x0)
-        output =  cl
-    else:
-        output =  _supersonic()
-
-	*/
+	// Compute atmosphere
+	double rd = 1.2250 * exp((-9.80665 * 0.0289644 * altitude)/(8.31432*288.15)); 
 
 
+	// default is 0
+	double output = 0;
+
+	// Subsonic, transonic, and supersonic cases:
+	if (velocity <= SUBSONIC)
+		output = subsonic_fin(aa, I, rd);
+	else if (velocity < SUPERSONIC) {	
+		double y0 = subsonic_fin(aa, I, rd);
+        double y1 = supersonic_fin(aa, I, rd);
+        output = y0 + (y1-y0)*(velocity - SUBSONIC)/(SUPERSONIC-SUBSONIC);
+	}
+	else
+		output = supersonic_fin(aa, I, rd);
+
+	// Make negative if nessisary
     if (set_aa < 0)
         return -output;
     return output;
@@ -119,6 +141,7 @@ void rc_receive_imu(ADISMessage * imu){
 	const double dt = 1 / 819.2;
 	time_since_launch += dt;
 	velocity += (accel - 9.80665) * dt;
+    altitude += velocity * dt;
 
 	/* Proportional Controller */
 	// Roll rate:
@@ -131,7 +154,7 @@ void rc_receive_imu(ADISMessage * imu){
 	double correction = proportional;  // TODO: expand to PI or PID
 
 	// Look normilized fin angle based on correctio
-	double output = estimate_alpha(correction, 3000, velocity, 0);
+	double output = estimate_alpha(correction);
 
 	set_canard_angle(output);
 }

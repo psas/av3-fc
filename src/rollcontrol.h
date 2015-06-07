@@ -16,8 +16,15 @@
 /* Fin charachterization constants */
 #define FINFIT_A 0.0006
 #define FINFIT_B 0.045
+#define FIN_CBASE 3.2
 #define FIN_AREA 1.13e-3
 #define FIN_ARM 0.085
+#define LAUNCH_ALTITUDE 1390
+#define I_INIT 0.086
+#define I_BO 0.077
+#define EXPECTED_BURN_TIME 5.7
+#define SUBSONIC 265
+#define SUPERSONIC 330
 
 // Converts degrees to radians.
 #define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
