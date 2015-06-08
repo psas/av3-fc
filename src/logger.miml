@@ -13,6 +13,9 @@ receivers:
   log_receive_adis:
   - [data, ADISMessage*]
 
+  log_receive_state:
+  - [data, VSTEMessage*]
+
   log_receive_gps:
   - [data, GPSMessage*]
 

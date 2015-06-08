@@ -1,0 +1,20 @@
+%YAML 1.2
+---
+include: state.h
+object: src/state.o
+init: state_init();
+
+senders:
+
+  state_send_message:
+  - [data, VSTEMessage*]
+
+receivers:
+  state_receive_imu:
+  - [data, ADISMessage*]
+
+  state_raw_ld_in:
+  - [code, unsigned char*]
+  - [len, unsigned int]
+  - [timestamp, unsigned char*]
+

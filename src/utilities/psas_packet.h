@@ -7,198 +7,25 @@
 
 #ifndef _PSAS_PACKET_H
 #define _PSAS_PACKET_H
-
-
-/*! \typedef
- * SequenceNo Data
- */
-typedef struct {
-	uint32_t seqn_sequence;
-} __attribute__((packed)) SequenceNoData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	SequenceNoData data;
-} __attribute__((packed)) SEQNMessage;
-
-
-/*! \typedef
- * ADIS16405 Data
- */
-typedef struct {
-	uint16_t adis_vcc;
-	int16_t adis_gyro_x;
-	int16_t adis_gyro_y;
-	int16_t adis_gyro_z;
-	int16_t adis_acc_x;
-	int16_t adis_acc_y;
-	int16_t adis_acc_z;
-	int16_t adis_magn_x;
-	int16_t adis_magn_y;
-	int16_t adis_magn_z;
-	int16_t adis_temp;
-	uint16_t adis_aux_adc;
-} __attribute__((packed)) ADIS16405Data;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	ADIS16405Data data;
-} __attribute__((packed)) ADISMessage;
-
-
-/*! \typedef
- * RollServo Data
- */
-typedef struct {
-	uint16_t roll_pwm;
-	uint8_t roll_disable;
-} __attribute__((packed)) RollServoData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	RollServoData data;
-} __attribute__((packed)) ROLLMessage;
-
-
-/*! \typedef
- * RNHHealth Data
- */
-typedef struct {
-	uint16_t rnhh_temperature;
-	int16_t rnhh_ts1temperature;
-	int16_t rnhh_ts2temperature;
-	uint16_t rnhh_temprange;
-	uint16_t rnhh_voltage;
-	int16_t rnhh_current;
-	int16_t rnhh_averagecurrent;
-	uint16_t rnhh_cellvoltage1;
-	uint16_t rnhh_cellvoltage2;
-	uint16_t rnhh_cellvoltage3;
-	uint16_t rnhh_cellvoltage4;
-	uint16_t rnhh_packvoltage;
-	uint16_t rnhh_averagevoltage;
-} __attribute__((packed)) RNHHealthData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	RNHHealthData data;
-} __attribute__((packed)) RNHHMessage;
-
-
-/*! \typedef
- * RNHPower Data
- */
-typedef struct {
-	uint16_t rnhp_port1;
-	uint16_t rnhp_port2;
-	uint16_t rnhp_port3;
-	uint16_t rnhp_port4;
-	uint16_t rnhp_port5;
-	uint16_t rnhp_port6;
-	uint16_t rnhp_port7;
-	uint16_t rnhp_port8;
-} __attribute__((packed)) RNHPowerData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	RNHPowerData data;
-} __attribute__((packed)) RNHPMessage;
-
-
-/*! \typedef
- * FCFHealth Data
- */
-typedef struct {
-	float fcfh_cpu_user;
-	float fcfh_cpu_system;
-	float fcfh_cpu_nice;
-	float fcfh_cpu_iowait;
-	float fcfh_cpu_irq;
-	float fcfh_cpu_softirq;
-	uint64_t fcfh_ram_used;
-	uint64_t fcfh_ram_buffer;
-	uint64_t fcfh_ram_cached;
-	uint16_t fcfh_pid;
-	uint64_t fcfh_disk_used;
-	uint64_t fcfh_disk_read;
-	uint64_t fcfh_disk_write;
-	uint32_t fcfh_io_lo_bytes_sent;
-	uint32_t fcfh_io_lo_bytes_recv;
-	uint32_t fcfh_io_lo_packets_sent;
-	uint32_t fcfh_io_lo_packets_recv;
-	uint32_t fcfh_io_eth0_bytes_sent;
-	uint32_t fcfh_io_eth0_bytes_recv;
-	uint32_t fcfh_io_eth0_packets_sent;
-	uint32_t fcfh_io_eth0_packets_recv;
-	uint32_t fcfh_io_wlan0_bytes_sent;
-	uint32_t fcfh_io_wlan0_bytes_recv;
-	uint32_t fcfh_io_wlan0_packets_sent;
-	uint32_t fcfh_io_wlan0_packets_recv;
-	uint16_t fcfh_core_temp;
-} __attribute__((packed)) FCFHealthData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	FCFHealthData data;
-} __attribute__((packed)) FCFHMessage;
-
-
-/*! \typedef
- * LaunchTowerComputer Data
- */
-typedef struct {
-	float ltch_rocket_ready;
-	uint8_t ltch_iginition_relay;
-	float ltch_ignition_battery;
-	uint8_t ltch_shore_power_relay;
-	float ltch_shore_power;
-	float ltch_solar_voltage;
-	float ltch_system_battery;
-	float ltch_internal_temp;
-	float ltch_external_temp;
-	float ltch_humidity;
-	float ltch_wind_speed;
-	float ltch_wind_direction;
-	float ltch_barometric_pressure;
-} __attribute__((packed)) LaunchTowerComputerData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	LaunchTowerComputerData data;
-} __attribute__((packed)) LTCHMessage;
-
+#include <stdint.h>
 
 /*! \typedef
  * GPSFix Data
  */
 typedef struct {
-	uint8_t gps1_age_of_diff;
-	uint8_t gps1_num_of_sats;
-	uint16_t gps1_gps_week;
-	double gps1_gps_time_of_week;
-	double gps1_latitude;
-	double gps1_longitude;
-	float gps1_height;
-	float gps1_vnorth;
-	float gps1_veast;
-	float gps1_vup;
-	float gps1_std_dev_resid;
-	uint16_t gps1_nav_mode;
-	uint16_t gps1_extended_age_of_diff;
+	uint8_t age_of_diff;
+	uint8_t num_of_sats;
+	uint16_t gps_week;
+	double gps_time_of_week;
+	double latitude;
+	double longitude;
+	float height;
+	float vnorth;
+	float veast;
+	float vup;
+	float std_dev_resid;
+	uint16_t nav_mode;
+	uint16_t extended_age_of_diff;
 } __attribute__((packed)) GPSFixData;
 
 typedef struct {
@@ -210,33 +37,69 @@ typedef struct {
 
 
 /*! \typedef
- * GPSFixQuality Data
+ * Version Data
  */
 typedef struct {
-	uint32_t gps2_mask_sats_tracked;
-	uint32_t gps2_mask_sats_used;
-	uint16_t gps2_gps_utc_diff;
-	uint16_t gps2_hdop;
-	uint16_t gps2_vdop;
-	uint16_t gps2_mask_waas_prn;
-} __attribute__((packed)) GPSFixQualityData;
+	char vers[17];
+} __attribute__((packed)) VersionData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	GPSFixQualityData data;
-} __attribute__((packed)) GPS2Message;
+	VersionData data;
+} __attribute__((packed)) VERSMessage;
+
+
+/*! \typedef
+ * ADIS16405 Data
+ */
+typedef struct {
+	uint16_t vcc;
+	int16_t gyro_x;
+	int16_t gyro_y;
+	int16_t gyro_z;
+	int16_t acc_x;
+	int16_t acc_y;
+	int16_t acc_z;
+	int16_t magn_x;
+	int16_t magn_y;
+	int16_t magn_z;
+	int16_t temp;
+	uint16_t aux_adc;
+} __attribute__((packed)) ADIS16405Data;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	ADIS16405Data data;
+} __attribute__((packed)) ADISMessage;
+
+
+/*! \typedef
+ * SequenceNo Data
+ */
+typedef struct {
+	uint32_t sequence;
+} __attribute__((packed)) SequenceNoData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	SequenceNoData data;
+} __attribute__((packed)) SEQNMessage;
 
 
 /*! \typedef
  * GPSWAASMessage Data
  */
 typedef struct {
-	uint16_t gps80_prn;
-	uint16_t gps80_spare;
-	uint32_t gps80_msg_sec_of_week;
-	char gps80_waas_msg[32];
+	uint16_t prn;
+	uint16_t spare;
+	uint32_t msg_sec_of_week;
+	char waas_msg[32];
 } __attribute__((packed)) GPSWAASMessageData;
 
 typedef struct {
@@ -248,46 +111,211 @@ typedef struct {
 
 
 /*! \typedef
- * GPSWAASEphemeris Data
+ * MPL3115A2 Data
  */
 typedef struct {
-	uint16_t gps93_sv;
-	uint16_t gps93_spare;
-	uint32_t gps93_tow_sec_of_week;
-	uint16_t gps93_iode;
-	uint16_t gps93_ura;
-	int32_t gps93_t_zero;
-	int32_t gps93_xg;
-	int32_t gps93_yg;
-	int32_t gps93_zg;
-	int32_t gps93_xg_dot;
-	int32_t gps93_yg_dot;
-	int32_t gps93_zg_dot;
-	int32_t gps93_xg_dotdot;
-	int32_t gps93_yg_dotdot;
-	int32_t gps93_zg_dotdot;
-	uint16_t gps93_gf_zero;
-	uint16_t gps93_gf_zero_dot;
-} __attribute__((packed)) GPSWAASEphemerisData;
+	uint32_t pressure;
+	int16_t temp;
+} __attribute__((packed)) MPL3115A2Data;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	GPSWAASEphemerisData data;
-} __attribute__((packed)) GPS93Message;
+	MPL3115A2Data data;
+} __attribute__((packed)) MPL3Message;
+
+
+/*! \typedef
+ * RNHHealth Data
+ */
+typedef struct {
+	uint16_t temperature;
+	int16_t ts1temperature;
+	int16_t ts2temperature;
+	uint16_t temprange;
+	uint16_t voltage;
+	int16_t current;
+	int16_t averagecurrent;
+	uint16_t cellvoltage1;
+	uint16_t cellvoltage2;
+	uint16_t cellvoltage3;
+	uint16_t cellvoltage4;
+	uint16_t packvoltage;
+	uint16_t averagevoltage;
+} __attribute__((packed)) RNHHealthData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	RNHHealthData data;
+} __attribute__((packed)) RNHHMessage;
+
+
+/*! \typedef
+ * GPSFixQuality Data
+ */
+typedef struct {
+	uint32_t mask_sats_tracked;
+	uint32_t mask_sats_used;
+	uint16_t gps_utc_diff;
+	uint16_t hdop;
+	uint16_t vdop;
+	uint16_t mask_waas_prn;
+} __attribute__((packed)) GPSFixQualityData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSFixQualityData data;
+} __attribute__((packed)) GPS2Message;
+
+
+/*! \typedef
+ * RNHUmbilical Data
+ */
+typedef struct {
+	uint8_t detect;
+} __attribute__((packed)) RNHUmbilicalData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	RNHUmbilicalData data;
+} __attribute__((packed)) RNHUMessage;
+
+
+/*! \typedef
+ * FCFHealth Data
+ */
+typedef struct {
+	float cpu_user;
+	float cpu_system;
+	float cpu_nice;
+	float cpu_iowait;
+	float cpu_irq;
+	float cpu_softirq;
+	uint64_t ram_used;
+	uint64_t ram_buffer;
+	uint64_t ram_cached;
+	uint16_t pid;
+	uint64_t disk_used;
+	uint64_t disk_read;
+	uint64_t disk_write;
+	uint32_t io_lo_bytes_sent;
+	uint32_t io_lo_bytes_recv;
+	uint32_t io_lo_packets_sent;
+	uint32_t io_lo_packets_recv;
+	uint32_t io_eth0_bytes_sent;
+	uint32_t io_eth0_bytes_recv;
+	uint32_t io_eth0_packets_sent;
+	uint32_t io_eth0_packets_recv;
+	uint32_t io_wlan0_bytes_sent;
+	uint32_t io_wlan0_bytes_recv;
+	uint32_t io_wlan0_packets_sent;
+	uint32_t io_wlan0_packets_recv;
+	uint16_t core_temp;
+} __attribute__((packed)) FCFHealthData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	FCFHealthData data;
+} __attribute__((packed)) FCFHMessage;
+
+
+/*! \typedef
+ * State Data
+ */
+typedef struct {
+	double time;
+	double acc_up;
+	double vel_up;
+	double altitude;
+	double roll_rate;
+	double roll_angle;
+} __attribute__((packed)) StateData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	StateData data;
+} __attribute__((packed)) VSTEMessage;
+
+
+/*! \typedef
+ * LaunchTowerComputer Data
+ */
+typedef struct {
+	float rocket_ready;
+	uint8_t iginition_relay;
+	float ignition_battery;
+	uint8_t shore_power_relay;
+	float shore_power;
+	float solar_voltage;
+	float system_battery;
+	float internal_temp;
+	float external_temp;
+	float humidity;
+	float wind_speed;
+	float wind_direction;
+	float barometric_pressure;
+} __attribute__((packed)) LaunchTowerComputerData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	LaunchTowerComputerData data;
+} __attribute__((packed)) LTCHMessage;
+
+
+/*! \typedef
+ * GPSIonosphereUTC Data
+ */
+typedef struct {
+	double a0;
+	double a1;
+	double a2;
+	double a3;
+	double b0;
+	double b1;
+	double b2;
+	double b3;
+	double utc_a0;
+	double utc_a1;
+	uint32_t tot;
+	uint16_t wnt;
+	uint16_t wnlsf;
+	uint16_t dn;
+	uint16_t dtls;
+	uint16_t dtlsf;
+	uint16_t space;
+} __attribute__((packed)) GPSIonosphereUTCData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSIonosphereUTCData data;
+} __attribute__((packed)) GPS94Message;
 
 
 /*! \typedef
  * GPSEphemeris Data
  */
 typedef struct {
-	uint16_t gps95_sv;
-	uint16_t gps95_spare;
-	uint32_t gps95_sec_of_week;
-	char gps95_sf1_words[40];
-	char gps95_sf2_words[40];
-	char gps95_sf3_words[40];
+	uint16_t sv;
+	uint16_t spare;
+	uint32_t sec_of_week;
+	char sf1_words[40];
+	char sf2_words[40];
+	char sf3_words[40];
 } __attribute__((packed)) GPSEphemerisData;
 
 typedef struct {
@@ -299,78 +327,35 @@ typedef struct {
 
 
 /*! \typedef
- * GPSPsudorange Data
+ * RNHPower Data
  */
 typedef struct {
-	uint16_t gps96_spare;
-	uint16_t gps96_week;
-	double gps96_tow;
-	uint32_t gps96_uics_tt_snr_prn_0;
-	uint32_t gps96_uics_tt_snr_prn_1;
-	uint32_t gps96_uics_tt_snr_prn_2;
-	uint32_t gps96_uics_tt_snr_prn_3;
-	uint32_t gps96_uics_tt_snr_prn_4;
-	uint32_t gps96_uics_tt_snr_prn_5;
-	uint32_t gps96_uics_tt_snr_prn_6;
-	uint32_t gps96_uics_tt_snr_prn_7;
-	uint32_t gps96_uics_tt_snr_prn_8;
-	uint32_t gps96_uics_tt_snr_prn_9;
-	uint32_t gps96_uics_tt_snr_prn_10;
-	uint32_t gps96_uics_tt_snr_prn_11;
-	uint32_t gps96_uidoppler_fl_0;
-	uint32_t gps96_uidoppler_fl_1;
-	uint32_t gps96_uidoppler_fl_2;
-	uint32_t gps96_uidoppler_fl_3;
-	uint32_t gps96_uidoppler_fl_4;
-	uint32_t gps96_uidoppler_fl_5;
-	uint32_t gps96_uidoppler_fl_6;
-	uint32_t gps96_uidoppler_fl_7;
-	uint32_t gps96_uidoppler_fl_8;
-	uint32_t gps96_uidoppler_fl_9;
-	uint32_t gps96_uidoppler_fl_10;
-	uint32_t gps96_uidoppler_fl_11;
-	double gps96_pseudorange_0;
-	double gps96_pseudorange_1;
-	double gps96_pseudorange_2;
-	double gps96_pseudorange_3;
-	double gps96_pseudorange_4;
-	double gps96_pseudorange_5;
-	double gps96_pseudorange_6;
-	double gps96_pseudorange_7;
-	double gps96_pseudorange_8;
-	double gps96_pseudorange_9;
-	double gps96_pseudorange_10;
-	double gps96_pseudorange_11;
-	double gps96_phase_0;
-	double gps96_phase_1;
-	double gps96_phase_2;
-	double gps96_phase_3;
-	double gps96_phase_4;
-	double gps96_phase_5;
-	double gps96_phase_6;
-	double gps96_phase_7;
-	double gps96_phase_8;
-	double gps96_phase_9;
-	double gps96_phase_10;
-	double gps96_phase_11;
-} __attribute__((packed)) GPSPsudorangeData;
+	uint16_t port1;
+	uint16_t port2;
+	uint16_t port3;
+	uint16_t port4;
+	uint16_t umbilical;
+	uint16_t port6;
+	uint16_t port7;
+	uint16_t port8;
+} __attribute__((packed)) RNHPowerData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	GPSPsudorangeData data;
-} __attribute__((packed)) GPS96Message;
+	RNHPowerData data;
+} __attribute__((packed)) RNHPMessage;
 
 
 /*! \typedef
  * GPSAlmanac Data
  */
 typedef struct {
-	char gps98_alman_data[64];
-	uint8_t gps98_last_alman;
-	uint8_t gps98_ionoutcv_flag;
-	uint16_t gps98_spare;
+	char alman_data[64];
+	uint8_t last_alman;
+	uint8_t ionoutcv_flag;
+	uint16_t spare;
 } __attribute__((packed)) GPSAlmanacData;
 
 typedef struct {
@@ -385,228 +370,228 @@ typedef struct {
  * GPSSatellite Data
  */
 typedef struct {
-	uint8_t gps99_nav_mode_2;
-	uint8_t gps99_utc_time_diff;
-	uint16_t gps99_gps_week;
-	double gps99_gps_time_of_week;
-	uint8_t gps99_channel_0;
-	uint8_t gps99_tracked_0;
-	uint8_t gps99_status_0;
-	uint8_t gps99_last_subframe_0;
-	uint8_t gps99_ephm_v_flag_0;
-	uint8_t gps99_ephm_health_0;
-	uint8_t gps99_alm_v_flag_0;
-	uint8_t gps99_alm_health_0;
-	int8_t gps99_elev_angle_0;
-	uint8_t gps99_azimuth_angle_0;
-	uint8_t gps99_ura_0;
-	uint8_t gps99_spare_0;
-	uint16_t gps99_cli_for_snr_0;
-	int16_t gps99_diffcorr_0;
-	int16_t gps99_pos_resid_0;
-	int16_t gps99_vel_resid_0;
-	int16_t gps99_dopplr_0;
-	int16_t gps99_n_carr_offset_0;
-	uint8_t gps99_channel_1;
-	uint8_t gps99_tracked_1;
-	uint8_t gps99_status_1;
-	uint8_t gps99_last_subframe_1;
-	uint8_t gps99_ephm_v_flag_1;
-	uint8_t gps99_ephm_health_1;
-	uint8_t gps99_alm_v_flag_1;
-	uint8_t gps99_alm_health_1;
-	int8_t gps99_elev_angle_1;
-	uint8_t gps99_azimuth_angle_1;
-	uint8_t gps99_ura_1;
-	uint8_t gps99_spare_1;
-	uint16_t gps99_cli_for_snr_1;
-	int16_t gps99_diffcorr_1;
-	int16_t gps99_pos_resid_1;
-	int16_t gps99_vel_resid_1;
-	int16_t gps99_dopplr_1;
-	int16_t gps99_n_carr_offset_1;
-	uint8_t gps99_channel_2;
-	uint8_t gps99_tracked_2;
-	uint8_t gps99_status_2;
-	uint8_t gps99_last_subframe_2;
-	uint8_t gps99_ephm_v_flag_2;
-	uint8_t gps99_ephm_health_2;
-	uint8_t gps99_alm_v_flag_2;
-	uint8_t gps99_alm_health_2;
-	int8_t gps99_elev_angle_2;
-	uint8_t gps99_azimuth_angle_2;
-	uint8_t gps99_ura_2;
-	uint8_t gps99_spare_2;
-	uint16_t gps99_cli_for_snr_2;
-	int16_t gps99_diffcorr_2;
-	int16_t gps99_pos_resid_2;
-	int16_t gps99_vel_resid_2;
-	int16_t gps99_dopplr_2;
-	int16_t gps99_n_carr_offset_2;
-	uint8_t gps99_channel_3;
-	uint8_t gps99_tracked_3;
-	uint8_t gps99_status_3;
-	uint8_t gps99_last_subframe_3;
-	uint8_t gps99_ephm_v_flag_3;
-	uint8_t gps99_ephm_health_3;
-	uint8_t gps99_alm_v_flag_3;
-	uint8_t gps99_alm_health_3;
-	int8_t gps99_elev_angle_3;
-	uint8_t gps99_azimuth_angle_3;
-	uint8_t gps99_ura_3;
-	uint8_t gps99_spare_3;
-	uint16_t gps99_cli_for_snr_3;
-	int16_t gps99_diffcorr_3;
-	int16_t gps99_pos_resid_3;
-	int16_t gps99_vel_resid_3;
-	int16_t gps99_dopplr_3;
-	int16_t gps99_n_carr_offset_3;
-	uint8_t gps99_channel_4;
-	uint8_t gps99_tracked_4;
-	uint8_t gps99_status_4;
-	uint8_t gps99_last_subframe_4;
-	uint8_t gps99_ephm_v_flag_4;
-	uint8_t gps99_ephm_health_4;
-	uint8_t gps99_alm_v_flag_4;
-	uint8_t gps99_alm_health_4;
-	int8_t gps99_elev_angle_4;
-	uint8_t gps99_azimuth_angle_4;
-	uint8_t gps99_ura_4;
-	uint8_t gps99_spare_4;
-	uint16_t gps99_cli_for_snr_4;
-	int16_t gps99_diffcorr_4;
-	int16_t gps99_pos_resid_4;
-	int16_t gps99_vel_resid_4;
-	int16_t gps99_dopplr_4;
-	int16_t gps99_n_carr_offset_4;
-	uint8_t gps99_channel_5;
-	uint8_t gps99_tracked_5;
-	uint8_t gps99_status_5;
-	uint8_t gps99_last_subframe_5;
-	uint8_t gps99_ephm_v_flag_5;
-	uint8_t gps99_ephm_health_5;
-	uint8_t gps99_alm_v_flag_5;
-	uint8_t gps99_alm_health_5;
-	int8_t gps99_elev_angle_5;
-	uint8_t gps99_azimuth_angle_5;
-	uint8_t gps99_ura_5;
-	uint8_t gps99_spare_5;
-	uint16_t gps99_cli_for_snr_5;
-	int16_t gps99_diffcorr_5;
-	int16_t gps99_pos_resid_5;
-	int16_t gps99_vel_resid_5;
-	int16_t gps99_dopplr_5;
-	int16_t gps99_n_carr_offset_5;
-	uint8_t gps99_channel_6;
-	uint8_t gps99_tracked_6;
-	uint8_t gps99_status_6;
-	uint8_t gps99_last_subframe_6;
-	uint8_t gps99_ephm_v_flag_6;
-	uint8_t gps99_ephm_health_6;
-	uint8_t gps99_alm_v_flag_6;
-	uint8_t gps99_alm_health_6;
-	int8_t gps99_elev_angle_6;
-	uint8_t gps99_azimuth_angle_6;
-	uint8_t gps99_ura_6;
-	uint8_t gps99_spare_6;
-	uint16_t gps99_cli_for_snr_6;
-	int16_t gps99_diffcorr_6;
-	int16_t gps99_pos_resid_6;
-	int16_t gps99_vel_resid_6;
-	int16_t gps99_dopplr_6;
-	int16_t gps99_n_carr_offset_6;
-	uint8_t gps99_channel_7;
-	uint8_t gps99_tracked_7;
-	uint8_t gps99_status_7;
-	uint8_t gps99_last_subframe_7;
-	uint8_t gps99_ephm_v_flag_7;
-	uint8_t gps99_ephm_health_7;
-	uint8_t gps99_alm_v_flag_7;
-	uint8_t gps99_alm_health_7;
-	int8_t gps99_elev_angle_7;
-	uint8_t gps99_azimuth_angle_7;
-	uint8_t gps99_ura_7;
-	uint8_t gps99_spare_7;
-	uint16_t gps99_cli_for_snr_7;
-	int16_t gps99_diffcorr_7;
-	int16_t gps99_pos_resid_7;
-	int16_t gps99_vel_resid_7;
-	int16_t gps99_dopplr_7;
-	int16_t gps99_n_carr_offset_7;
-	uint8_t gps99_channel_8;
-	uint8_t gps99_tracked_8;
-	uint8_t gps99_status_8;
-	uint8_t gps99_last_subframe_8;
-	uint8_t gps99_ephm_v_flag_8;
-	uint8_t gps99_ephm_health_8;
-	uint8_t gps99_alm_v_flag_8;
-	uint8_t gps99_alm_health_8;
-	int8_t gps99_elev_angle_8;
-	uint8_t gps99_azimuth_angle_8;
-	uint8_t gps99_ura_8;
-	uint8_t gps99_spare_8;
-	uint16_t gps99_cli_for_snr_8;
-	int16_t gps99_diffcorr_8;
-	int16_t gps99_pos_resid_8;
-	int16_t gps99_vel_resid_8;
-	int16_t gps99_dopplr_8;
-	int16_t gps99_n_carr_offset_8;
-	uint8_t gps99_channel_9;
-	uint8_t gps99_tracked_9;
-	uint8_t gps99_status_9;
-	uint8_t gps99_last_subframe_9;
-	uint8_t gps99_ephm_v_flag_9;
-	uint8_t gps99_ephm_health_9;
-	uint8_t gps99_alm_v_flag_9;
-	uint8_t gps99_alm_health_9;
-	int8_t gps99_elev_angle_9;
-	uint8_t gps99_azimuth_angle_9;
-	uint8_t gps99_ura_9;
-	uint8_t gps99_spare_9;
-	uint16_t gps99_cli_for_snr_9;
-	int16_t gps99_diffcorr_9;
-	int16_t gps99_pos_resid_9;
-	int16_t gps99_vel_resid_9;
-	int16_t gps99_dopplr_9;
-	int16_t gps99_n_carr_offset_9;
-	uint8_t gps99_channel_10;
-	uint8_t gps99_tracked_10;
-	uint8_t gps99_status_10;
-	uint8_t gps99_last_subframe_10;
-	uint8_t gps99_ephm_v_flag_10;
-	uint8_t gps99_ephm_health_10;
-	uint8_t gps99_alm_v_flag_10;
-	uint8_t gps99_alm_health_10;
-	int8_t gps99_elev_angle_10;
-	uint8_t gps99_azimuth_angle_10;
-	uint8_t gps99_ura_10;
-	uint8_t gps99_spare_10;
-	uint16_t gps99_cli_for_snr_10;
-	int16_t gps99_diffcorr_10;
-	int16_t gps99_pos_resid_10;
-	int16_t gps99_vel_resid_10;
-	int16_t gps99_dopplr_10;
-	int16_t gps99_n_carr_offset_10;
-	uint8_t gps99_channel_11;
-	uint8_t gps99_tracked_11;
-	uint8_t gps99_status_11;
-	uint8_t gps99_last_subframe_11;
-	uint8_t gps99_ephm_v_flag_11;
-	uint8_t gps99_ephm_health_11;
-	uint8_t gps99_alm_v_flag_11;
-	uint8_t gps99_alm_health_11;
-	int8_t gps99_elev_angle_11;
-	uint8_t gps99_azimuth_angle_11;
-	uint8_t gps99_ura_11;
-	uint8_t gps99_spare_11;
-	uint16_t gps99_cli_for_snr_11;
-	int16_t gps99_diffcorr_11;
-	int16_t gps99_pos_resid_11;
-	int16_t gps99_vel_resid_11;
-	int16_t gps99_dopplr_11;
-	int16_t gps99_n_carr_offset_11;
-	int16_t gps99_clock_err_l1;
-	uint16_t gps99_spare;
+	uint8_t nav_mode_2;
+	uint8_t utc_time_diff;
+	uint16_t gps_week;
+	double gps_time_of_week;
+	uint8_t channel_0;
+	uint8_t tracked_0;
+	uint8_t status_0;
+	uint8_t last_subframe_0;
+	uint8_t ephm_v_flag_0;
+	uint8_t ephm_health_0;
+	uint8_t alm_v_flag_0;
+	uint8_t alm_health_0;
+	int8_t elev_angle_0;
+	uint8_t azimuth_angle_0;
+	uint8_t ura_0;
+	uint8_t spare_0;
+	uint16_t cli_for_snr_0;
+	int16_t diffcorr_0;
+	int16_t pos_resid_0;
+	int16_t vel_resid_0;
+	int16_t dopplr_0;
+	int16_t n_carr_offset_0;
+	uint8_t channel_1;
+	uint8_t tracked_1;
+	uint8_t status_1;
+	uint8_t last_subframe_1;
+	uint8_t ephm_v_flag_1;
+	uint8_t ephm_health_1;
+	uint8_t alm_v_flag_1;
+	uint8_t alm_health_1;
+	int8_t elev_angle_1;
+	uint8_t azimuth_angle_1;
+	uint8_t ura_1;
+	uint8_t spare_1;
+	uint16_t cli_for_snr_1;
+	int16_t diffcorr_1;
+	int16_t pos_resid_1;
+	int16_t vel_resid_1;
+	int16_t dopplr_1;
+	int16_t n_carr_offset_1;
+	uint8_t channel_2;
+	uint8_t tracked_2;
+	uint8_t status_2;
+	uint8_t last_subframe_2;
+	uint8_t ephm_v_flag_2;
+	uint8_t ephm_health_2;
+	uint8_t alm_v_flag_2;
+	uint8_t alm_health_2;
+	int8_t elev_angle_2;
+	uint8_t azimuth_angle_2;
+	uint8_t ura_2;
+	uint8_t spare_2;
+	uint16_t cli_for_snr_2;
+	int16_t diffcorr_2;
+	int16_t pos_resid_2;
+	int16_t vel_resid_2;
+	int16_t dopplr_2;
+	int16_t n_carr_offset_2;
+	uint8_t channel_3;
+	uint8_t tracked_3;
+	uint8_t status_3;
+	uint8_t last_subframe_3;
+	uint8_t ephm_v_flag_3;
+	uint8_t ephm_health_3;
+	uint8_t alm_v_flag_3;
+	uint8_t alm_health_3;
+	int8_t elev_angle_3;
+	uint8_t azimuth_angle_3;
+	uint8_t ura_3;
+	uint8_t spare_3;
+	uint16_t cli_for_snr_3;
+	int16_t diffcorr_3;
+	int16_t pos_resid_3;
+	int16_t vel_resid_3;
+	int16_t dopplr_3;
+	int16_t n_carr_offset_3;
+	uint8_t channel_4;
+	uint8_t tracked_4;
+	uint8_t status_4;
+	uint8_t last_subframe_4;
+	uint8_t ephm_v_flag_4;
+	uint8_t ephm_health_4;
+	uint8_t alm_v_flag_4;
+	uint8_t alm_health_4;
+	int8_t elev_angle_4;
+	uint8_t azimuth_angle_4;
+	uint8_t ura_4;
+	uint8_t spare_4;
+	uint16_t cli_for_snr_4;
+	int16_t diffcorr_4;
+	int16_t pos_resid_4;
+	int16_t vel_resid_4;
+	int16_t dopplr_4;
+	int16_t n_carr_offset_4;
+	uint8_t channel_5;
+	uint8_t tracked_5;
+	uint8_t status_5;
+	uint8_t last_subframe_5;
+	uint8_t ephm_v_flag_5;
+	uint8_t ephm_health_5;
+	uint8_t alm_v_flag_5;
+	uint8_t alm_health_5;
+	int8_t elev_angle_5;
+	uint8_t azimuth_angle_5;
+	uint8_t ura_5;
+	uint8_t spare_5;
+	uint16_t cli_for_snr_5;
+	int16_t diffcorr_5;
+	int16_t pos_resid_5;
+	int16_t vel_resid_5;
+	int16_t dopplr_5;
+	int16_t n_carr_offset_5;
+	uint8_t channel_6;
+	uint8_t tracked_6;
+	uint8_t status_6;
+	uint8_t last_subframe_6;
+	uint8_t ephm_v_flag_6;
+	uint8_t ephm_health_6;
+	uint8_t alm_v_flag_6;
+	uint8_t alm_health_6;
+	int8_t elev_angle_6;
+	uint8_t azimuth_angle_6;
+	uint8_t ura_6;
+	uint8_t spare_6;
+	uint16_t cli_for_snr_6;
+	int16_t diffcorr_6;
+	int16_t pos_resid_6;
+	int16_t vel_resid_6;
+	int16_t dopplr_6;
+	int16_t n_carr_offset_6;
+	uint8_t channel_7;
+	uint8_t tracked_7;
+	uint8_t status_7;
+	uint8_t last_subframe_7;
+	uint8_t ephm_v_flag_7;
+	uint8_t ephm_health_7;
+	uint8_t alm_v_flag_7;
+	uint8_t alm_health_7;
+	int8_t elev_angle_7;
+	uint8_t azimuth_angle_7;
+	uint8_t ura_7;
+	uint8_t spare_7;
+	uint16_t cli_for_snr_7;
+	int16_t diffcorr_7;
+	int16_t pos_resid_7;
+	int16_t vel_resid_7;
+	int16_t dopplr_7;
+	int16_t n_carr_offset_7;
+	uint8_t channel_8;
+	uint8_t tracked_8;
+	uint8_t status_8;
+	uint8_t last_subframe_8;
+	uint8_t ephm_v_flag_8;
+	uint8_t ephm_health_8;
+	uint8_t alm_v_flag_8;
+	uint8_t alm_health_8;
+	int8_t elev_angle_8;
+	uint8_t azimuth_angle_8;
+	uint8_t ura_8;
+	uint8_t spare_8;
+	uint16_t cli_for_snr_8;
+	int16_t diffcorr_8;
+	int16_t pos_resid_8;
+	int16_t vel_resid_8;
+	int16_t dopplr_8;
+	int16_t n_carr_offset_8;
+	uint8_t channel_9;
+	uint8_t tracked_9;
+	uint8_t status_9;
+	uint8_t last_subframe_9;
+	uint8_t ephm_v_flag_9;
+	uint8_t ephm_health_9;
+	uint8_t alm_v_flag_9;
+	uint8_t alm_health_9;
+	int8_t elev_angle_9;
+	uint8_t azimuth_angle_9;
+	uint8_t ura_9;
+	uint8_t spare_9;
+	uint16_t cli_for_snr_9;
+	int16_t diffcorr_9;
+	int16_t pos_resid_9;
+	int16_t vel_resid_9;
+	int16_t dopplr_9;
+	int16_t n_carr_offset_9;
+	uint8_t channel_10;
+	uint8_t tracked_10;
+	uint8_t status_10;
+	uint8_t last_subframe_10;
+	uint8_t ephm_v_flag_10;
+	uint8_t ephm_health_10;
+	uint8_t alm_v_flag_10;
+	uint8_t alm_health_10;
+	int8_t elev_angle_10;
+	uint8_t azimuth_angle_10;
+	uint8_t ura_10;
+	uint8_t spare_10;
+	uint16_t cli_for_snr_10;
+	int16_t diffcorr_10;
+	int16_t pos_resid_10;
+	int16_t vel_resid_10;
+	int16_t dopplr_10;
+	int16_t n_carr_offset_10;
+	uint8_t channel_11;
+	uint8_t tracked_11;
+	uint8_t status_11;
+	uint8_t last_subframe_11;
+	uint8_t ephm_v_flag_11;
+	uint8_t ephm_health_11;
+	uint8_t alm_v_flag_11;
+	uint8_t alm_health_11;
+	int8_t elev_angle_11;
+	uint8_t azimuth_angle_11;
+	uint8_t ura_11;
+	uint8_t spare_11;
+	uint16_t cli_for_snr_11;
+	int16_t diffcorr_11;
+	int16_t pos_resid_11;
+	int16_t vel_resid_11;
+	int16_t dopplr_11;
+	int16_t n_carr_offset_11;
+	int16_t clock_err_l1;
+	uint16_t spare;
 } __attribute__((packed)) GPSSatelliteData;
 
 typedef struct {
@@ -615,6 +600,142 @@ typedef struct {
 	uint16_t data_length;
 	GPSSatelliteData data;
 } __attribute__((packed)) GPS99Message;
+
+
+/*! \typedef
+ * GPSWAASEphemeris Data
+ */
+typedef struct {
+	uint16_t sv;
+	uint16_t spare;
+	uint32_t tow_sec_of_week;
+	uint16_t iode;
+	uint16_t ura;
+	int32_t t_zero;
+	int32_t xg;
+	int32_t yg;
+	int32_t zg;
+	int32_t xg_dot;
+	int32_t yg_dot;
+	int32_t zg_dot;
+	int32_t xg_dotdot;
+	int32_t yg_dotdot;
+	int32_t zg_dotdot;
+	uint16_t gf_zero;
+	uint16_t gf_zero_dot;
+} __attribute__((packed)) GPSWAASEphemerisData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSWAASEphemerisData data;
+} __attribute__((packed)) GPS93Message;
+
+
+/*! \typedef
+ * RollServo Data
+ */
+typedef struct {
+	double angle;
+	uint8_t disable;
+} __attribute__((packed)) RollServoData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	RollServoData data;
+} __attribute__((packed)) ROLLMessage;
+
+
+/*! \typedef
+ * GPSPsudorange Data
+ */
+typedef struct {
+	uint16_t spare;
+	uint16_t week;
+	double tow;
+	uint32_t uics_tt_snr_prn_0;
+	uint32_t uics_tt_snr_prn_1;
+	uint32_t uics_tt_snr_prn_2;
+	uint32_t uics_tt_snr_prn_3;
+	uint32_t uics_tt_snr_prn_4;
+	uint32_t uics_tt_snr_prn_5;
+	uint32_t uics_tt_snr_prn_6;
+	uint32_t uics_tt_snr_prn_7;
+	uint32_t uics_tt_snr_prn_8;
+	uint32_t uics_tt_snr_prn_9;
+	uint32_t uics_tt_snr_prn_10;
+	uint32_t uics_tt_snr_prn_11;
+	uint32_t uidoppler_fl_0;
+	uint32_t uidoppler_fl_1;
+	uint32_t uidoppler_fl_2;
+	uint32_t uidoppler_fl_3;
+	uint32_t uidoppler_fl_4;
+	uint32_t uidoppler_fl_5;
+	uint32_t uidoppler_fl_6;
+	uint32_t uidoppler_fl_7;
+	uint32_t uidoppler_fl_8;
+	uint32_t uidoppler_fl_9;
+	uint32_t uidoppler_fl_10;
+	uint32_t uidoppler_fl_11;
+	double pseudorange_0;
+	double pseudorange_1;
+	double pseudorange_2;
+	double pseudorange_3;
+	double pseudorange_4;
+	double pseudorange_5;
+	double pseudorange_6;
+	double pseudorange_7;
+	double pseudorange_8;
+	double pseudorange_9;
+	double pseudorange_10;
+	double pseudorange_11;
+	double phase_0;
+	double phase_1;
+	double phase_2;
+	double phase_3;
+	double phase_4;
+	double phase_5;
+	double phase_6;
+	double phase_7;
+	double phase_8;
+	double phase_9;
+	double phase_10;
+	double phase_11;
+} __attribute__((packed)) GPSPsudorangeData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSPsudorangeData data;
+} __attribute__((packed)) GPS96Message;
+
+
+/*! \typedef
+ * GPSProcessor Data
+ */
+typedef struct {
+	uint32_t cpu_availible;
+	uint16_t missed_sub_frames;
+	uint16_t max_subframe_queued;
+	uint16_t missed_accum;
+	uint16_t missed_meas;
+	uint32_t spare1;
+	uint32_t spare2;
+	uint32_t spare3;
+	uint16_t spare4;
+	uint16_t spare5;
+} __attribute__((packed)) GPSProcessorData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSProcessorData data;
+} __attribute__((packed)) GPS97Message;
 
 
 

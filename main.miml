@@ -8,6 +8,7 @@ sources:
   - [ARM, arm.miml]             # Arm Code Module
   - [RC, rollcontrol.miml]      # Roll Control Code Module
   - [RS, rollservo.miml]        # Roll Servo Control Interface
+  - [STATE, state.miml]         # State Estimation Module
   - [ETH, ethmux.miml]          # Central Ethernet receiver
   - [MPU, mpu.miml]             # MPU module
   - [MPL, mpl.miml]             # MPL module
@@ -46,8 +47,12 @@ messages:
 
   ADIS.adis_data_out:
     - ARM.arm_receive_imu
-    - RC.rc_receive_imu
+    - STATE.state_receive_imu
     - LOG.log_receive_adis
+
+  STATE.state_send_message:
+    - RC.rc_receive_state
+    - LOG.log_receive_state
 
   GPS.gps_data_out:
     - ARM.arm_receive_gps

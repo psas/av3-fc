@@ -26,9 +26,9 @@ int about(double a, double b){
 void arm_receive_imu(ADISMessage * data){
 	// does the acceleration vector == -1g over the last 100 samples?
 	// 3.3mg per bit
-	double x = data->data.adis_acc_x * 0.00333;
-	double y = data->data.adis_acc_y * 0.00333;
-	double z = data->data.adis_acc_z * 0.00333;
+	double x = data->data.acc_x * 0.00333;
+	double y = data->data.acc_y * 0.00333;
+	double z = data->data.acc_z * 0.00333;
 	if(!about(x, -1) || !about(y, 0) || !about(z, 0)){
 		upright = 0;
 	}
@@ -42,7 +42,7 @@ void arm_receive_gps(GPSMessage * d){
 		return;
 
 	GPS1Message * data = (GPS1Message *)d;
-	switch(data->data.gps1_nav_mode) {
+	switch(data->data.nav_mode) {
 	case 2:   // 3D fix
 	case 4:   // 3D + diff
 	case 6:   // 3D + diff + rtk

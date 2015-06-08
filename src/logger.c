@@ -194,6 +194,11 @@ void log_receive_adis(ADISMessage *data) {
 	logg(data, sizeof(ADISMessage));
 }
 
+void log_receive_state(VSTEMessage *data) {
+	data->data_length = htons(data->data_length);
+	logg(data, sizeof(VSTEMessage));
+}
+
 void log_receive_gps(GPSMessage* data){
 	uint16_t len = data->data_length;
 	data->data_length = htons(data->data_length);

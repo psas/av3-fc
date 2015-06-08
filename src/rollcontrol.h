@@ -5,7 +5,7 @@
 #ifndef ROLLCONTROL_H_
 #define ROLLCONTROL_H_
 
-#include "adis.h"
+#include "utilities/psas_packet.h"
 
 #define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
@@ -19,7 +19,6 @@
 #define FIN_CBASE 3.2
 #define FIN_AREA 1.13e-3
 #define FIN_ARM 0.085
-#define LAUNCH_ALTITUDE 1390
 #define I_INIT 0.086
 #define I_BO 0.077
 #define EXPECTED_BURN_TIME 5.7
@@ -43,7 +42,7 @@ typedef struct{
 
 void rollcontrol_init(void); // [miml:init]
 
-void rc_receive_imu(ADISMessage *); // [miml:receiver]
+void rc_receive_state(VSTEMessage*); // [miml:receiver]
 void rc_receive_arm(const char *); // [miml:receiver]
 void rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
 void rc_raw_testrc(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]

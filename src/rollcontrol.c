@@ -15,15 +15,8 @@ static int sd;
 static bool enable_servo;
 static bool armed;
 
-static double time_since_launch;
-static double velocity;
-static double altitude;
-
 static void set_servo_enable(bool enable)
 {
-	time_since_launch = 0;
-	velocity = 0;
-	altitude = LAUNCH_ALTITUDE;
 	enable_servo = enable;
 }
 
@@ -65,19 +58,21 @@ static void set_canard_angle(double degrees)
 /**
  * Subsonic fin estimation
  */
-double subsonic_fin(double set_aa, double I, double rd);
-double subsonic_fin(double set_aa_rad, double I, double rd) {
-	double alpha = sqrt(fabs(2*set_aa_rad*I*FINFIT_A)/(rd*velocity*velocity*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
+double subsonic_fin(double set_aa_rad, double I, double rd, StateData state);
+double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
+	double v = state.vel_up;
+	double alpha = sqrt(fabs(2*set_aa_rad*I*FINFIT_A)/(rd*v*v*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
 	alpha = alpha / (2*FINFIT_A);
-	return alpha;
+	return alpha; // Orginial fit variables include degress/radians, so this return is in degrees
 }
 
 /**
  * Supersonic fin estimation
  */
-double supersonic_fin(double set_aa, double I, double rd);
-double supersonic_fin(double set_aa, double I, double rd) {
-	double alpha = (set_aa*I)/(2*rd*velocity*velocity*FIN_AREA*FIN_ARM*FIN_CBASE);
+double supersonic_fin(double set_aa_rad, double I, double rd, StateData state);
+double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
+	double v = state.vel_up;
+	double alpha = (set_aa_rad*I)/(2*rd*v*v*FIN_AREA*FIN_ARM*FIN_CBASE);
 	return radiansToDegrees(alpha);
 }
 
@@ -85,8 +80,11 @@ double supersonic_fin(double set_aa, double I, double rd) {
 /**
  * Given a correction from control system, estimate correct angle of attack for canard
  */
-double estimate_alpha(double set_aa);
-double estimate_alpha(double set_aa) {
+double estimate_alpha(double set_aa, StateData state);
+double estimate_alpha(double set_aa, StateData state) {
+
+	double velocity = state.vel_up;
+	double time = state.time;
 
 	// obvious cases (and avoid divide by 0):
 	if ((fabs(set_aa) < 1)  || (velocity < 1))
@@ -96,14 +94,14 @@ double estimate_alpha(double set_aa) {
 
 	// Compute inertia
 	double I = I_INIT;
-	if (time_since_launch < EXPECTED_BURN_TIME) {
-		I = I_INIT + (I_BO - I_INIT)*(time_since_launch / EXPECTED_BURN_TIME);
+	if (time < EXPECTED_BURN_TIME) {
+		I = I_INIT + (I_BO - I_INIT)*(time / EXPECTED_BURN_TIME);
 	} else {
 		I = I_BO;
 	}
 
 	// Compute atmosphere
-	double rd = 1.2250 * exp((-9.80665 * 0.0289644 * altitude)/(8.31432*288.15)); 
+	double rd = 1.2250 * exp((-9.80665 * 0.0289644 * state.altitude)/(8.31432*288.15)); 
 
 
 	// default is 0
@@ -111,14 +109,14 @@ double estimate_alpha(double set_aa) {
 
 	// Subsonic, transonic, and supersonic cases:
 	if (velocity <= SUBSONIC)
-		output = subsonic_fin(aa, I, rd);
+		output = subsonic_fin(aa, I, rd, state);
 	else if (velocity < SUPERSONIC) {	
-		double y0 = subsonic_fin(aa, I, rd);
-        double y1 = supersonic_fin(aa, I, rd);
+		double y0 = subsonic_fin(aa, I, rd, state);
+        double y1 = supersonic_fin(aa, I, rd, state);
         output = y0 + (y1-y0)*(velocity - SUBSONIC)/(SUPERSONIC-SUBSONIC);
 	}
 	else
-		output = supersonic_fin(aa, I, rd);
+		output = supersonic_fin(aa, I, rd, state);
 
 	// Make negative if nessisary
     if (set_aa < 0)
@@ -126,35 +124,22 @@ double estimate_alpha(double set_aa) {
     return output;
 }
 
-void rc_receive_imu(ADISMessage * imu){
+void rc_receive_state(VSTEMessage *state) {
 
 	if (!enable_servo)
 		return;
 
-	/* ADIS fixed-to-float conversion to m/s/s */
-	const double accel = (0.00333 * 9.80665) * (int16_t) ntohs(imu->data.adis_acc_x);
-
-	/* don't start integrating until it looks like we've launched */
-	if (armed && (time_since_launch <= 0 && fabs(accel - 9.80665) < 20 ))
-		return;
-
-	const double dt = 1 / 819.2;
-	time_since_launch += dt;
-	velocity += (accel - 9.80665) * dt;
-    altitude += velocity * dt;
-
+	// Read from state
+	
 	/* Proportional Controller */
-	// Roll rate:
-	const double roll_rate = 0.05 * (int16_t) ntohs(imu->data.adis_gyro_x);
-
 
 	// Error amd PID Constants
-	double error = 0 - roll_rate;
+	double error = 0 - state->data.roll_rate;
 	double proportional = KP * error;
 	double correction = proportional;  // TODO: expand to PI or PID
 
-	// Look normilized fin angle based on correctio
-	double output = estimate_alpha(correction);
+	// Look normilized fin angle based on requested angular acceleration
+	double output = estimate_alpha(correction, state->data);
 
 	set_canard_angle(output);
 }
