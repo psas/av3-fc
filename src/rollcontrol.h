@@ -11,7 +11,7 @@
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
 /* PID */
-#define KP 10.0
+#define KP 1.1
 
 /* Fin charachterization constants */
 #define FINFIT_A 0.0006

@@ -129,14 +129,16 @@ void rc_receive_state(VSTEMessage *state) {
 	if (!enable_servo)
 		return;
 
-	// Read from state
-	
-	/* Proportional Controller */
+	/* Controller */
 
-	// Error amd PID Constants
-	double error = 0 - state->data.roll_rate;
+	// Error
+	double error = 0 - state->data.roll_angle;
 	double proportional = KP * error;
 	double correction = proportional;  // TODO: expand to PI or PID
+
+	// Differentiate to roll acceleration
+	correction -= state->data.roll_rate;
+	correction *= 10; // gain
 
 	// Look normilized fin angle based on requested angular acceleration
 	double output = estimate_alpha(correction, state->data);
