@@ -35,6 +35,9 @@ miml: $(MIMLMK)
 $(MIMLMK): $(MAINMIML)
 	python ./elderberry/codeGen.py -mch $^
 
+packet:
+	gen-psas-types > src/utilities/psas_packet.h
+
 cleanbuild:
 	rm `find . -name '*.o'` -f
 	rm `find . -name '*.d'` -f

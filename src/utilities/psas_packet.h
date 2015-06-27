@@ -10,6 +10,26 @@
 #include <stdint.h>
 
 /*! \typedef
+ * GPSFixQuality Data
+ */
+typedef struct {
+	uint32_t mask_sats_tracked;
+	uint32_t mask_sats_used;
+	uint16_t gps_utc_diff;
+	uint16_t hdop;
+	uint16_t vdop;
+	uint16_t mask_waas_prn;
+} __attribute__((packed)) GPSFixQualityData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSFixQualityData data;
+} __attribute__((packed)) GPS2Message;
+
+
+/*! \typedef
  * GPSFix Data
  */
 typedef struct {
@@ -52,278 +72,19 @@ typedef struct {
 
 
 /*! \typedef
- * ADIS16405 Data
+ * RollServo Data
  */
 typedef struct {
-	uint16_t vcc;
-	int16_t gyro_x;
-	int16_t gyro_y;
-	int16_t gyro_z;
-	int16_t acc_x;
-	int16_t acc_y;
-	int16_t acc_z;
-	int16_t magn_x;
-	int16_t magn_y;
-	int16_t magn_z;
-	int16_t temp;
-	uint16_t aux_adc;
-} __attribute__((packed)) ADIS16405Data;
+	double angle;
+	uint8_t disable;
+} __attribute__((packed)) RollServoData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	ADIS16405Data data;
-} __attribute__((packed)) ADISMessage;
-
-
-/*! \typedef
- * SequenceNo Data
- */
-typedef struct {
-	uint32_t sequence;
-} __attribute__((packed)) SequenceNoData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	SequenceNoData data;
-} __attribute__((packed)) SEQNMessage;
-
-
-/*! \typedef
- * GPSWAASMessage Data
- */
-typedef struct {
-	uint16_t prn;
-	uint16_t spare;
-	uint32_t msg_sec_of_week;
-	char waas_msg[32];
-} __attribute__((packed)) GPSWAASMessageData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	GPSWAASMessageData data;
-} __attribute__((packed)) GPS80Message;
-
-
-/*! \typedef
- * MPL3115A2 Data
- */
-typedef struct {
-	uint32_t pressure;
-	int16_t temp;
-} __attribute__((packed)) MPL3115A2Data;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	MPL3115A2Data data;
-} __attribute__((packed)) MPL3Message;
-
-
-/*! \typedef
- * RNHHealth Data
- */
-typedef struct {
-	uint16_t temperature;
-	int16_t ts1temperature;
-	int16_t ts2temperature;
-	uint16_t temprange;
-	uint16_t voltage;
-	int16_t current;
-	int16_t averagecurrent;
-	uint16_t cellvoltage1;
-	uint16_t cellvoltage2;
-	uint16_t cellvoltage3;
-	uint16_t cellvoltage4;
-	uint16_t packvoltage;
-	uint16_t averagevoltage;
-} __attribute__((packed)) RNHHealthData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	RNHHealthData data;
-} __attribute__((packed)) RNHHMessage;
-
-
-/*! \typedef
- * GPSFixQuality Data
- */
-typedef struct {
-	uint32_t mask_sats_tracked;
-	uint32_t mask_sats_used;
-	uint16_t gps_utc_diff;
-	uint16_t hdop;
-	uint16_t vdop;
-	uint16_t mask_waas_prn;
-} __attribute__((packed)) GPSFixQualityData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	GPSFixQualityData data;
-} __attribute__((packed)) GPS2Message;
-
-
-/*! \typedef
- * RNHUmbilical Data
- */
-typedef struct {
-	uint8_t detect;
-} __attribute__((packed)) RNHUmbilicalData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	RNHUmbilicalData data;
-} __attribute__((packed)) RNHUMessage;
-
-
-/*! \typedef
- * FCFHealth Data
- */
-typedef struct {
-	float cpu_user;
-	float cpu_system;
-	float cpu_nice;
-	float cpu_iowait;
-	float cpu_irq;
-	float cpu_softirq;
-	uint64_t ram_used;
-	uint64_t ram_buffer;
-	uint64_t ram_cached;
-	uint16_t pid;
-	uint64_t disk_used;
-	uint64_t disk_read;
-	uint64_t disk_write;
-	uint32_t io_lo_bytes_sent;
-	uint32_t io_lo_bytes_recv;
-	uint32_t io_lo_packets_sent;
-	uint32_t io_lo_packets_recv;
-	uint32_t io_eth0_bytes_sent;
-	uint32_t io_eth0_bytes_recv;
-	uint32_t io_eth0_packets_sent;
-	uint32_t io_eth0_packets_recv;
-	uint32_t io_wlan0_bytes_sent;
-	uint32_t io_wlan0_bytes_recv;
-	uint32_t io_wlan0_packets_sent;
-	uint32_t io_wlan0_packets_recv;
-	uint16_t core_temp;
-} __attribute__((packed)) FCFHealthData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	FCFHealthData data;
-} __attribute__((packed)) FCFHMessage;
-
-
-/*! \typedef
- * State Data
- */
-typedef struct {
-	double time;
-	double acc_up;
-	double vel_up;
-	double altitude;
-	double roll_rate;
-	double roll_angle;
-} __attribute__((packed)) StateData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	StateData data;
-} __attribute__((packed)) VSTEMessage;
-
-
-/*! \typedef
- * LaunchTowerComputer Data
- */
-typedef struct {
-	float rocket_ready;
-	uint8_t iginition_relay;
-	float ignition_battery;
-	uint8_t shore_power_relay;
-	float shore_power;
-	float solar_voltage;
-	float system_battery;
-	float internal_temp;
-	float external_temp;
-	float humidity;
-	float wind_speed;
-	float wind_direction;
-	float barometric_pressure;
-} __attribute__((packed)) LaunchTowerComputerData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	LaunchTowerComputerData data;
-} __attribute__((packed)) LTCHMessage;
-
-
-/*! \typedef
- * GPSIonosphereUTC Data
- */
-typedef struct {
-	double a0;
-	double a1;
-	double a2;
-	double a3;
-	double b0;
-	double b1;
-	double b2;
-	double b3;
-	double utc_a0;
-	double utc_a1;
-	uint32_t tot;
-	uint16_t wnt;
-	uint16_t wnlsf;
-	uint16_t dn;
-	uint16_t dtls;
-	uint16_t dtlsf;
-	uint16_t space;
-} __attribute__((packed)) GPSIonosphereUTCData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	GPSIonosphereUTCData data;
-} __attribute__((packed)) GPS94Message;
-
-
-/*! \typedef
- * GPSEphemeris Data
- */
-typedef struct {
-	uint16_t sv;
-	uint16_t spare;
-	uint32_t sec_of_week;
-	char sf1_words[40];
-	char sf2_words[40];
-	char sf3_words[40];
-} __attribute__((packed)) GPSEphemerisData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	GPSEphemerisData data;
-} __attribute__((packed)) GPS95Message;
+	RollServoData data;
+} __attribute__((packed)) ROLLMessage;
 
 
 /*! \typedef
@@ -349,21 +110,18 @@ typedef struct {
 
 
 /*! \typedef
- * GPSAlmanac Data
+ * RNHUmbilical Data
  */
 typedef struct {
-	char alman_data[64];
-	uint8_t last_alman;
-	uint8_t ionoutcv_flag;
-	uint16_t spare;
-} __attribute__((packed)) GPSAlmanacData;
+	uint8_t detect;
+} __attribute__((packed)) RNHUmbilicalData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	GPSAlmanacData data;
-} __attribute__((packed)) GPS98Message;
+	RNHUmbilicalData data;
+} __attribute__((packed)) RNHUMessage;
 
 
 /*! \typedef
@@ -603,50 +361,47 @@ typedef struct {
 
 
 /*! \typedef
- * GPSWAASEphemeris Data
+ * State Data
  */
 typedef struct {
-	uint16_t sv;
-	uint16_t spare;
-	uint32_t tow_sec_of_week;
-	uint16_t iode;
-	uint16_t ura;
-	int32_t t_zero;
-	int32_t xg;
-	int32_t yg;
-	int32_t zg;
-	int32_t xg_dot;
-	int32_t yg_dot;
-	int32_t zg_dot;
-	int32_t xg_dotdot;
-	int32_t yg_dotdot;
-	int32_t zg_dotdot;
-	uint16_t gf_zero;
-	uint16_t gf_zero_dot;
-} __attribute__((packed)) GPSWAASEphemerisData;
+	double time;
+	double acc_up;
+	double vel_up;
+	double altitude;
+	double roll_rate;
+	double roll_angle;
+} __attribute__((packed)) StateData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	GPSWAASEphemerisData data;
-} __attribute__((packed)) GPS93Message;
+	StateData data;
+} __attribute__((packed)) VSTEMessage;
 
 
 /*! \typedef
- * RollServo Data
+ * GPSProcessor Data
  */
 typedef struct {
-	double angle;
-	uint8_t disable;
-} __attribute__((packed)) RollServoData;
+	uint32_t cpu_availible;
+	uint16_t missed_sub_frames;
+	uint16_t max_subframe_queued;
+	uint16_t missed_accum;
+	uint16_t missed_meas;
+	uint32_t spare1;
+	uint32_t spare2;
+	uint32_t spare3;
+	uint16_t spare4;
+	uint16_t spare5;
+} __attribute__((packed)) GPSProcessorData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	RollServoData data;
-} __attribute__((packed)) ROLLMessage;
+	GPSProcessorData data;
+} __attribute__((packed)) GPS97Message;
 
 
 /*! \typedef
@@ -715,27 +470,305 @@ typedef struct {
 
 
 /*! \typedef
- * GPSProcessor Data
+ * SequenceNo Data
  */
 typedef struct {
-	uint32_t cpu_availible;
-	uint16_t missed_sub_frames;
-	uint16_t max_subframe_queued;
-	uint16_t missed_accum;
-	uint16_t missed_meas;
-	uint32_t spare1;
-	uint32_t spare2;
-	uint32_t spare3;
-	uint16_t spare4;
-	uint16_t spare5;
-} __attribute__((packed)) GPSProcessorData;
+	uint32_t sequence;
+} __attribute__((packed)) SequenceNoData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	GPSProcessorData data;
-} __attribute__((packed)) GPS97Message;
+	SequenceNoData data;
+} __attribute__((packed)) SEQNMessage;
+
+
+/*! \typedef
+ * GPSEphemeris Data
+ */
+typedef struct {
+	uint16_t sv;
+	uint16_t spare;
+	uint32_t sec_of_week;
+	char sf1_words[40];
+	char sf2_words[40];
+	char sf3_words[40];
+} __attribute__((packed)) GPSEphemerisData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSEphemerisData data;
+} __attribute__((packed)) GPS95Message;
+
+
+/*! \typedef
+ * GPSAlmanac Data
+ */
+typedef struct {
+	char alman_data[64];
+	uint8_t last_alman;
+	uint8_t ionoutcv_flag;
+	uint16_t spare;
+} __attribute__((packed)) GPSAlmanacData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSAlmanacData data;
+} __attribute__((packed)) GPS98Message;
+
+
+/*! \typedef
+ * ADIS16405 Data
+ */
+typedef struct {
+	uint16_t vcc;
+	int16_t gyro_x;
+	int16_t gyro_y;
+	int16_t gyro_z;
+	int16_t acc_x;
+	int16_t acc_y;
+	int16_t acc_z;
+	int16_t magn_x;
+	int16_t magn_y;
+	int16_t magn_z;
+	int16_t temp;
+	uint16_t aux_adc;
+} __attribute__((packed)) ADIS16405Data;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	ADIS16405Data data;
+} __attribute__((packed)) ADISMessage;
+
+
+/*! \typedef
+ * GPSWAASMessage Data
+ */
+typedef struct {
+	uint16_t prn;
+	uint16_t spare;
+	uint32_t msg_sec_of_week;
+	char waas_msg[32];
+} __attribute__((packed)) GPSWAASMessageData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSWAASMessageData data;
+} __attribute__((packed)) GPS80Message;
+
+
+/*! \typedef
+ * LaunchTowerComputer Data
+ */
+typedef struct {
+	float rocket_ready;
+	uint8_t iginition_relay;
+	float ignition_battery;
+	uint8_t shore_power_relay;
+	float shore_power;
+	float solar_voltage;
+	float system_battery;
+	float internal_temp;
+	float external_temp;
+	float humidity;
+	float wind_speed;
+	float wind_direction;
+	float barometric_pressure;
+} __attribute__((packed)) LaunchTowerComputerData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	LaunchTowerComputerData data;
+} __attribute__((packed)) LTCHMessage;
+
+
+/*! \typedef
+ * MPL3115A2 Data
+ */
+typedef struct {
+	uint32_t pressure;
+	int16_t temp;
+} __attribute__((packed)) MPL3115A2Data;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	MPL3115A2Data data;
+} __attribute__((packed)) MPL3Message;
+
+
+/*! \typedef
+ * Venus6Fix Data
+ */
+typedef struct {
+	uint16_t fix_mode;
+	uint16_t num_sv;
+	uint32_t gps_week;
+	uint64_t tow;
+	int64_t latitude;
+	int64_t longitude;
+	uint64_t ellipsoid_altitude;
+	uint64_t msl_altitude;
+	uint32_t gdop;
+	uint32_t pdop;
+	uint32_t hdop;
+	uint32_t vdop;
+	uint32_t tdop;
+	int64_t ecef_x;
+	int64_t ecef_y;
+	int64_t ecef_z;
+	int64_t ecef_vx;
+	int64_t ecef_vy;
+	int64_t ecef_vz;
+} __attribute__((packed)) Venus6FixData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	Venus6FixData data;
+} __attribute__((packed)) V6NAMessage;
+
+
+/*! \typedef
+ * FCFHealth Data
+ */
+typedef struct {
+	float cpu_user;
+	float cpu_system;
+	float cpu_nice;
+	float cpu_iowait;
+	float cpu_irq;
+	float cpu_softirq;
+	uint64_t ram_used;
+	uint64_t ram_buffer;
+	uint64_t ram_cached;
+	uint16_t pid;
+	uint64_t disk_used;
+	uint64_t disk_read;
+	uint64_t disk_write;
+	uint32_t io_lo_bytes_sent;
+	uint32_t io_lo_bytes_recv;
+	uint32_t io_lo_packets_sent;
+	uint32_t io_lo_packets_recv;
+	uint32_t io_eth0_bytes_sent;
+	uint32_t io_eth0_bytes_recv;
+	uint32_t io_eth0_packets_sent;
+	uint32_t io_eth0_packets_recv;
+	uint32_t io_wlan0_bytes_sent;
+	uint32_t io_wlan0_bytes_recv;
+	uint32_t io_wlan0_packets_sent;
+	uint32_t io_wlan0_packets_recv;
+	uint16_t core_temp;
+} __attribute__((packed)) FCFHealthData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	FCFHealthData data;
+} __attribute__((packed)) FCFHMessage;
+
+
+/*! \typedef
+ * RNHHealth Data
+ */
+typedef struct {
+	uint16_t temperature;
+	int16_t ts1temperature;
+	int16_t ts2temperature;
+	uint16_t temprange;
+	uint16_t voltage;
+	int16_t current;
+	int16_t averagecurrent;
+	uint16_t cellvoltage1;
+	uint16_t cellvoltage2;
+	uint16_t cellvoltage3;
+	uint16_t cellvoltage4;
+	uint16_t packvoltage;
+	uint16_t averagevoltage;
+} __attribute__((packed)) RNHHealthData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	RNHHealthData data;
+} __attribute__((packed)) RNHHMessage;
+
+
+/*! \typedef
+ * GPSWAASEphemeris Data
+ */
+typedef struct {
+	uint16_t sv;
+	uint16_t spare;
+	uint32_t tow_sec_of_week;
+	uint16_t iode;
+	uint16_t ura;
+	int32_t t_zero;
+	int32_t xg;
+	int32_t yg;
+	int32_t zg;
+	int32_t xg_dot;
+	int32_t yg_dot;
+	int32_t zg_dot;
+	int32_t xg_dotdot;
+	int32_t yg_dotdot;
+	int32_t zg_dotdot;
+	uint16_t gf_zero;
+	uint16_t gf_zero_dot;
+} __attribute__((packed)) GPSWAASEphemerisData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSWAASEphemerisData data;
+} __attribute__((packed)) GPS93Message;
+
+
+/*! \typedef
+ * GPSIonosphereUTC Data
+ */
+typedef struct {
+	double a0;
+	double a1;
+	double a2;
+	double a3;
+	double b0;
+	double b1;
+	double b2;
+	double b3;
+	double utc_a0;
+	double utc_a1;
+	uint32_t tot;
+	uint16_t wnt;
+	uint16_t wnlsf;
+	uint16_t dn;
+	uint16_t dtls;
+	uint16_t dtlsf;
+	uint16_t space;
+} __attribute__((packed)) GPSIonosphereUTCData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	GPSIonosphereUTCData data;
+} __attribute__((packed)) GPS94Message;
 
 
 

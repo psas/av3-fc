@@ -1,2 +1,3 @@
-PyYAML==3.10
 setuptools>=0.7
+PyYAML==3.10
+psas_packet==0.2.4
