@@ -19,4 +19,4 @@ receivers:
   - [data, ADISMessage*]
   
   arm_receive_gps:
-  - [data, GPSMessage*]
+  - [data, V6NAMessage*]

@@ -6,23 +6,14 @@
 
 #include <stdint.h>
 #include "psas_packet.h"
-// chan99.status bitfields
-#define STATUS99_CODE_LOCK	0x01
-#define STATUS99_BIT_LOCK	0x02
-#define STATUS99_FRAME_LOCK	0x04
-#define STATUS99_FRAME_SYNC	0x08
-#define STATUS99_FAME_SYNC_NEW_EPOCH	0x10
-#define STATUS99_CHANNEL_RESET	0x20
-#define STATUS99_PHASE_LOCK	0x40
 
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	uint8_t  raw[304];
-} __attribute__((packed)) GPSMessage;
-
+// Venus 6 fix mode bitmask:
+#define VENUS6_FIX_MODE_NO_FIX 0
+#define VENUS6_FIX_MODE_2D 1
+#define VENUS6_FIX_MODE_3D 2
+#define VENUS6_FIX_MODE_3D_DGPS 3
+ 
 void cots_raw_in(unsigned char*, unsigned int, unsigned char*);
-void gps_data_out(GPSMessage *);
+void gps_data_out(V6NAMessage *);
 
 #endif /* GPS_H_ */

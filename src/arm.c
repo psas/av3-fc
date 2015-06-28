@@ -6,6 +6,7 @@
 #include "elderberry/fcfutils.h"
 #include "utilities/net_addrs.h"
 #include "utilities/utils_sockets.h"
+#include "devices/gps.h"
 #include "arm.h"
 
 #define COMPARE_BUFFER_TO_CMD(a, b, len)\
@@ -37,20 +38,22 @@ void arm_receive_imu(ADISMessage * data){
 	}
 }
 
-void arm_receive_gps(GPSMessage * d){
-	if (memcmp(d->ID, "GPS\x01", 4))
-		return;
 
-	GPS1Message * data = (GPS1Message *)d;
-	switch(data->data.nav_mode) {
-	case 2:   // 3D fix
-	case 4:   // 3D + diff
-	case 6:   // 3D + diff + rtk
-		GPS_locked = true; break;
-	default:
-		GPS_locked = false; break;
+/**
+ * Receive data from the COTS GPS to determine fix status.
+ * If we don't have GPS laock we shouldn't fly.
+ */
+void arm_receive_gps(V6NAMessage *fixdata) {
+
+	// We must at least have a 3D fix
+	if (fixdata->data.fix_mode >= VENUS6_FIX_MODE_3D) {
+		GPS_locked = true;
+	}
+	else {
+		GPS_locked = false;
 	}
 }
+
 
 static void send_arm_response(const char * message){
 	if(write(sd, message, strlen(message)) < 0){

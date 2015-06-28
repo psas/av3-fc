@@ -17,7 +17,7 @@ receivers:
   - [data, VSTEMessage*]
 
   log_receive_gps:
-  - [data, GPSMessage*]
+  - [data, V6NAMessage*]
 
   log_receive_mpu:
   - [data, MPUMessage*]

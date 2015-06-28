@@ -23,7 +23,7 @@ void logger_final(void); // [miml:final]
 
 void log_receive_adis(ADISMessage *); // [miml:receiver]
 void log_receive_state(VSTEMessage *); // [miml:receiver]
-void log_receive_gps(GPSMessage*);
+void log_receive_gps(V6NAMessage*);
 void log_receive_mpu(MPUMessage*);
 void log_receive_mpl(MPLMessage*);
 void log_receive_rc(RollServoMessage*);

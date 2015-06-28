@@ -5,11 +5,11 @@ object: src/devices/gps.o
 
 senders:
   gps_data_out:
-  - [data, GPSMessage*]
+  - [data, V6NAMessage*]
 
 receivers:
   cots_raw_in:
-  - [ARG1, unsigned char*]
-  - [ARG2, unsigned int]
-  - [ARG3, unsigned char*]
+  - [data, unsigned char*]
+  - [len, unsigned int]
+  - [timestamp, unsigned char*]
 

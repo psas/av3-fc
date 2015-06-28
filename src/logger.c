@@ -199,11 +199,9 @@ void log_receive_state(VSTEMessage *data) {
 	logg(data, sizeof(VSTEMessage));
 }
 
-void log_receive_gps(GPSMessage* data){
-	uint16_t len = data->data_length;
+void log_receive_gps(V6NAMessage* data){
 	data->data_length = htons(data->data_length);
-	// different GPS packets have different lengths
-	logg(data, sizeof(message_header) + len);
+	logg(data, sizeof(V6NAMessage));
 }
 
 void log_receive_mpu(MPUMessage* data){
