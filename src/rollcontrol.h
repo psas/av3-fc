@@ -10,8 +10,12 @@
 #define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
-/* PID */
-#define KP 1.1
+/* PID gain constants */
+#define Kp 10
+#define Ki .001
+#define Kd 0
+#define pidTarget 0
+
 
 /* Fin charachterization constants */
 #define FINFIT_A 0.0006
@@ -31,6 +35,9 @@
 // Converts radians to degrees.
 #define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
 
+/* global variables needed for PID controller */
+double lastError;
+double integrator;
 
 typedef struct{
 	char     ID[4];

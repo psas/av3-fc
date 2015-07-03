@@ -112,13 +112,13 @@ double estimate_alpha(double set_aa, StateData state) {
 		output = subsonic_fin(aa, I, rd, state);
 	else if (velocity < SUPERSONIC) {	
 		double y0 = subsonic_fin(aa, I, rd, state);
-        double y1 = supersonic_fin(aa, I, rd, state);
-        output = y0 + (y1-y0)*(velocity - SUBSONIC)/(SUPERSONIC-SUBSONIC);
+		double y1 = supersonic_fin(aa, I, rd, state);
+		output = y0 + (y1-y0)*(velocity - SUBSONIC)/(SUPERSONIC-SUBSONIC);
 	}
 	else
 		output = supersonic_fin(aa, I, rd, state);
 
-	// Make negative if nessisary
+    // Make negative if nessisary
     if (set_aa < 0)
         return -output;
     return output;
@@ -129,19 +129,37 @@ void rc_receive_state(VSTEMessage *state) {
 	if (!enable_servo)
 		return;
 
-	/* Controller */
+	/* begin PID Controller */
 
-	// Error
-	double error = 0 - state->data.roll_angle;
-	double proportional = KP * error;
-	double correction = proportional;  // TODO: expand to PI or PID
+	/* 
+	   determine the error by taking the difference of the target
+	   and the current value
+	 */
+	double error = pidTarget - state->data.roll_rate;
+	
+	/* proportional stage */
+	double proportional = Kp * error;
 
-	// Differentiate to roll acceleration
-	correction -= state->data.roll_rate;
-	correction *= 10; // gain
+	/* integral stage */
+	double integral = Ki * integrator;
+
+	/* derivative stage */
+	double derivative = Kd * (error - lastError);
+
+	/* output of the PID controller */
+	/* sum each stage together */
+	double correction = proportional + integral + derivative;
+
+	/* remember the error for the derivative stage */
+	lastError = error;
+
+	/* add the error to the integral stage for next step */
+	integrator += error;
 
 	// Look normilized fin angle based on requested angular acceleration
 	double output = estimate_alpha(correction, state->data);
+
+	/* end PID controller */
 
 	set_canard_angle(output);
 }
