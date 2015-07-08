@@ -37,9 +37,11 @@
 
 #define LOG_TIMEOUT_NS 100e6 //100ms
 
-static FILE *fp = NULL;
-static char log_buffer[LINK_MTU];  // Global so destructor can flush final data
+static char log_buffer[P_LIMIT];  // Global so destructor can flush final data
 static unsigned int log_buffer_size = 0;
+static char disk_log_buffer[65536];
+static unsigned int disk_log_buffer_size = 0;
+static int disk_fd;
 static int net_fd;
 
 // sequence number, each UDP packet gets a number
@@ -66,7 +68,7 @@ static void open_logfile(void)
 			exit(1);
 		}
 
-		fp = fdopen(fd, "w");
+		disk_fd = fd;
 		return;
 	}
 
@@ -97,17 +99,14 @@ static void open_socket(void)
 static void log_timeout(struct pollfd * pfd);
 void logger_init() {
 	open_logfile();
-	setbuf(fp, NULL);
 
 	// Outgoing socket (WiFi)
 	open_socket();
 
 	// Initialize sequence number
 	sequence = 0;
-
-	// Add sequence number to the first packet
-	memcpy(&log_buffer[log_buffer_size], &sequence, sizeof(uint32_t));
-	log_buffer_size += sizeof(uint32_t);
+	log_buffer_size = 0;
+	disk_log_buffer_size = 0;
 
 
     int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
@@ -121,54 +120,82 @@ void logger_init() {
 }
 
 
-void logger_final() {
-	if(log_buffer_size > 0){
-		fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
-	}
-	fclose(fp);
-}
-
 static void flush_log()
 {
+	if (!disk_log_buffer_size)
+		return;
+
 	// Send current buffer to disk
 	// for the log file, convert the sequence number to a SEQN message
-	SEQNMessage header = {
-	        .ID={"SEQN"},
-	        .data_length=htons(sizeof(SequenceNoData))
-    };
+	message_header header = {
+		.ID={"SEQN"},
+		.data_length=htons(sizeof(SequenceNoData))
+	};
 	get_psas_time(header.timestamp);
-    //TODO: fix the -4 which accounts for the sequence number size in a ugly way
-	fwrite(&header, 1, sizeof(header)-sizeof(SequenceNoData), fp);
-	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
-	// Send current buffer to WiFi
-	if(write(net_fd, log_buffer, log_buffer_size) != log_buffer_size)
-		perror("flush_log: ignoring error from write(net_fd)");
+
+	const struct iovec disk_iov[] = {
+		{ .iov_base = &header, .iov_len = sizeof header },
+		{ .iov_base = &sequence, .iov_len = sizeof sequence },
+		{ .iov_base = disk_log_buffer, .iov_len = disk_log_buffer_size },
+	};
+	writev(disk_fd, disk_iov, sizeof disk_iov / sizeof *disk_iov);
+
+	const struct iovec net_iov[] = {
+		{ .iov_base = &sequence, .iov_len = sizeof sequence },
+		{ .iov_base = log_buffer, .iov_len = log_buffer_size },
+	};
+	writev(net_fd, net_iov, sizeof net_iov / sizeof *net_iov);
 
 	// Reset buffer size
 	log_buffer_size = 0;
+	disk_log_buffer_size = 0;
 
 	// Increment sequence number
 	sequence++;
-
-	// Write sequence number to head of next packet
-	uint32_t s  = htonl(sequence);
-	memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
-	log_buffer_size += sizeof(uint32_t);
 }
 
-void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data)
-{
-	if (log_buffer_size + sizeof(message_header) + data_length > P_LIMIT)
-		flush_log();
+void logger_final() {
+	flush_log();
+	close(disk_fd);
+	close(net_fd);
+}
 
-	message_header *header = (message_header *) (log_buffer + log_buffer_size);
+static void ensure_disk_log_space(unsigned int len) {
+	if (disk_log_buffer_size + len > sizeof disk_log_buffer)
+		flush_log();
+}
+
+static void ensure_net_log_space(unsigned int len) {
+	ensure_disk_log_space(len);
+	if (log_buffer_size + len > sizeof log_buffer)
+		flush_log();
+}
+
+void log_write_disk_only(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data)
+{
+	unsigned int len = sizeof(message_header) + data_length;
+	ensure_disk_log_space(len);
+
+	message_header *header = (message_header *) (disk_log_buffer + disk_log_buffer_size);
 	memcpy(header->ID, ID, sizeof header->ID);
 	memcpy(header->timestamp, timestamp, sizeof header->timestamp);
 	header->data_length = htons(data_length);
 
-	memcpy(log_buffer + log_buffer_size + sizeof(message_header), data, data_length);
+	memcpy(disk_log_buffer + disk_log_buffer_size + sizeof(message_header), data, data_length);
 
-	log_buffer_size += sizeof(message_header) + data_length;
+	disk_log_buffer_size += len;
+}
+
+void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data)
+{
+	unsigned int len = sizeof(message_header) + data_length;
+	ensure_net_log_space(len);
+
+	unsigned int disk_start = disk_log_buffer_size;
+	log_write_disk_only(ID, timestamp, data_length, data);
+
+	memcpy(log_buffer + log_buffer_size, disk_log_buffer + disk_start, len);
+	log_buffer_size += len;
 }
 
 static void log_timeout(struct pollfd * pfd){
@@ -176,9 +203,7 @@ static void log_timeout(struct pollfd * pfd){
 	if(read(pfd->fd, buf, 8)<0){ //clears timerfd
 		perror("log_timeout: read() failed");
 	}
-	if(log_buffer_size > sizeof(uint32_t)){ //sequence number
-		flush_log();
-	}
+	flush_log();
 }
 
 void log_receive_state(VSTEMessage *data) {

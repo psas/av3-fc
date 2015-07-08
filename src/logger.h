@@ -17,6 +17,7 @@ typedef struct{
 void logger_init(void); // [miml:init]
 void logger_final(void); // [miml:final]
 
+void log_write_disk_only(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data);
 void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data);
 void log_receive_state(VSTEMessage *); // [miml:receiver]
 void log_receive_gps(V6NAMessage*);
