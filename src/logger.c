@@ -171,17 +171,6 @@ void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_lengt
 	log_buffer_size += sizeof(message_header) + data_length;
 }
 
-static void logg(const void *data, size_t len)
-{
-	// Check size of buffer, if big enough, we can send packet
-	if (log_buffer_size + len >= P_LIMIT)
-		flush_log();
-
-	// Copy data into packet buffer
-	memcpy(log_buffer + log_buffer_size, data, len);
-	log_buffer_size += len;
-}
-
 static void log_timeout(struct pollfd * pfd){
 	char buf[8];
 	if(read(pfd->fd, buf, 8)<0){ //clears timerfd
@@ -193,8 +182,7 @@ static void log_timeout(struct pollfd * pfd){
 }
 
 void log_receive_state(VSTEMessage *data) {
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(VSTEMessage));
+	log_write(data->ID, data->timestamp, data->data_length, &data->data);
 }
 
 void log_receive_arm(const char* code){
@@ -204,7 +192,6 @@ void log_receive_arm(const char* code){
 }
 
 void log_receive_rc(ROLLMessage* data) {
-	data->data_length = htons(data->data_length);
 	union {
 		uint64_t uint;
 		double doub;
@@ -213,23 +200,11 @@ void log_receive_rc(ROLLMessage* data) {
 	convert.doub = data->data.angle;
 	convert.uint = __builtin_bswap64(convert.uint);
 	data->data.angle = convert.doub;
-	logg(data, sizeof(ROLLMessage));
+	log_write(data->ID, data->timestamp, data->data_length, &data->data);
 }
 
-//FIXME: move to psas_packet
-struct VERSMessage {
-	message_header header;
-	uint8_t data[50];
-} __attribute__((packed));
-
 void log_receive_rnh_version(uint8_t * message, unsigned int length){
-	struct VERSMessage vers = {
-		.header = {
-			.ID = {"VERS"},
-			.data_length = length
-		}
-	};
-	get_psas_time(vers.header.timestamp);
-	memcpy(vers.data, message, length);
-	logg(&vers, sizeof(message_header) + length);
+	uint8_t timestamp[6];
+	get_psas_time(timestamp);
+	log_write("VERS", timestamp, length, message);
 }
