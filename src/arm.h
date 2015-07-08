@@ -7,12 +7,11 @@
 #define ARM_H_
 #include <stdint.h>
 #include "psas_packet.h"
-#include "adis.h"
 
 void arm_init(void);
 void arm_final(void);
 
-void arm_receive_imu(ADISMessage*);
+void arm_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *buf);
 void arm_receive_gps(V6NAMessage*);
 void arm_raw_in(unsigned char *, unsigned int, unsigned char *);
 

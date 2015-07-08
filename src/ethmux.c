@@ -4,19 +4,60 @@
 #include <linux/net_tstamp.h>
 #include <time.h>
 #include <string.h>
+#include "devices/mpl.h"
+#include "devices/rnh.h"
 #include "elderberry/fcfutils.h"
+#include "utilities/net_addrs.h"
+#include "utilities/psas_packet.h"
 #include "utilities/utils_sockets.h"
 #include "utilities/utils_time.h"
-#include "utilities/net_addrs.h"
 #include "ethmux.h"
 
 static uint8_t buffer[ETH_MTU];
 
-typedef void (*demux_handler)(uint8_t * buffer, unsigned int len, uint8_t * timestamp);
+struct demux_type {
+	const char ID[4];
+	const uint16_t data_length;
+	void (*const handler)(const char ID[4], uint8_t timestamp[6], uint16_t data_length, void *buffer);
+	uint32_t next_sequence;
+};
 
-void sequenced_receive(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t* timestamp, uint32_t * seq, demux_handler handler) {
-	if (len < sizeof(uint32_t)) {
-		sequenced_error(port, buffer, len, timestamp, 0, 0);
+static int is_expected_length(struct demux_type *type, unsigned int len) {
+	if (type->data_length)
+		return len == sizeof(uint32_t) + type->data_length;
+	return len >= sizeof(uint32_t) && len <= UINT16_MAX - sizeof(uint32_t);
+}
+
+//FIXME: move to psas_packet
+struct seqerror {
+	struct {
+		uint16_t port;
+		uint32_t expected;
+		uint32_t received;
+	} meta;
+	uint8_t buf[1024];
+} __attribute__((packed));
+
+void format_sequenced_error(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received) {
+	struct seqerror err = {
+		.meta = {
+			.port = htons(port),
+			.expected = htonl(expected),
+			.received = htonl(received),
+		},
+	};
+
+	if (len > sizeof err.buf)
+		len = sizeof err.buf;
+
+	memcpy(err.buf, buffer, len);
+
+	sequenced_error("SEQE", timestamp, sizeof err.meta + len, &err);
+}
+
+void sequenced_receive(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t* timestamp, struct demux_type *type) {
+	if (!is_expected_length(type, len)) {
+		format_sequenced_error(port, buffer, len, timestamp, 0, 0);
 		return;
 	}
 
@@ -24,30 +65,30 @@ void sequenced_receive(unsigned short port, uint8_t * buffer, unsigned int len, 
 	buffer += sizeof(uint32_t);
 	len -= sizeof(uint32_t);
 
-	if (rcvseq < *seq) {
-		sequenced_error(port, buffer, len, timestamp, *seq, rcvseq);
+	if (rcvseq < type->next_sequence) {
+		format_sequenced_error(port, buffer, len, timestamp, type->next_sequence, rcvseq);
 	}
-	if (rcvseq > *seq) {
-		sequenced_error(port, NULL, 0, timestamp, *seq, rcvseq);
-		handler(buffer, len, timestamp);
+	if (rcvseq > type->next_sequence) {
+		format_sequenced_error(port, NULL, 0, timestamp, type->next_sequence, rcvseq);
+		type->handler(type->ID, timestamp, len, buffer);
 	}
-	if (rcvseq == *seq) {
-		handler(buffer, len, timestamp);
+	if (rcvseq == type->next_sequence) {
+		type->handler(type->ID, timestamp, len, buffer);
 	}
 
-	*seq = rcvseq + 1;
+	type->next_sequence = rcvseq + 1;
 }
 
 void demux(struct pollfd *pfd){
-	static uint32_t seq_ADIS = 0;
-	static uint32_t seq_MPU = 0;
-	static uint32_t seq_MPL = 0;
-	static uint32_t seq_RNH = 0;
-	static uint32_t seq_RNHPORT = 0;
-	static uint32_t seq_RNHALARM = 0;
-	static uint32_t seq_RNHUMBDET = 0;
-	static uint32_t seq_FCFH = 0;
-	static uint32_t seq_GPS_COTS = 0;
+	static struct demux_type seq_ADIS = { "ADIS", sizeof(ADIS16405Data), demuxed_ADIS };
+	static struct demux_type seq_MPU = { "MPU9", UINT16_MAX, demuxed_MPU };
+	static struct demux_type seq_MPL = { "MPL3", sizeof(MPLData), demuxed_MPL };
+	static struct demux_type seq_RNH = { "RNHH", sizeof(RNHHealthData), demuxed_RNH };
+	static struct demux_type seq_RNHPORT = { "RNHP", sizeof(RNHPowerData), demuxed_RNH };
+	static struct demux_type seq_RNHALARM = { "RNHA", sizeof(RNHAlarms), demuxed_RNH };
+	static struct demux_type seq_RNHUMBDET = { "RNHU", sizeof(RNHUmbdet), demuxed_RNH };
+	static struct demux_type seq_FCFH = { "FCFH", sizeof(FCFHealthData), demuxed_FCFH };
+	static struct demux_type seq_GPS_COTS = { "V6NA", sizeof(Venus6FixData), demuxed_COTS };
 	struct sockaddr_in packet_info;
 	struct timespec ts;
 
@@ -61,37 +102,37 @@ void demux(struct pollfd *pfd){
 	if(bytes > 0){
 		switch(port){
 		case ADIS_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_ADIS, demuxed_ADIS);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_ADIS);
 			break;
 		case ARM_PORT:
 			demuxed_ARM(buffer, bytes, timestamp);
 			break;
 		case MPU_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPU, demuxed_MPU);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPU);
 			break;
 		case MPL_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPL, demuxed_MPL);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPL);
 			break;
 		case RC_SERVO_ENABLE_PORT:
 			demuxed_RC(buffer, bytes, timestamp);
 			break;
 		case RNH_BATTERY:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNH, demuxed_RNH);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNH);
 			break;
 		case RNH_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHPORT, demuxed_RNH);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHPORT);
 			break;
 		case RNH_ALARM:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHALARM, demuxed_RNH);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHALARM);
 			break;
 		case RNH_UMBDET:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHUMBDET, demuxed_RNH);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_RNHUMBDET);
 			break;
 		case FCF_HEALTH_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_FCFH, demuxed_FCFH);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_FCFH);
 			break;
 		case GPS_COTS:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_GPS_COTS, demuxed_COTS);
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_GPS_COTS);
 			break;
 		default:
 			break;

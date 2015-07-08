@@ -24,12 +24,13 @@ int about(double a, double b){
 	return fabs(a-b) < ACCEL_NOISE_BOUND;
 }
 
-void arm_receive_imu(ADISMessage * data){
+void arm_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *buf){
 	// does the acceleration vector == -1g over the last 100 samples?
 	// 3.3mg per bit
-	double x = data->data.acc_x * 0.00333;
-	double y = data->data.acc_y * 0.00333;
-	double z = data->data.acc_z * 0.00333;
+	ADIS16405Data *data = buf;
+	double x = data->acc_x * 0.00333;
+	double y = data->acc_y * 0.00333;
+	double z = data->acc_z * 0.00333;
 	if(!about(x, -1) || !about(y, 0) || !about(z, 0)){
 		upright = 0;
 	}

@@ -16,7 +16,10 @@ receivers:
   - [timestamp, unsigned char*]
   
   arm_receive_imu:
-  - [data, ADISMessage*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
   
   arm_receive_gps:
   - [data, V6NAMessage*]

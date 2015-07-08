@@ -10,8 +10,11 @@ senders:
 
 # Functions that handle incoming data
 receivers:
-  log_receive_adis:
-  - [data, ADISMessage*]
+  log_write:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   log_receive_state:
   - [data, VSTEMessage*]
@@ -19,35 +22,12 @@ receivers:
   log_receive_gps:
   - [data, V6NAMessage*]
 
-  log_receive_mpu:
-  - [data, MPUMessage*]
-
-  log_receive_mpl:
-  - [data, MPLMessage*]
-
   log_receive_arm:
   - [code, const char*]
 
   log_receive_rc:
   - [data, RollServoMessage*]
 
-  log_receive_rnh:
-  - [ARG1, RNHMessage*]
-
   log_receive_rnh_version:
   - [ARG1, uint8_t*]
   - [ARG2, unsigned int]
-
-  log_receive_fcfh:
-  - [ARG1, unsigned char*]
-  - [ARG2, unsigned int]
-  - [ARG3, unsigned char*]
-
-  log_receive_seqpacket_err:
-  - [port, unsigned short]
-  - [buffer, uint8_t*]
-  - [len, unsigned int]
-  - [timestamp, uint8_t *]
-  - [expected, uint32_t]
-  - [received, uint32_t]
-

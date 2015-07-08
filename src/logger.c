@@ -156,6 +156,21 @@ static void flush_log()
 	log_buffer_size += sizeof(uint32_t);
 }
 
+void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data)
+{
+	if (log_buffer_size + sizeof(message_header) + data_length > P_LIMIT)
+		flush_log();
+
+	message_header *header = (message_header *) (log_buffer + log_buffer_size);
+	memcpy(header->ID, ID, sizeof header->ID);
+	memcpy(header->timestamp, timestamp, sizeof header->timestamp);
+	header->data_length = htons(data_length);
+
+	memcpy(log_buffer + log_buffer_size + sizeof(message_header), data, data_length);
+
+	log_buffer_size += sizeof(message_header) + data_length;
+}
+
 static void logg(const void *data, size_t len)
 {
 	// Check size of buffer, if big enough, we can send packet
@@ -177,44 +192,15 @@ static void log_timeout(struct pollfd * pfd){
 	}
 }
 
-static void log_message(const char *msg)
-{
-	int len = strlen(msg);
-	if (log_buffer_size + sizeof(message_header) + len > P_LIMIT)
-		flush_log();
-
-	message_header header = { .ID = "MESG", .data_length=htons(len) };
-	get_psas_time(header.timestamp);
-	logg(&header, sizeof(message_header));
-	logg(msg, len);
-}
-
-void log_receive_adis(ADISMessage *data) {
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(ADISMessage));
-}
-
 void log_receive_state(VSTEMessage *data) {
 	data->data_length = htons(data->data_length);
 	logg(data, sizeof(VSTEMessage));
 }
 
-void log_receive_gps(V6NAMessage* data){
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(V6NAMessage));
-}
-
-void log_receive_mpu(MPUMessage* data){
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(MPUMessage));
-}
-void log_receive_mpl(MPLMessage* data){
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(MPLMessage));
-}
-
 void log_receive_arm(const char* code){
-	log_message(code);
+	uint8_t timestamp[6];
+	get_psas_time(timestamp);
+	log_write("MESG", timestamp, strlen(code), code);
 }
 
 void log_receive_rc(RollServoMessage* data) {
@@ -228,10 +214,6 @@ void log_receive_rc(RollServoMessage* data) {
 	convert.uint = __builtin_bswap64(convert.uint);
 	data->finangle = convert.doub;
 	logg(data, sizeof(RollServoMessage));
-}
-
-void log_receive_rnh(RNHMessage * packet) {
-	logg(packet, sizeof(message_header) + ntohs(packet->data_length));
 }
 
 //FIXME: move to psas_packet
@@ -250,54 +232,4 @@ void log_receive_rnh_version(uint8_t * message, unsigned int length){
 	get_psas_time(vers.header.timestamp);
 	memcpy(vers.data, message, length);
 	logg(&vers, sizeof(message_header) + length);
-}
-
-void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-
-    if (len == sizeof(FCFHealthData)) {
-
-        FCFHMessage message = {
-            .ID={"FCFH"},
-            .timestamp={
-                (uint8_t)timestamp[0], (uint8_t)timestamp[1],
-                (uint8_t)timestamp[2], (uint8_t)timestamp[3],
-                (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-            .data_length=htons(sizeof(FCFHealthData))
-        };
-        // Copy in data from socket
-        memcpy(&message.data, buffer, sizeof(FCFHealthData));
-
-        logg(&message, sizeof(FCFHMessage));
-    }
-
-}
-
-//FIXME: move to psas_packet
-struct seqerror {
-	char ID[4];
-	uint8_t timestamp[6];
-	uint16_t data_length;
-	unsigned short port;
-	uint32_t expected;
-	uint32_t received;
-} __attribute__((packed));
-
-void log_receive_seqpacket_err(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received){
-	uint16_t data_length = htons(sizeof(unsigned short) + sizeof(uint32_t)*2 + len);
-	struct seqerror err = {
-		.ID={"SEQE"},
-		.timestamp={
-			(uint8_t)timestamp[0], (uint8_t)timestamp[1],
-			(uint8_t)timestamp[2], (uint8_t)timestamp[3],
-			(uint8_t)timestamp[4], (uint8_t)timestamp[5]
-		},
-		.data_length=data_length,
-		.port = port,
-		.expected = expected,
-		.received = received
-	};
-	uint8_t message[sizeof(struct seqerror) + len];
-	memcpy(message, &err, sizeof(struct seqerror));
-	memcpy(message + sizeof(struct seqerror), buffer, len);
-	logg(&message, sizeof(struct seqerror) + len);
 }

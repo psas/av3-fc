@@ -11,7 +11,10 @@ senders:
 
 receivers:
   state_receive_imu:
-  - [data, ADISMessage*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   state_raw_ld_in:
   - [code, unsigned char*]

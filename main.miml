@@ -2,7 +2,6 @@ sources:
   - [TIME, utils_time.miml]     # Time utilities
   - [SOCK, utils_sockets.miml]  # Socket utilities
   - [ADDR, net_addrs.miml]      # RocketNet addresses
-  - [ADIS, adis.miml]           # ADIS Sensor
   - [LOG, logger.miml]          # Logger code Module
   - [GPS, gps.miml]             # GPS Sensor
   - [ARM, arm.miml]             # Arm Code Module
@@ -10,42 +9,37 @@ sources:
   - [RS, rollservo.miml]        # Roll Servo Control Interface
   - [STATE, state.miml]         # State Estimation Module
   - [ETH, ethmux.miml]          # Central Ethernet receiver
-  - [MPU, mpu.miml]             # MPU module
-  - [MPL, mpl.miml]             # MPL module
   - [RNH, rnh.miml]             # RocketNet Hub
 
 messages:
   ETH.demuxed_ADIS:
-    - ADIS.adis_raw_in
+    - LOG.log_write
+    - ARM.arm_receive_imu
+    - STATE.state_receive_imu
 
   ETH.demuxed_ARM:
     - ARM.arm_raw_in
 
   ETH.demuxed_MPU:
-    - MPU.mpu_raw_in
+    - LOG.log_write
 
   ETH.demuxed_MPL:
-    - MPL.mpl_raw_in
+    - LOG.log_write
 
   ETH.demuxed_RC:
-   - RC.rc_raw_testrc
+    - RC.rc_raw_testrc
 
   ETH.demuxed_RNH:
-   - RNH.rnh_raw_in
+    - LOG.log_write
 
   ETH.demuxed_FCFH:
-   - LOG.log_receive_fcfh
+    - LOG.log_write
 
   ETH.demuxed_COTS:
-   - GPS.cots_raw_in
+    - LOG.log_write
 
   ETH.sequenced_error:
-   - LOG.log_receive_seqpacket_err
-
-  ADIS.adis_data_out:
-    - ARM.arm_receive_imu
-    - STATE.state_receive_imu
-    - LOG.log_receive_adis
+    - LOG.log_write
 
   STATE.state_send_message:
     - RC.rc_receive_state
@@ -62,15 +56,6 @@ messages:
   RC.rc_send_servo:
     - RS.rs_receive_adj
     - LOG.log_receive_rc
-
-  MPU.mpu_data_out:
-    - LOG.log_receive_mpu
-
-  MPL.mpl_data_out:
-    - LOG.log_receive_mpl
-
-  RNH.rnh_data_out:
-    - LOG.log_receive_rnh
 
   RNH.rnh_version_out:
     - LOG.log_receive_rnh_version
