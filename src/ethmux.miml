@@ -11,11 +11,6 @@ senders:
   - [len, unsigned int]
   - [timestamp, unsigned char*]
   
-  demuxed_LD:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
-  
   demuxed_ADIS:
   - [data, unsigned char*]
   - [len, unsigned int]

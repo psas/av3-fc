@@ -21,9 +21,6 @@ messages:
   ETH.demuxed_ARM:
     - ARM.arm_raw_in
 
-  ETH.demuxed_LD:
-    - RC.rc_raw_ld_in
-
   ETH.demuxed_MPU:
     - MPU.mpu_raw_in
 

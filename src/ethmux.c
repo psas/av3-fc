@@ -40,7 +40,6 @@ void sequenced_receive(unsigned short port, uint8_t * buffer, unsigned int len, 
 
 void demux(struct pollfd *pfd){
 	static uint32_t seq_ADIS = 0;
-	static uint32_t seq_LD = 0;
 	static uint32_t seq_MPU = 0;
 	static uint32_t seq_MPL = 0;
 	static uint32_t seq_RNH = 0;
@@ -66,9 +65,6 @@ void demux(struct pollfd *pfd){
 			break;
 		case ARM_PORT:
 			demuxed_ARM(buffer, bytes, timestamp);
-			break;
-		case TEATHER_PORT:
-			sequenced_receive(port, buffer, bytes, timestamp, &seq_LD, demuxed_LD);
 			break;
 		case MPU_PORT:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPU, demuxed_MPU);

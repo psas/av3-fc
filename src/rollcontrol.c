@@ -173,10 +173,6 @@ void rc_receive_arm(const char * signal){
 	}
 }
 
-void rc_raw_ld_in(unsigned char * signal, unsigned int len, unsigned char* timestamp){
-	/* we're ignoring launch detect for this launch */
-}
-
 static void send_servo_response(const char * message){
 	int len = strlen(message);
 	if(write(sd, message, len) != len){
