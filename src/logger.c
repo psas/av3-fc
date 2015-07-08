@@ -203,17 +203,17 @@ void log_receive_arm(const char* code){
 	log_write("MESG", timestamp, strlen(code), code);
 }
 
-void log_receive_rc(RollServoMessage* data) {
+void log_receive_rc(ROLLMessage* data) {
 	data->data_length = htons(data->data_length);
 	union {
 		uint64_t uint;
 		double doub;
 	} convert;
 
-	convert.doub = data->finangle;
+	convert.doub = data->data.angle;
 	convert.uint = __builtin_bswap64(convert.uint);
-	data->finangle = convert.doub;
-	logg(data, sizeof(RollServoMessage));
+	data->data.angle = convert.doub;
+	logg(data, sizeof(ROLLMessage));
 }
 
 //FIXME: move to psas_packet

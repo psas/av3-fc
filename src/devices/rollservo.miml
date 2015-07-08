@@ -7,4 +7,4 @@ final: rollservo_final();
 
 receivers:
   rs_receive_adj:
-  - [data, RollServoMessage*]
+  - [data, ROLLMessage*]

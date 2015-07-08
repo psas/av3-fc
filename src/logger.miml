@@ -26,7 +26,7 @@ receivers:
   - [code, const char*]
 
   log_receive_rc:
-  - [data, RollServoMessage*]
+  - [data, ROLLMessage*]
 
   log_receive_rnh_version:
   - [ARG1, uint8_t*]

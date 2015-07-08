@@ -20,7 +20,7 @@ void logger_final(void); // [miml:final]
 void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data);
 void log_receive_state(VSTEMessage *); // [miml:receiver]
 void log_receive_gps(V6NAMessage*);
-void log_receive_rc(RollServoMessage*);
+void log_receive_rc(ROLLMessage*);
 void log_receive_rnh_version(uint8_t * buffer, unsigned int length);
 void log_receive_arm(const char*);
 

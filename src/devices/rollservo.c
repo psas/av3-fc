@@ -36,14 +36,14 @@ void rollservo_final(void){
 #define MIN_SERVO_POSITION_TICKS ( MIN_SERVO_POSITION_US * PWM_TICKS_MAX / PWM_US_MAX )
 
 
-void rs_receive_adj(RollServoMessage* adj){
+void rs_receive_adj(ROLLMessage* adj){
 	static uint32_t seq = 0;
 	/* Slope */
 	const double PWM_TICKS_PER_DEGREE = (MAX_SERVO_POSITION_TICKS - MIN_SERVO_POSITION_TICKS) / (MAX_CANARD_ANGLE - MIN_CANARD_ANGLE);
 	/* Intercept */
 	const double PWM_TICKS_CENTER = MIN_SERVO_POSITION_TICKS - PWM_TICKS_PER_DEGREE * MIN_CANARD_ANGLE;
 
-	uint16_t ticks = PWM_TICKS_PER_DEGREE * adj->finangle + PWM_TICKS_CENTER;
+	uint16_t ticks = PWM_TICKS_PER_DEGREE * adj->data.angle + PWM_TICKS_CENTER;
 	ticks = CLAMP(ticks, MIN_SERVO_POSITION_TICKS, MAX_SERVO_POSITION_TICKS);
 
 	char data[7];
@@ -53,7 +53,7 @@ void rs_receive_adj(RollServoMessage* adj){
 	data[3] = seq;
 	data[4] = ticks >> 8;
 	data[5] = ticks;
-	data[6] = adj->servoDisableFlag;
+	data[6] = adj->data.disable;
 	if(write(sd, data, sizeof(data)) != sizeof(data)){
 		perror("rs_receive_adj: write failed");
 	}

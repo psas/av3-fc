@@ -43,11 +43,13 @@ void rollcontrol_init(void){
 static void set_canard_angle(double degrees)
 {
 	degrees = CLAMP(degrees, MIN_CANARD_ANGLE, MAX_CANARD_ANGLE);
-	RollServoMessage out = {
-			.ID = {"ROLL"},
-			.data_length = 9,
-			.finangle = degrees,
-			.servoDisableFlag = !enable_servo,
+	ROLLMessage out = {
+		.ID = {"ROLL"},
+		.data_length = sizeof(RollServoData),
+		.data = {
+			.angle = degrees,
+			.disable = !enable_servo,
+		},
 	};
 	get_psas_time(out.timestamp);
 

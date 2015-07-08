@@ -11,7 +11,7 @@
 void rollservo_init(void);
 void rollservo_final(void);
 
-void rs_receive_adj(RollServoMessage*);
+void rs_receive_adj(ROLLMessage*);
 
 
 

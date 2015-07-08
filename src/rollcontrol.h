@@ -39,14 +39,6 @@
 double lastError;
 double integrator;
 
-typedef struct{
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	double   finangle;
-	uint8_t  servoDisableFlag;
-} __attribute__((packed)) RollServoMessage;
-
 void rollcontrol_init(void); // [miml:init]
 
 void rc_receive_state(VSTEMessage*); // [miml:receiver]
@@ -55,7 +47,7 @@ void rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*); // [miml:recei
 void rc_raw_testrc(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
 
 
-void rc_send_servo(RollServoMessage*); // [miml:sender]
+void rc_send_servo(ROLLMessage*); // [miml:sender]
 
 #endif /* ROLLCONTROL_H_ */
 
