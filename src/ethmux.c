@@ -88,7 +88,7 @@ void demux(struct pollfd *pfd){
 	static struct demux_type seq_RNHALARM = { "RNHA", sizeof(RNHAlarms), demuxed_RNH };
 	static struct demux_type seq_RNHUMBDET = { "RNHU", sizeof(RNHUmbdet), demuxed_RNH };
 	static struct demux_type seq_FCFH = { "FCFH", sizeof(FCFHealthData), demuxed_FCFH };
-	static struct demux_type seq_GPS_COTS = { "V6NA", sizeof(Venus6FixData), demuxed_COTS };
+	static struct demux_type seq_GPS_COTS = { "V8BS", 0, demuxed_COTS };
 	struct sockaddr_in packet_info;
 	struct timespec ts;
 

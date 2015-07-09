@@ -36,7 +36,7 @@ messages:
     - LOG.log_write
 
   ETH.demuxed_COTS:
-    - LOG.log_write
+    - GPS.cots_raw_in
 
   ETH.sequenced_error:
     - LOG.log_write
@@ -47,7 +47,7 @@ messages:
 
   GPS.gps_data_out:
     - ARM.arm_receive_gps
-    - LOG.log_receive_gps
+    - LOG.log_write
 
   ARM.arm_send_signal:
     - RC.rc_receive_arm

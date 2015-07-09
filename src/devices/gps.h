@@ -13,7 +13,7 @@
 #define VENUS6_FIX_MODE_3D 2
 #define VENUS6_FIX_MODE_3D_DGPS 3
  
-void cots_raw_in(unsigned char*, unsigned int, unsigned char*);
-void gps_data_out(V6NAMessage *);
+void cots_raw_in(const char *, uint8_t *, uint16_t, void *);
+void gps_data_out(const char *, uint8_t *, uint16_t, void *);
 
 #endif /* GPS_H_ */

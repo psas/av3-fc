@@ -44,10 +44,16 @@ void arm_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *buf
  * Receive data from the COTS GPS to determine fix status.
  * If we don't have GPS laock we shouldn't fly.
  */
-void arm_receive_gps(V6NAMessage *fixdata) {
+void arm_receive_gps(const char ID[4], uint8_t timestamp[6], uint16_t data_length, void *buffer) {
+	// We only care about one Venus message type; ignore all others.
+	// TODO: Use Venus 8 message 0xA8 instead
+	if (memcmp("V6NA", ID, 4))
+		return;
+
+	Venus6FixData *fixdata = buffer;
 
 	// We must at least have a 3D fix
-	if (fixdata->data.fix_mode >= VENUS6_FIX_MODE_3D) {
+	if (fixdata->fix_mode >= VENUS6_FIX_MODE_3D) {
 		GPS_locked = true;
 	}
 	else {

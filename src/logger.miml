@@ -25,9 +25,6 @@ receivers:
   log_receive_state:
   - [data, VSTEMessage*]
 
-  log_receive_gps:
-  - [data, V6NAMessage*]
-
   log_receive_arm:
   - [code, const char*]
 
