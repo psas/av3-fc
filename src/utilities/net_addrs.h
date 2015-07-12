@@ -69,6 +69,9 @@ extern const struct sockaddr * WIFI_ADDR;
 #define RC_SERVO_ENABLE_PORT 35667
 extern const struct sockaddr * ARM_ADDR;
 extern const struct sockaddr * RC_SERVO_ENABLE_ADDR;
+
+#define JGPS_PORT 35050
+
 #define GPS_COTS 35051
 extern const struct sockaddr * GPS_COTS_ADDR;
 

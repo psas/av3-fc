@@ -16,6 +16,7 @@ extern void demuxed_MPL(const char *, uint8_t *, uint16_t, void *);
 extern void demuxed_RC(unsigned char*, unsigned int, unsigned char*);
 extern void demuxed_RNH(const char *, uint8_t *, uint16_t, void *);
 extern void demuxed_FCFH(const char *, uint8_t *, uint16_t, void *);
+extern void demuxed_JGPS(const char *, uint8_t *, uint16_t, void *);
 extern void demuxed_COTS(const char *, uint8_t *, uint16_t, void *);
 void sequenced_error(const char *, uint8_t *, uint16_t, void *);
 

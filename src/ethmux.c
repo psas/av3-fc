@@ -88,6 +88,7 @@ void demux(struct pollfd *pfd){
 	static struct demux_type seq_RNHALARM = { "RNHA", sizeof(RNHAlarms), demuxed_RNH };
 	static struct demux_type seq_RNHUMBDET = { "RNHU", sizeof(RNHUmbdet), demuxed_RNH };
 	static struct demux_type seq_FCFH = { "FCFH", sizeof(FCFHealthData), demuxed_FCFH };
+	static struct demux_type seq_JGPS = { "JGPS", 0, demuxed_JGPS };
 	static struct demux_type seq_GPS_COTS = { "V8BS", 0, demuxed_COTS };
 	struct sockaddr_in packet_info;
 	struct timespec ts;
@@ -130,6 +131,9 @@ void demux(struct pollfd *pfd){
 			break;
 		case FCF_HEALTH_PORT:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_FCFH);
+			break;
+		case JGPS_PORT:
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_JGPS);
 			break;
 		case GPS_COTS:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_GPS_COTS);

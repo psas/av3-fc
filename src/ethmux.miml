@@ -46,6 +46,12 @@ senders:
   - [data_length, uint16_t]
   - [data, void*]
 
+  demuxed_JGPS:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+
   demuxed_COTS:
   - [ID, const char*]
   - [timestamp, uint8_t*]

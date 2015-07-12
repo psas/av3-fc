@@ -36,6 +36,9 @@ messages:
   ETH.demuxed_FCFH:
     - LOG.log_write
 
+  ETH.demuxed_JGPS:
+    - FILTER.filter_receive
+
   ETH.demuxed_COTS:
     - GPS.cots_raw_in
 
