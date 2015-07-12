@@ -704,36 +704,36 @@ typedef struct {
 
 
 /*! \typedef
- * Venus6Fix Data
+ * Venus8Navigation Data
  */
 typedef struct {
-	uint16_t fix_mode;
-	uint16_t num_sv;
-	uint32_t gps_week;
-	uint64_t tow;
-	int64_t latitude;
-	int64_t longitude;
-	uint64_t ellipsoid_altitude;
-	uint64_t msl_altitude;
-	uint32_t gdop;
-	uint32_t pdop;
-	uint32_t hdop;
-	uint32_t vdop;
-	uint32_t tdop;
-	int64_t ecef_x;
-	int64_t ecef_y;
-	int64_t ecef_z;
-	int64_t ecef_vx;
-	int64_t ecef_vy;
-	int64_t ecef_vz;
-} __attribute__((packed)) Venus6FixData;
+	uint8_t fix_mode;
+	uint8_t num_sv;
+	uint16_t gps_week;
+	uint32_t tow;
+	int32_t latitude;
+	int32_t longitude;
+	uint32_t ellipsoid_altitude;
+	uint32_t msl_altitude;
+	uint16_t gdop;
+	uint16_t pdop;
+	uint16_t hdop;
+	uint16_t vdop;
+	uint16_t tdop;
+	int32_t ecef_x;
+	int32_t ecef_y;
+	int32_t ecef_z;
+	int32_t ecef_vx;
+	int32_t ecef_vy;
+	int32_t ecef_vz;
+} __attribute__((packed)) Venus8NavigationData;
 
 typedef struct {
 	char     ID[4];
 	uint8_t  timestamp[6];
 	uint16_t data_length;
-	Venus6FixData data;
-} __attribute__((packed)) V6NAMessage;
+	Venus8NavigationData data;
+} __attribute__((packed)) V8A8Message;
 
 
 /*! \typedef
