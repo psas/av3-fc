@@ -1,0 +1,24 @@
+%YAML 1.2
+---
+include: filter.h
+object: src/filter.o
+
+senders:
+  filter_to_ground:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+
+  filter_to_disk:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+
+receivers:
+  filter_receive:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]

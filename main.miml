@@ -2,6 +2,7 @@ sources:
   - [TIME, utils_time.miml]     # Time utilities
   - [SOCK, utils_sockets.miml]  # Socket utilities
   - [ADDR, net_addrs.miml]      # RocketNet addresses
+  - [FILTER, filter.miml]       # Log filtering
   - [LOG, logger.miml]          # Logger code Module
   - [GPS, gps.miml]             # GPS Sensor
   - [ARM, arm.miml]             # Arm Code Module
@@ -47,7 +48,13 @@ messages:
 
   GPS.gps_data_out:
     - ARM.arm_receive_gps
+    - FILTER.filter_receive
+
+  FILTER.filter_to_ground:
     - LOG.log_write
+
+  FILTER.filter_to_disk:
+    - LOG.log_write_disk_only
 
   ARM.arm_send_signal:
     - RC.rc_receive_arm
