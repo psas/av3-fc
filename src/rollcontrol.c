@@ -141,7 +141,7 @@ void rc_raw_umb(const char *ID, unsigned char* timestamp, unsigned int len, void
 	launched = !umb->detect;
 }
 
-void check_timeout(const char* timestamp)
+static void check_timeout(const char* timestamp)
 {
 	if (!launched || !enable_servo) return;
 
