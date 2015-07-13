@@ -8,6 +8,7 @@
 #include "utilities/utils_time.h"
 #include "utilities/net_addrs.h"
 #include "utilities/utils_sockets.h"
+#include "devices/rnh.h"
 #include "rollcontrol.h"
 
 static int sd;
@@ -134,14 +135,14 @@ void rc_raw_umb(const char *ID, unsigned char* timestamp, unsigned int len, void
 	if (memcmp(ID, "RNHU", 4))
 		return;
 
-	RNHUmbDet *umb = (RNHUmbDet *)data;
+	RNHUmbdet *umb = (RNHUmbdet *)data;
 	if (!launched && !umb->detect)		// did umbilical just now disconnect?
 		timeout = from_psas_time(timestamp) + TIMEOUT;
 
 	launched = !umb->detect;
 }
 
-static void check_timeout(const char* timestamp)
+static void check_timeout(const uint8_t* timestamp)
 {
 	if (!launched || !enable_servo) return;
 
@@ -150,7 +151,7 @@ static void check_timeout(const char* timestamp)
 		// timeout: disable the canards
 		// NOTE: won't center them, disabling has precedence
 		// TODO: make a little state machine to center, wait, then disable
-		set_servo_enabled(false);
+		set_servo_enable(false);
 		set_canard_angle(0);
 	}
 }

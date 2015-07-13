@@ -6,6 +6,8 @@
 
 #ifndef UTILS_TIME_H_
 #define UTILS_TIME_H_
+
+#include <stdint.h>
 #include <time.h>
 
 void utils_time_init(void);
