@@ -60,8 +60,7 @@ static void set_canard_angle(double degrees)
 /**
  * Subsonic fin estimation
  */
-double subsonic_fin(double set_aa_rad, double I, double rd, StateData state);
-double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
+static double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 	double v = state.vel_up;
 	double alpha = sqrt(fabs(2*set_aa_rad*I*FINFIT_A)/(rd*v*v*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
 	alpha = alpha / (2*FINFIT_A);
@@ -71,8 +70,7 @@ double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 /**
  * Supersonic fin estimation
  */
-double supersonic_fin(double set_aa_rad, double I, double rd, StateData state);
-double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
+static double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 	double v = state.vel_up;
 	double alpha = (set_aa_rad*I)/(2*rd*v*v*FIN_AREA*FIN_ARM*FIN_CBASE);
 	return radiansToDegrees(alpha);
@@ -82,8 +80,7 @@ double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 /**
  * Given a correction from control system, estimate correct angle of attack for canard
  */
-double estimate_alpha(double set_aa, StateData state);
-double estimate_alpha(double set_aa, StateData state) {
+static double estimate_alpha(double set_aa, StateData state) {
 
 	double velocity = state.vel_up;
 	double time = state.time;
