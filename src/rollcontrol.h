@@ -43,7 +43,7 @@ void rollcontrol_init(void); // [miml:init]
 
 void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf); // [miml:receiver]
 void rc_receive_arm(const char *); // [miml:receiver]
-void rc_raw_ld_in(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
+void rc_raw_umb(const char *, unsigned char*, unsigned int, void*); // [miml:receiver]
 void rc_raw_testrc(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
 
 

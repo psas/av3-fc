@@ -15,6 +15,11 @@ static int sd;
 static bool enable_servo;
 static bool armed;
 
+#define TIMEOUT (120 * UINT64_C(1000000000))	// two minutes in nanoseconds
+
+static bool launched = false;
+static uint64_t timeout;
+
 static void set_servo_enable(bool enable)
 {
 	enable_servo = enable;
@@ -123,7 +128,36 @@ static double estimate_alpha(double set_aa, StateData state) {
     return output;
 }
 
+// rnhumb message, assume disconnect is launch detect
+void rc_raw_umb(const char *ID, unsigned char* timestamp, unsigned int len, void* data)
+{
+	if (memcmp(ID, "RNHU", 4))
+		return;
+
+	RNHUmbDet *umb = (RNHUmbDet *)data;
+	if (!launched && !umb->detect)		// did umbilical just now disconnect?
+		timeout = from_psas_time(timestamp) + TIMEOUT;
+
+	launched = !umb->detect;
+}
+
+void check_timeout(const char* timestamp)
+{
+	if (!launched || !enable_servo) return;
+
+	if (from_psas_time(timestamp) > timeout)
+	{
+		// timeout: disable the canards
+		// NOTE: won't center them, disabling has precedence
+		// TODO: make a little state machine to center, wait, then disable
+		set_servo_enabled(false);
+		set_canard_angle(0);
+	}
+}
+
 void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf) {
+
+	check_timeout(timestamp);
 
 	if (!enable_servo)
 		return;

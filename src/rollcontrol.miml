@@ -18,6 +18,12 @@ receivers:
   rc_receive_arm:
   - [code, const char*]
 
+  rc_raw_umb:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+
   rc_raw_testrc:
   - [code, unsigned char*]
   - [len, unsigned int]

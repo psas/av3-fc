@@ -33,6 +33,10 @@ messages:
   ETH.demuxed_RNH:
     - LOG.log_write
 
+  ETH.demuxed_RNHUMB:
+    - RC.rc_raw_umb
+    - LOG.log_write
+
   ETH.demuxed_FCFH:
     - LOG.log_write
 

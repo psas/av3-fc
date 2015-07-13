@@ -86,7 +86,7 @@ void demux(struct pollfd *pfd){
 	static struct demux_type seq_RNH = { "RNHH", sizeof(RNHHealthData), demuxed_RNH };
 	static struct demux_type seq_RNHPORT = { "RNHP", sizeof(RNHPowerData), demuxed_RNH };
 	static struct demux_type seq_RNHALARM = { "RNHA", sizeof(RNHAlarms), demuxed_RNH };
-	static struct demux_type seq_RNHUMBDET = { "RNHU", sizeof(RNHUmbdet), demuxed_RNH };
+	static struct demux_type seq_RNHUMBDET = { "RNHU", sizeof(RNHUmbdet), demuxed_RNHUMB };
 	static struct demux_type seq_FCFH = { "FCFH", sizeof(FCFHealthData), demuxed_FCFH };
 	static struct demux_type seq_JGPS = { "JGPS", 0, demuxed_JGPS };
 	static struct demux_type seq_GPS_COTS = { "V8BS", 0, demuxed_COTS };

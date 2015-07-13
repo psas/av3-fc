@@ -21,6 +21,18 @@ void to_psas_time(struct timespec* ts, unsigned char* out){
 	out[5] = now;
 }
 
+// nanoseconds, for comparison purposes
+uint64_t from_psas_time(const unsigned char* in)
+{
+	uint64_t time =      in[0];
+	time = (time << 8) | in[1];
+	time = (time << 8) | in[2];
+	time = (time << 8) | in[3];
+	time = (time << 8) | in[4];
+	time = (time << 8) | in[5];
+	return time;
+}
+
 void get_psas_time(unsigned char* out){
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
