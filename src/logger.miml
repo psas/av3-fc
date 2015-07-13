@@ -22,9 +22,6 @@ receivers:
   - [data_length, uint16_t]
   - [data, void*]
 
-  log_receive_state:
-  - [data, VSTEMessage*]
-
   log_receive_arm:
   - [code, const char*]
 

@@ -37,15 +37,7 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 	current_state.roll_angle += roll_rate*dt;
 
 	// Send data
-	VSTEMessage packet ={
-		.ID={"VSTE"},
-		.timestamp={(uint8_t)timestamp[0], (uint8_t)timestamp[1],
-					(uint8_t)timestamp[2], (uint8_t)timestamp[3],
-					(uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-		.data_length=htons(sizeof(StateData)),
-	};
-	memcpy(&packet.data, &current_state, sizeof(StateData));
-	state_send_message(&packet);
+	state_send_message("VSTE", timestamp, sizeof(StateData), &current_state);
 }
 
 

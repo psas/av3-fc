@@ -123,10 +123,15 @@ static double estimate_alpha(double set_aa, StateData state) {
     return output;
 }
 
-void rc_receive_state(VSTEMessage *state) {
+void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf) {
 
 	if (!enable_servo)
 		return;
+
+	if (memcmp(ID, "VSTE", 4))
+		return;
+
+	StateData *state = buf;
 
 	/* begin PID Controller */
 
@@ -134,7 +139,7 @@ void rc_receive_state(VSTEMessage *state) {
 	   determine the error by taking the difference of the target
 	   and the current value
 	 */
-	double error = pidTarget - state->data.roll_rate;
+	double error = pidTarget - state->roll_rate;
 	
 	/* proportional stage */
 	double proportional = Kp * error;
@@ -156,7 +161,7 @@ void rc_receive_state(VSTEMessage *state) {
 	integrator += error;
 
 	// Look normilized fin angle based on requested angular acceleration
-	double output = estimate_alpha(correction, state->data);
+	double output = estimate_alpha(correction, *state);
 
 	/* end PID controller */
 

@@ -206,10 +206,6 @@ static void log_timeout(struct pollfd * pfd){
 	flush_log();
 }
 
-void log_receive_state(VSTEMessage *data) {
-	log_write(data->ID, data->timestamp, data->data_length, &data->data);
-}
-
 void log_receive_arm(const char* code){
 	uint8_t timestamp[6];
 	get_psas_time(timestamp);

@@ -10,7 +10,10 @@ senders:
 
 receivers:
   rc_receive_state:
-  - [state, VSTEMessage*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   rc_receive_arm:
   - [code, const char*]
