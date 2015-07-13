@@ -28,26 +28,6 @@ void dump(uint8_t *buf, size_t len)
 static uint8_t buf[512];	/* at least 2x longer than longest GPS message */
 static uint8_t *cur = buf;
 
-static void *mem2chr(uint8_t *s, uint8_t c1, uint8_t c2, size_t len)
-{
-	uint8_t *out = memchr(s, c1, len-1);
-	while (out != NULL)
-	{
-		if (out[1] == c2)
-			return out;
-		len -= out+1 - s;
-		s = out+1;
-		out = memchr(s, c1, len-1);
-	}
-	return out;
-}
-
-/* Venus binary data is big-endian: must swap for interpretation */
-static inline uint16_t swapShort(uint16_t s)
-{
-	return (s >> 8) | (s << 8);
-}
-
 static uint8_t chexxor(uint8_t *data, size_t len)
 {
 	uint8_t ret = 0;
@@ -66,68 +46,60 @@ static uint8_t chexxor(uint8_t *data, size_t len)
  */
 static void send_venus_messages(uint8_t timestamp[6])
 {
-	uint8_t *frame = mem2chr(buf, 0xA0, 0xA1, cur - buf);
-	if (frame != buf)
+	uint8_t *frame = buf;
+	while (frame < cur)
 	{
+		uint8_t *start = frame;
+		frame = memchr(buf, 0xA0, cur - start);
 		if (frame == NULL)
-			printf("Frame marker not found.\n");
-		printf("Dropped %ld bytes of data from GPS stream.\n", cur - buf);
-		//dump(buf, cur-buf);
-	}
-	while (frame != NULL)
-	{
-		uint16_t packet_len;
-		if (frame + 2+2 > cur)
+			frame = cur; // reached end of buffer
+		if (frame != start)
 		{
-			/* not a full packet, move remaining data to start of buf */
-			memmove(buf, frame, cur-frame);
-			cur -= frame-buf;
-			return;
+			fprintf(stderr, "Dropped %ld bytes of data from GPS stream.\n", frame - start);
+			//dump(buf, frame - start);
 		}
-		memcpy(&packet_len, frame+2, 2);
-		packet_len = swapShort(packet_len);
-		
-		/* sanity check */
-		if (packet_len > 163)	// max len of 0xDE: 3 + 10 bytes * 16 sats
+
+		/* header + trailer is 7 bytes */
+		if (frame + 7 > cur)
+			break; // wait for more data
+
+		if (frame[1] != 0xA1)
 		{
-			perror("Bad GPS packet length.");
-			/* packet_len corrupt, resync on packet terminator \r\n */
-			frame = mem2chr(frame, '\r', '\n', cur - frame);
-			if (frame == NULL)
-				return;
-			frame = mem2chr(frame, 0xA0, 0xA1, cur - frame);
+			frame += 1; // skip A0
 			continue;
 		}
-		if (frame + 2+2 + packet_len +1+2 > cur)
+
+		uint16_t packet_len = (frame[2] << 8) | frame[3];
+		
+		/* sanity check */
+		if (packet_len > sizeof buf / 2)
 		{
-			/* not a full packet, move remaining data to start of buf */
-			memmove(buf, frame, cur-frame);
-			cur -= frame-buf;
-			return;
+			fprintf(stderr, "GPS packet with ID %02X too long: %u bytes.\n", frame[4], packet_len);
+			frame += 2; // skip A0A1
+			continue;
 		}
-		if (chexxor(frame+4, packet_len) == frame[4+packet_len])
+
+		if (frame + 7 + packet_len > cur)
+			break; // wait for more data
+
+		if (chexxor(frame+4, packet_len) != frame[4+packet_len])
 		{
-			/* full packet, transmit ID "V8XX" where XX is the hex packet ID */
-			char ID[5];
-			sprintf(ID, "V8%02X", frame[4]);
-			gps_data_out(ID, timestamp, packet_len-1, frame+5);
+			fprintf(stderr, "Bad GPS packet checksum for ID %02X.\n", frame[4]);
+			frame += 2; // skip A0A1
+			continue;
 		}
-		else
-			perror("Bad GPS packet checksum.");
+
+		/* full packet, transmit ID "V8XX" where XX is the hex packet ID */
+		char ID[5];
+		sprintf(ID, "V8%02X", frame[4]);
+		gps_data_out(ID, timestamp, packet_len-1, frame+5);
+
 		frame += packet_len + 7;
-		if (frame + 2+2 > cur)
-		{
-			/* not a full packet, move remaining data to start of buf */
-			memmove(buf, frame, cur-frame);
-			cur -= frame-buf;
-			return;
-		}
-		frame = mem2chr(frame, 0xA0, 0xA1, cur - frame);
 	}
-	/* no more packets, start over */
-	printf("Dropped %ld bytes of data from GPS stream.\n", cur - buf);
-	//dump(buf, cur-buf);
-	cur = buf;
+
+	/* not a full packet, move remaining data to start of buf */
+	memmove(buf, frame, cur - frame);
+	cur -= frame - buf;
 }
 
 /**
@@ -158,7 +130,7 @@ struct packetA8 {
 	uint8_t data[57];
 	uint8_t checksum;
 	uint8_t tail[2];
-} __attribute__((packed)) pA8 = { { 0xA0, 0xA1 }, 59, 0xA8, 0, { }, 0, { '\r', '\n' } };
+} __attribute__((packed)) pA8 = { { 0xA0, 0xA1 }, htons(59), 0xA8, 0, { }, 0, { '\r', '\n' } };
 
 uint8_t input[0x10000];
 
@@ -167,8 +139,6 @@ int main(int argc, char *argv[])
 	char ID[5] = "GPSV";	//???
 	uint8_t timestamp[6] = { 0,0,0,0,0,0 } ;
 	size_t chunk = 100;
-	
-	pA8.len = swapShort(pA8.len);
 
 	/* fill input */
 	uint8_t *p = input;
