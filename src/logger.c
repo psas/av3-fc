@@ -133,15 +133,17 @@ static void flush_log()
 	};
 	get_psas_time(header.timestamp);
 
+	uint32_t swapped_sequence = htonl(sequence);
+
 	const struct iovec disk_iov[] = {
 		{ .iov_base = &header, .iov_len = sizeof header },
-		{ .iov_base = &sequence, .iov_len = sizeof sequence },
+		{ .iov_base = &swapped_sequence, .iov_len = sizeof swapped_sequence },
 		{ .iov_base = disk_log_buffer, .iov_len = disk_log_buffer_size },
 	};
 	writev(disk_fd, disk_iov, sizeof disk_iov / sizeof *disk_iov);
 
 	const struct iovec net_iov[] = {
-		{ .iov_base = &sequence, .iov_len = sizeof sequence },
+		{ .iov_base = &swapped_sequence, .iov_len = sizeof swapped_sequence },
 		{ .iov_base = log_buffer, .iov_len = log_buffer_size },
 	};
 	writev(net_fd, net_iov, sizeof net_iov / sizeof *net_iov);
