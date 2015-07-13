@@ -50,13 +50,18 @@ static void send_venus_messages(uint8_t timestamp[6])
 	while (frame < cur)
 	{
 		uint8_t *start = frame;
-		frame = memchr(buf, 0xA0, cur - start);
-		if (frame == NULL)
-			frame = cur; // reached end of buffer
+		frame = memchr(start, 0xA0, cur - start);
+		if (frame == NULL) // reached end of buffer
+		{
+			fprintf(stderr, "No packet found. Dropped %ld bytes of data from GPS stream.\n", cur - start);
+			//dump(start, cur - start);
+			cur = buf;
+			return;
+		}
 		if (frame != start)
 		{
 			fprintf(stderr, "Dropped %ld bytes of data from GPS stream.\n", frame - start);
-			//dump(buf, frame - start);
+			//dump(start, frame - start);
 		}
 
 		/* header + trailer is 7 bytes */
@@ -109,7 +114,7 @@ void cots_raw_in(const char ID[4], uint8_t timestamp[6], uint16_t data_length, v
 {
 	if (cur + data_length >= buf + sizeof(buf))
 	{
-		perror("GPS buffer overrun!");
+		fprintf(stderr, "GPS buffer overrun! Dropped %ld bytes of data from GPS stream.\n", cur - buf);
 		cur = buf;
 	}
 	memcpy(cur, buffer, data_length);
