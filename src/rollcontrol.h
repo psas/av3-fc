@@ -11,8 +11,8 @@
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
 /* PID gain constants */
-#define Kp 10
-#define Ki .001
+#define Kp 50
+#define Ki .009
 #define Kd 0
 #define pidTarget 0
 
