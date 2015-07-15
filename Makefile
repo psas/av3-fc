@@ -5,6 +5,7 @@ OPTSPROF := -pg
 OPTS     := -Ofast
 WARNINGS := -Wall -Wextra -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
 CFLAGS   := -MD -std=gnu99 -g $(OPTS) $(WARNINGS) -fno-strict-aliasing $(INCLUDE_DIRS)
+LDFLAGS  := -g
 LDLIBS   := -lrt -lm
 .DEFAULT_GOAL := all
 OBJECTS  += elderberry/fcfutils.o fcfmain.o
@@ -17,6 +18,7 @@ MIMLMK   ?= miml.mk
 all: debug
 
 live: CFLAGS += $(OPTSLIVE)
+live: LDFLAGS += $(OPTSLIVE)
 live: fc
 
 debug: CFLAGS  += $(OPTSDEV)
