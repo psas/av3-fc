@@ -28,36 +28,19 @@ static int is_expected_length(struct demux_type *type, unsigned int len) {
 	return len >= sizeof(uint32_t) && len <= UINT16_MAX - sizeof(uint32_t);
 }
 
-//FIXME: move to psas_packet
-struct seqerror {
-	struct {
-		uint16_t port;
-		uint32_t expected;
-		uint32_t received;
-	} meta;
-	uint8_t buf[1024];
-} __attribute__((packed));
-
-void format_sequenced_error(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received) {
-	struct seqerror err = {
-		.meta = {
-			.port = htons(port),
-			.expected = htonl(expected),
-			.received = htonl(received),
-		},
+void format_sequenced_error(unsigned short port, uint8_t * timestamp, uint32_t expected, uint32_t received) {
+	SequenceErrorData err = {
+		.port = htons(port),
+		.expected = htonl(expected),
+		.received = htonl(received),
 	};
 
-	if (len > sizeof err.buf)
-		len = sizeof err.buf;
-
-	memcpy(err.buf, buffer, len);
-
-	sequenced_error("SEQE", timestamp, sizeof err.meta + len, &err);
+	sequenced_error("SEQE", timestamp, sizeof err, &err);
 }
 
 void sequenced_receive(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t* timestamp, struct demux_type *type) {
 	if (!is_expected_length(type, len)) {
-		format_sequenced_error(port, buffer, len, timestamp, 0, 0);
+		format_sequenced_error(port, timestamp, 0, 0);
 		return;
 	}
 
@@ -66,10 +49,10 @@ void sequenced_receive(unsigned short port, uint8_t * buffer, unsigned int len, 
 	len -= sizeof(uint32_t);
 
 	if (rcvseq < type->next_sequence) {
-		format_sequenced_error(port, buffer, len, timestamp, type->next_sequence, rcvseq);
+		format_sequenced_error(port, timestamp, type->next_sequence, rcvseq);
 	}
 	if (rcvseq > type->next_sequence) {
-		format_sequenced_error(port, NULL, 0, timestamp, type->next_sequence, rcvseq);
+		format_sequenced_error(port, timestamp, type->next_sequence, rcvseq);
 		type->handler(type->ID, timestamp, len, buffer);
 	}
 	if (rcvseq == type->next_sequence) {
