@@ -126,6 +126,7 @@ void cots_raw_in(const char ID[4], uint8_t timestamp[6], uint16_t data_length, v
 }
 
 #ifdef TESTING
+#include <arpa/inet.h>
 
 struct packetA8 {
 	uint8_t head[2];
@@ -135,7 +136,7 @@ struct packetA8 {
 	uint8_t data[57];
 	uint8_t checksum;
 	uint8_t tail[2];
-} __attribute__((packed)) pA8 = { { 0xA0, 0xA1 }, htons(59), 0xA8, 0, { }, 0, { '\r', '\n' } };
+} __attribute__((packed)) pA8 = { { 0xA0, 0xA1 }, 0, 0xA8, 0, { }, 0, { '\r', '\n' } };
 
 uint8_t input[0x10000];
 
@@ -144,6 +145,8 @@ int main(int argc, char *argv[])
 	char ID[5] = "GPSV";	//???
 	uint8_t timestamp[6] = { 0,0,0,0,0,0 } ;
 	size_t chunk = 100;
+
+	pA8.len = htons(59);
 
 	/* fill input */
 	uint8_t *p = input;
