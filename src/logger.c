@@ -37,9 +37,11 @@
 
 #define LOG_TIMEOUT_NS 100e6 //100ms
 
-static FILE *fp = NULL;
-static char log_buffer[LINK_MTU];  // Global so destructor can flush final data
+static char log_buffer[P_LIMIT];  // Global so destructor can flush final data
 static unsigned int log_buffer_size = 0;
+static char disk_log_buffer[65536];
+static unsigned int disk_log_buffer_size = 0;
+static int disk_fd;
 static int net_fd;
 
 // sequence number, each UDP packet gets a number
@@ -66,7 +68,7 @@ static void open_logfile(void)
 			exit(1);
 		}
 
-		fp = fdopen(fd, "w");
+		disk_fd = fd;
 		return;
 	}
 
@@ -97,17 +99,14 @@ static void open_socket(void)
 static void log_timeout(struct pollfd * pfd);
 void logger_init() {
 	open_logfile();
-	setbuf(fp, NULL);
 
 	// Outgoing socket (WiFi)
 	open_socket();
 
 	// Initialize sequence number
 	sequence = 0;
-
-	// Add sequence number to the first packet
-	memcpy(&log_buffer[log_buffer_size], &sequence, sizeof(uint32_t));
-	log_buffer_size += sizeof(uint32_t);
+	log_buffer_size = 0;
+	disk_log_buffer_size = 0;
 
 
     int tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
@@ -121,49 +120,83 @@ void logger_init() {
 }
 
 
-void logger_final() {
-	if(log_buffer_size > 0){
-		fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
-	}
-	fclose(fp);
-}
-
 static void flush_log()
 {
+	if (!disk_log_buffer_size)
+		return;
+
 	// Send current buffer to disk
 	// for the log file, convert the sequence number to a SEQN message
-	SEQNMessage header = {
-	        .ID={"SEQN"},
-	        .data_length=htons(sizeof(SequenceNoData))
-    };
+	message_header header = {
+		.ID={"SEQN"},
+		.data_length=htons(sizeof(SequenceNoData))
+	};
 	get_psas_time(header.timestamp);
-    //TODO: fix the -4 which accounts for the sequence number size in a ugly way
-	fwrite(&header, 1, sizeof(header)-sizeof(SequenceNoData), fp);
-	fwrite(log_buffer, sizeof(char), log_buffer_size, fp);
-	// Send current buffer to WiFi
-	if(write(net_fd, log_buffer, log_buffer_size) != log_buffer_size)
-		perror("flush_log: ignoring error from write(net_fd)");
+
+	uint32_t swapped_sequence = htonl(sequence);
+
+	const struct iovec disk_iov[] = {
+		{ .iov_base = &header, .iov_len = sizeof header },
+		{ .iov_base = &swapped_sequence, .iov_len = sizeof swapped_sequence },
+		{ .iov_base = disk_log_buffer, .iov_len = disk_log_buffer_size },
+	};
+	writev(disk_fd, disk_iov, sizeof disk_iov / sizeof *disk_iov);
+
+	const struct iovec net_iov[] = {
+		{ .iov_base = &swapped_sequence, .iov_len = sizeof swapped_sequence },
+		{ .iov_base = log_buffer, .iov_len = log_buffer_size },
+	};
+	writev(net_fd, net_iov, sizeof net_iov / sizeof *net_iov);
 
 	// Reset buffer size
 	log_buffer_size = 0;
+	disk_log_buffer_size = 0;
 
 	// Increment sequence number
 	sequence++;
-
-	// Write sequence number to head of next packet
-	uint32_t s  = htonl(sequence);
-	memcpy(&log_buffer[log_buffer_size], &s, sizeof(uint32_t));
-	log_buffer_size += sizeof(uint32_t);
 }
 
-static void logg(const void *data, size_t len)
-{
-	// Check size of buffer, if big enough, we can send packet
-	if (log_buffer_size + len >= P_LIMIT)
-		flush_log();
+void logger_final() {
+	flush_log();
+	close(disk_fd);
+	close(net_fd);
+}
 
-	// Copy data into packet buffer
-	memcpy(log_buffer + log_buffer_size, data, len);
+static void ensure_disk_log_space(unsigned int len) {
+	if (disk_log_buffer_size + len > sizeof disk_log_buffer)
+		flush_log();
+}
+
+static void ensure_net_log_space(unsigned int len) {
+	ensure_disk_log_space(len);
+	if (log_buffer_size + len > sizeof log_buffer)
+		flush_log();
+}
+
+void log_write_disk_only(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data)
+{
+	unsigned int len = sizeof(message_header) + data_length;
+	ensure_disk_log_space(len);
+
+	message_header *header = (message_header *) (disk_log_buffer + disk_log_buffer_size);
+	memcpy(header->ID, ID, sizeof header->ID);
+	memcpy(header->timestamp, timestamp, sizeof header->timestamp);
+	header->data_length = htons(data_length);
+
+	memcpy(disk_log_buffer + disk_log_buffer_size + sizeof(message_header), data, data_length);
+
+	disk_log_buffer_size += len;
+}
+
+void log_write(const char ID[4], const uint8_t timestamp[6], uint16_t data_length, const void *data)
+{
+	unsigned int len = sizeof(message_header) + data_length;
+	ensure_net_log_space(len);
+
+	unsigned int disk_start = disk_log_buffer_size;
+	log_write_disk_only(ID, timestamp, data_length, data);
+
+	memcpy(log_buffer + log_buffer_size, disk_log_buffer + disk_start, len);
 	log_buffer_size += len;
 }
 
@@ -172,132 +205,29 @@ static void log_timeout(struct pollfd * pfd){
 	if(read(pfd->fd, buf, 8)<0){ //clears timerfd
 		perror("log_timeout: read() failed");
 	}
-	if(log_buffer_size > sizeof(uint32_t)){ //sequence number
-		flush_log();
-	}
-}
-
-static void log_message(const char *msg)
-{
-	int len = strlen(msg);
-	if (log_buffer_size + sizeof(message_header) + len > P_LIMIT)
-		flush_log();
-
-	message_header header = { .ID = "MESG", .data_length=htons(len) };
-	get_psas_time(header.timestamp);
-	logg(&header, sizeof(message_header));
-	logg(msg, len);
-}
-
-void log_receive_adis(ADISMessage *data) {
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(ADISMessage));
-}
-
-void log_receive_state(VSTEMessage *data) {
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(VSTEMessage));
-}
-
-void log_receive_gps(V6NAMessage* data){
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(V6NAMessage));
-}
-
-void log_receive_mpu(MPUMessage* data){
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(MPUMessage));
-}
-void log_receive_mpl(MPLMessage* data){
-	data->data_length = htons(data->data_length);
-	logg(data, sizeof(MPLMessage));
+	flush_log();
 }
 
 void log_receive_arm(const char* code){
-	log_message(code);
+	uint8_t timestamp[6];
+	get_psas_time(timestamp);
+	log_write("MESG", timestamp, strlen(code), code);
 }
 
-void log_receive_rc(RollServoMessage* data) {
-	data->data_length = htons(data->data_length);
+void log_receive_rc(ROLLMessage* data) {
 	union {
 		uint64_t uint;
 		double doub;
 	} convert;
 
-	convert.doub = data->finangle;
+	convert.doub = data->data.angle;
 	convert.uint = __builtin_bswap64(convert.uint);
-	data->finangle = convert.doub;
-	logg(data, sizeof(RollServoMessage));
+	data->data.angle = convert.doub;
+	log_write(data->ID, data->timestamp, data->data_length, &data->data);
 }
-
-void log_receive_rnh(RNHMessage * packet) {
-	logg(packet, sizeof(message_header) + ntohs(packet->data_length));
-}
-
-//FIXME: move to psas_packet
-struct VERSMessage {
-	message_header header;
-	uint8_t data[50];
-} __attribute__((packed));
 
 void log_receive_rnh_version(uint8_t * message, unsigned int length){
-	struct VERSMessage vers = {
-		.header = {
-			.ID = {"VERS"},
-			.data_length = length
-		}
-	};
-	get_psas_time(vers.header.timestamp);
-	memcpy(vers.data, message, length);
-	logg(&vers, sizeof(message_header) + length);
-}
-
-void log_receive_fcfh(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-
-    if (len == sizeof(FCFHealthData)) {
-
-        FCFHMessage message = {
-            .ID={"FCFH"},
-            .timestamp={
-                (uint8_t)timestamp[0], (uint8_t)timestamp[1],
-                (uint8_t)timestamp[2], (uint8_t)timestamp[3],
-                (uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-            .data_length=htons(sizeof(FCFHealthData))
-        };
-        // Copy in data from socket
-        memcpy(&message.data, buffer, sizeof(FCFHealthData));
-
-        logg(&message, sizeof(FCFHMessage));
-    }
-
-}
-
-//FIXME: move to psas_packet
-struct seqerror {
-	char ID[4];
 	uint8_t timestamp[6];
-	uint16_t data_length;
-	unsigned short port;
-	uint32_t expected;
-	uint32_t received;
-} __attribute__((packed));
-
-void log_receive_seqpacket_err(unsigned short port, uint8_t * buffer, unsigned int len, uint8_t * timestamp, uint32_t expected, uint32_t received){
-	uint16_t data_length = htons(sizeof(unsigned short) + sizeof(uint32_t)*2 + len);
-	struct seqerror err = {
-		.ID={"SEQE"},
-		.timestamp={
-			(uint8_t)timestamp[0], (uint8_t)timestamp[1],
-			(uint8_t)timestamp[2], (uint8_t)timestamp[3],
-			(uint8_t)timestamp[4], (uint8_t)timestamp[5]
-		},
-		.data_length=data_length,
-		.port = port,
-		.expected = expected,
-		.received = received
-	};
-	uint8_t message[sizeof(struct seqerror) + len];
-	memcpy(message, &err, sizeof(struct seqerror));
-	memcpy(message + sizeof(struct seqerror), buffer, len);
-	logg(&message, sizeof(struct seqerror) + len);
+	get_psas_time(timestamp);
+	log_write("VERS", timestamp, length, message);
 }

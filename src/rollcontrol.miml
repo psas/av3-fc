@@ -6,19 +6,23 @@ init: rollcontrol_init();
 
 senders:
   rc_send_servo:
-  - [data, RollServoMessage*]
+  - [data, ROLLMessage*]
 
 receivers:
   rc_receive_state:
-  - [state, VSTEMessage*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   rc_receive_arm:
   - [code, const char*]
 
-  rc_raw_ld_in:
-  - [code, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  rc_raw_umb:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   rc_raw_testrc:
   - [code, unsigned char*]

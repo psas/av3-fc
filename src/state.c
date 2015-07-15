@@ -22,11 +22,12 @@ void state_init(void) {
 /**
  * Recieve data from the IMU, and integrate to a state estimation
  */
-void state_receive_imu(ADISMessage *imu) {
+void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *buf) {
+	ADIS16405Data *imu = buf;
 
 	// Convert raw IMU data to MKS/degrees unit system
-	const double accel = ADIS_GLSB * (int16_t) ntohs(imu->data.acc_x);
-	const double roll_rate = ADIS_RLSB * (int16_t) ntohs(imu->data.gyro_x);
+	const double accel = ADIS_GLSB * (int16_t) ntohs(imu->acc_x);
+	const double roll_rate = ADIS_RLSB * (int16_t) ntohs(imu->gyro_x);
 
 	// Integrate sensors
 	current_state.acc_up = accel;
@@ -36,15 +37,7 @@ void state_receive_imu(ADISMessage *imu) {
 	current_state.roll_angle += roll_rate*dt;
 
 	// Send data
-	VSTEMessage packet ={
-		.ID={"VSTE"},
-		.timestamp={(uint8_t)imu->timestamp[0], (uint8_t)imu->timestamp[1],
-					(uint8_t)imu->timestamp[2], (uint8_t)imu->timestamp[3],
-					(uint8_t)imu->timestamp[4], (uint8_t)imu->timestamp[5]},
-		.data_length=sizeof(StateData),
-	};
-	memcpy(&packet.data, &current_state, sizeof(StateData));
-	state_send_message(&packet);
+	state_send_message("VSTE", timestamp, sizeof(StateData), &current_state);
 }
 
 

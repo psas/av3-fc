@@ -8,12 +8,18 @@
 #include "utilities/utils_time.h"
 #include "utilities/net_addrs.h"
 #include "utilities/utils_sockets.h"
+#include "devices/rnh.h"
 #include "rollcontrol.h"
 
 static int sd;
 
 static bool enable_servo;
 static bool armed;
+
+#define TIMEOUT (120 * UINT64_C(1000000000))	// two minutes in nanoseconds
+
+static bool launched = false;
+static uint64_t timeout;
 
 static void set_servo_enable(bool enable)
 {
@@ -43,11 +49,13 @@ void rollcontrol_init(void){
 static void set_canard_angle(double degrees)
 {
 	degrees = CLAMP(degrees, MIN_CANARD_ANGLE, MAX_CANARD_ANGLE);
-	RollServoMessage out = {
-			.ID = {"ROLL"},
-			.data_length = 9,
-			.finangle = degrees,
-			.servoDisableFlag = !enable_servo,
+	ROLLMessage out = {
+		.ID = {"ROLL"},
+		.data_length = sizeof(RollServoData),
+		.data = {
+			.angle = degrees,
+			.disable = !enable_servo,
+		},
 	};
 	get_psas_time(out.timestamp);
 
@@ -58,8 +66,7 @@ static void set_canard_angle(double degrees)
 /**
  * Subsonic fin estimation
  */
-double subsonic_fin(double set_aa_rad, double I, double rd, StateData state);
-double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
+static double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 	double v = state.vel_up;
 	double alpha = sqrt(fabs(2*set_aa_rad*I*FINFIT_A)/(rd*v*v*FIN_AREA*FIN_ARM) + FINFIT_B*FINFIT_B) - FINFIT_B;
 	alpha = alpha / (2*FINFIT_A);
@@ -69,8 +76,7 @@ double subsonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 /**
  * Supersonic fin estimation
  */
-double supersonic_fin(double set_aa_rad, double I, double rd, StateData state);
-double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
+static double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 	double v = state.vel_up;
 	double alpha = (set_aa_rad*I)/(2*rd*v*v*FIN_AREA*FIN_ARM*FIN_CBASE);
 	return radiansToDegrees(alpha);
@@ -80,8 +86,7 @@ double supersonic_fin(double set_aa_rad, double I, double rd, StateData state) {
 /**
  * Given a correction from control system, estimate correct angle of attack for canard
  */
-double estimate_alpha(double set_aa, StateData state);
-double estimate_alpha(double set_aa, StateData state) {
+static double estimate_alpha(double set_aa, StateData state) {
 
 	double velocity = state.vel_up;
 	double time = state.time;
@@ -124,10 +129,44 @@ double estimate_alpha(double set_aa, StateData state) {
     return output;
 }
 
-void rc_receive_state(VSTEMessage *state) {
+// rnhumb message, assume disconnect is launch detect
+void rc_raw_umb(const char *ID, unsigned char* timestamp, unsigned int len, void* data)
+{
+	if (memcmp(ID, "RNHU", 4))
+		return;
+
+	RNHUmbdet *umb = (RNHUmbdet *)data;
+	if (!launched && !umb->detect)		// did umbilical just now disconnect?
+		timeout = from_psas_time(timestamp) + TIMEOUT;
+
+	launched = !umb->detect;
+}
+
+static void check_timeout(const uint8_t* timestamp)
+{
+	if (!launched || !enable_servo) return;
+
+	if (from_psas_time(timestamp) > timeout)
+	{
+		// timeout: disable the canards
+		// NOTE: won't center them, disabling has precedence
+		// TODO: make a little state machine to center, wait, then disable
+		set_servo_enable(false);
+		set_canard_angle(0);
+	}
+}
+
+void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf) {
+
+	check_timeout(timestamp);
 
 	if (!enable_servo)
 		return;
+
+	if (memcmp(ID, "VSTE", 4))
+		return;
+
+	StateData *state = buf;
 
 	/* begin PID Controller */
 
@@ -135,7 +174,7 @@ void rc_receive_state(VSTEMessage *state) {
 	   determine the error by taking the difference of the target
 	   and the current value
 	 */
-	double error = pidTarget - state->data.roll_rate;
+	double error = pidTarget - state->roll_rate;
 	
 	/* proportional stage */
 	double proportional = Kp * error;
@@ -157,7 +196,7 @@ void rc_receive_state(VSTEMessage *state) {
 	integrator += error;
 
 	// Look normilized fin angle based on requested angular acceleration
-	double output = estimate_alpha(correction, state->data);
+	double output = estimate_alpha(correction, *state);
 
 	/* end PID controller */
 
@@ -171,10 +210,6 @@ void rc_receive_arm(const char * signal){
 		set_armed(false);
 		set_canard_angle(0);
 	}
-}
-
-void rc_raw_ld_in(unsigned char * signal, unsigned int len, unsigned char* timestamp){
-	/* we're ignoring launch detect for this launch */
 }
 
 static void send_servo_response(const char * message){

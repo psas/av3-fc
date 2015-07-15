@@ -65,7 +65,6 @@ const struct sockaddr * MPU_ADDR = make_addr(SENSOR_IP, MPU_PORT);
 const struct sockaddr * MPL_ADDR = make_addr(SENSOR_IP, MPL_PORT);
 
 const struct sockaddr * ROLL_ADDR = make_addr(ROLL_IP, ROLL_PORT);
-const struct sockaddr * TEATHER_ADDR = make_addr(ROLL_IP, TEATHER_PORT);
 
 const struct sockaddr * WIFI_ADDR = make_addr(WIFI_IP, WIFI_PORT);
 

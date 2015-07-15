@@ -24,12 +24,13 @@ int about(double a, double b){
 	return fabs(a-b) < ACCEL_NOISE_BOUND;
 }
 
-void arm_receive_imu(ADISMessage * data){
+void arm_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *buf){
 	// does the acceleration vector == -1g over the last 100 samples?
 	// 3.3mg per bit
-	double x = data->data.acc_x * 0.00333;
-	double y = data->data.acc_y * 0.00333;
-	double z = data->data.acc_z * 0.00333;
+	ADIS16405Data *data = buf;
+	double x = data->acc_x * 0.00333;
+	double y = data->acc_y * 0.00333;
+	double z = data->acc_z * 0.00333;
 	if(!about(x, -1) || !about(y, 0) || !about(z, 0)){
 		upright = 0;
 	}
@@ -43,10 +44,15 @@ void arm_receive_imu(ADISMessage * data){
  * Receive data from the COTS GPS to determine fix status.
  * If we don't have GPS laock we shouldn't fly.
  */
-void arm_receive_gps(V6NAMessage *fixdata) {
+void arm_receive_gps(const char ID[4], uint8_t timestamp[6], uint16_t data_length, void *buffer) {
+	// We only care about one Venus message type; ignore all others.
+	if (memcmp("V8A8", ID, 4))
+		return;
+
+	Venus8NavigationData *fixdata = buffer;
 
 	// We must at least have a 3D fix
-	if (fixdata->data.fix_mode >= VENUS6_FIX_MODE_3D) {
+	if (fixdata->fix_mode >= VENUS_A8_FIX_MODE_3D) {
 		GPS_locked = true;
 	}
 	else {

@@ -6,17 +6,9 @@ init: rnh_init();
 
 # Functions that handle outgoing data
 senders:
-  rnh_data_out:
-  - [ARG1, RNHMessage*]
-
   rnh_version_out:
   - [ARG1, uint8_t*]
   - [ARG2, unsigned int]
 
 # Functions that handle incoming data
 receivers:
-  rnh_raw_in:
-  - [ARG1, unsigned char*]
-  - [ARG2, unsigned int]
-  - [ARG3, unsigned char*]
-

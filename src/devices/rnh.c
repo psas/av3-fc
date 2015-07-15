@@ -8,40 +8,6 @@
 #include "utilities/net_addrs.h"
 #include "rnh.h"
 
-
-
-void rnh_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestamp) {
-	char ID[4];
-	switch(len){
-	case sizeof(RNHAlarms):
-		strncpy(ID, "RNHA", 4);
-		break;
-	case sizeof(RNHUmbdet):
-		strncpy(ID, "RNHU", 4);
-		break;
-	case sizeof(RNHHealthData):
-		strncpy(ID, "RNHH", 4);
-		break;
-	case sizeof(RNHPowerData):
-		strncpy(ID, "RNHP", 4);
-		break;
-	default:
-		return;
-	}
-
-	RNHMessage packet = {
-		.timestamp={
-			(uint8_t)timestamp[0], (uint8_t)timestamp[1],
-			(uint8_t)timestamp[2], (uint8_t)timestamp[3],
-			(uint8_t)timestamp[4], (uint8_t)timestamp[5]},
-		.data_length=htons(len)
-	};
-	strncpy(packet.ID, ID, 4);
-	memcpy(&packet.raw, buffer, len);
-
-	rnh_data_out(&packet);
-}
-
 static void version_callback(struct pollfd *pfd){
 	uint8_t buffer[50];
 

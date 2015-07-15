@@ -20,8 +20,6 @@ typedef struct {
 	uint8_t detect;
 } __attribute__((packed)) RNHUmbdet;
 
-void rnh_raw_in(unsigned char *buffer, int unsigned len, unsigned char* timestamp);
-void rnh_data_out(RNHMessage * message);
 void rnh_version_out(uint8_t * buffer, unsigned int length);
 void rnh_init(void);
 #endif

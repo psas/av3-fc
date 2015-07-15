@@ -57,9 +57,7 @@ extern const struct sockaddr * MPL_ADDR;
 
 /* Roll Control */
 #define ROLL_PORT 35003    // Servo control
-#define TEATHER_PORT 35004 // Launch detect
 extern const struct sockaddr * ROLL_ADDR;
-extern const struct sockaddr * TEATHER_ADDR;
 
 /* WiFi */
 #define WIFI_PORT 35001
@@ -71,6 +69,9 @@ extern const struct sockaddr * WIFI_ADDR;
 #define RC_SERVO_ENABLE_PORT 35667
 extern const struct sockaddr * ARM_ADDR;
 extern const struct sockaddr * RC_SERVO_ENABLE_ADDR;
+
+#define JGPS_PORT 35050
+
 #define GPS_COTS 35051
 extern const struct sockaddr * GPS_COTS_ADDR;
 

@@ -1,26 +1,24 @@
 %YAML 1.2
 ---
-include: state.h
-object: src/state.o
-init: state_init();
+include: filter.h
+object: src/filter.o
 
 senders:
+  filter_to_ground:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
-  state_send_message:
+  filter_to_disk:
   - [ID, const char*]
   - [timestamp, uint8_t*]
   - [data_length, uint16_t]
   - [data, void*]
 
 receivers:
-  state_receive_imu:
+  filter_receive:
   - [ID, const char*]
   - [timestamp, uint8_t*]
   - [data_length, uint16_t]
   - [data, void*]
-
-  state_raw_ld_in:
-  - [code, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
-

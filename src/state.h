@@ -13,9 +13,9 @@
 #define LAUNCH_ALTITUDE 1390.0
 
 void state_init(void); // [miml:init]
-void state_receive_imu(ADISMessage *); // [miml:receiver]
+void state_receive_imu(const char *, uint8_t *, uint16_t, void *); // [miml:receiver]
 void state_raw_ld_in(unsigned char *, unsigned int, unsigned char*); // [miml:receiver]
-void state_send_message(VSTEMessage *); // [miml:sender]
+void state_send_message(const char *, uint8_t *, uint16_t, void *); // [miml:sender]
 
 
 #endif /* STATE_H_ */

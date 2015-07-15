@@ -11,25 +11,23 @@ senders:
   - [len, unsigned int]
   - [timestamp, unsigned char*]
   
-  demuxed_LD:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
-  
   demuxed_ADIS:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
   
   demuxed_MPU:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
   
   demuxed_MPL:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
   
   demuxed_RC:
   - [data, unsigned char*]
@@ -37,26 +35,39 @@ senders:
   - [timestamp, unsigned char*]
 
   demuxed_RNH:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+
+  demuxed_RNHUMB:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   demuxed_FCFH:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+
+  demuxed_JGPS:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   demuxed_COTS:
-  - [data, unsigned char*]
-  - [len, unsigned int]
-  - [timestamp, unsigned char*]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
   sequenced_error:
-  - [port, unsigned short]
-  - [buffer, uint8_t*]
-  - [len, unsigned int]
-  - [timestamp, uint8_t *]
-  - [expected, uint32_t]
-  - [received, uint32_t]
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
 
 receivers:
