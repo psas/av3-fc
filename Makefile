@@ -1,10 +1,10 @@
 INCLUDE_DIRS := -Isrc -Isrc/devices -Isrc/utilities -I.
 OPTSLIVE := -flto -D FCF_FC_NETWORK
-OPTSDEV  := -flto -g
+OPTSDEV  := -flto
 OPTSPROF := -pg
 OPTS     := -Ofast
 WARNINGS := -Wall -Wextra -Wwrite-strings -Wno-missing-field-initializers -Wno-unused-parameter
-CFLAGS   := -MD -std=gnu99 $(OPTS) $(WARNINGS) -fno-strict-aliasing $(INCLUDE_DIRS)
+CFLAGS   := -MD -std=gnu99 -g $(OPTS) $(WARNINGS) -fno-strict-aliasing $(INCLUDE_DIRS)
 LDLIBS   := -lrt -lm
 .DEFAULT_GOAL := all
 OBJECTS  += elderberry/fcfutils.o fcfmain.o
