@@ -87,6 +87,13 @@ static void send_venus_messages(uint8_t timestamp[6])
 		if (frame + 7 + packet_len > cur)
 			break; // wait for more data
 
+		if (memcmp(frame + 5 + packet_len, "\r\n", 2))
+		{
+			fprintf(stderr, "GPS packet with ID %02X does not end with frame trailer.\n", frame[4]);
+			frame += 2; // skip A0A1
+			continue;
+		}
+
 		if (chexxor(frame+4, packet_len) != frame[4+packet_len])
 		{
 			fprintf(stderr, "Bad GPS packet checksum for ID %02X.\n", frame[4]);
