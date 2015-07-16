@@ -87,6 +87,13 @@ static void send_venus_messages(uint8_t timestamp[6])
 		if (frame + 7 + packet_len > cur)
 			break; // wait for more data
 
+		if (memcmp(frame + 5 + packet_len, "\r\n", 2))
+		{
+			fprintf(stderr, "GPS packet with ID %02X does not end with frame trailer.\n", frame[4]);
+			frame += 2; // skip A0A1
+			continue;
+		}
+
 		if (chexxor(frame+4, packet_len) != frame[4+packet_len])
 		{
 			fprintf(stderr, "Bad GPS packet checksum for ID %02X.\n", frame[4]);
@@ -126,6 +133,7 @@ void cots_raw_in(const char ID[4], uint8_t timestamp[6], uint16_t data_length, v
 }
 
 #ifdef TESTING
+#include <arpa/inet.h>
 
 struct packetA8 {
 	uint8_t head[2];
@@ -135,7 +143,7 @@ struct packetA8 {
 	uint8_t data[57];
 	uint8_t checksum;
 	uint8_t tail[2];
-} __attribute__((packed)) pA8 = { { 0xA0, 0xA1 }, htons(59), 0xA8, 0, { }, 0, { '\r', '\n' } };
+} __attribute__((packed)) pA8 = { { 0xA0, 0xA1 }, 0, 0xA8, 0, { }, 0, { '\r', '\n' } };
 
 uint8_t input[0x10000];
 
@@ -144,6 +152,8 @@ int main(int argc, char *argv[])
 	char ID[5] = "GPSV";	//???
 	uint8_t timestamp[6] = { 0,0,0,0,0,0 } ;
 	size_t chunk = 100;
+
+	pA8.len = htons(59);
 
 	/* fill input */
 	uint8_t *p = input;

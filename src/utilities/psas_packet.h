@@ -689,6 +689,23 @@ typedef struct {
 
 
 /*! \typedef
+ * SequenceError Data
+ */
+typedef struct {
+	uint16_t port;
+	uint32_t expected;
+	uint32_t received;
+} __attribute__((packed)) SequenceErrorData;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	SequenceErrorData data;
+} __attribute__((packed)) SEQEMessage;
+
+
+/*! \typedef
  * SequenceNo Data
  */
 typedef struct {
@@ -734,21 +751,6 @@ typedef struct {
 	uint16_t data_length;
 	Venus8NavigationData data;
 } __attribute__((packed)) V8A8Message;
-
-
-/*! \typedef
- * Version Data
- */
-typedef struct {
-	char vers[17];
-} __attribute__((packed)) VersionData;
-
-typedef struct {
-	char     ID[4];
-	uint8_t  timestamp[6];
-	uint16_t data_length;
-	VersionData data;
-} __attribute__((packed)) VERSMessage;
 
 
 /*! \typedef
