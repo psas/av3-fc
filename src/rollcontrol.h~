@@ -10,26 +10,11 @@
 #define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
-
-/* Important Stuff for PID loop! */
-
 /* PID gain constants */
 #define Kp 50
 #define Ki .009
 #define Kd 0
-
-/* PID target */
 #define pidTarget 0
-
-/* for clamping integrator term in PID */
-#define integrator_max 500
-#define integrator_min -500
-
-/* global variables needed for PID controller */
-double lastError;
-double integrator;
-
-/* End Important Stuff for PID loop! */
 
 
 /* Fin charachterization constants */
@@ -50,7 +35,12 @@ double integrator;
 // Converts radians to degrees.
 #define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
 
+/* global variables needed for PID controller */
+double lastError;
+double integrator;
+
 void rollcontrol_init(void); // [miml:init]
+
 void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf); // [miml:receiver]
 void rc_receive_arm(const char *); // [miml:receiver]
 void rc_raw_umb(const char *, unsigned char*, unsigned int, void*); // [miml:receiver]
