@@ -22,8 +22,8 @@
 #define pidTarget 0
 
 /* for clamping integrator term in PID */
-#define integrator_max 500
-#define integrator_min -500
+#define integrator_max 100
+#define integrator_min -100
 
 /* global variables needed for PID controller */
 double lastError;
