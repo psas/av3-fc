@@ -63,6 +63,7 @@ const struct sockaddr * FC_ADDR = make_addr(FC_IP, FC_LISTEN_PORT);
 const struct sockaddr * ADIS_ADDR = make_addr(SENSOR_IP, ADIS_PORT);
 const struct sockaddr * MPU_ADDR = make_addr(SENSOR_IP, MPU_PORT);
 const struct sockaddr * MPL_ADDR = make_addr(SENSOR_IP, MPL_PORT);
+const struct sockaddr * BMP_ADDR = make_addr(SENSOR_IP, BMP_PORT);
 
 const struct sockaddr * ROLL_ADDR = make_addr(ROLL_IP, ROLL_PORT);
 

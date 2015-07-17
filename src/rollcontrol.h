@@ -11,6 +11,7 @@
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
 
+<<<<<<< HEAD
 /* Important Stuff for PID loop! */
 
 /* PID gain constants */
@@ -50,6 +51,8 @@ double integrator;
 // Converts radians to degrees.
 #define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
 
+=======
+>>>>>>> 64424930e5000cab077758167631ebe4ef3ba84c
 void rollcontrol_init(void); // [miml:init]
 void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf); // [miml:receiver]
 void rc_receive_arm(const char *); // [miml:receiver]

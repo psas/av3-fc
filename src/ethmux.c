@@ -66,6 +66,7 @@ void demux(struct pollfd *pfd){
 	static struct demux_type seq_ADIS = { "ADIS", sizeof(ADIS16405Data), demuxed_ADIS };
 	static struct demux_type seq_MPU = { "MPU9", UINT16_MAX, demuxed_MPU };
 	static struct demux_type seq_MPL = { "MPL3", sizeof(MPLData), demuxed_MPL };
+	static struct demux_type seq_BMP = { "BMP1", sizeof(BMP180Data), demuxed_BMP };
 	static struct demux_type seq_RNH = { "RNHH", sizeof(RNHHealthData), demuxed_RNH };
 	static struct demux_type seq_RNHPORT = { "RNHP", sizeof(RNHPowerData), demuxed_RNH };
 	static struct demux_type seq_RNHALARM = { "RNHA", sizeof(RNHAlarms), demuxed_RNH };
@@ -96,6 +97,9 @@ void demux(struct pollfd *pfd){
 			break;
 		case MPL_PORT:
 			sequenced_receive(port, buffer, bytes, timestamp, &seq_MPL);
+			break;
+		case BMP_PORT:
+			sequenced_receive(port, buffer, bytes, timestamp, &seq_BMP);
 			break;
 		case RC_SERVO_ENABLE_PORT:
 			demuxed_RC(buffer, bytes, timestamp);
