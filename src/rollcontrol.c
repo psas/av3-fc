@@ -11,6 +11,45 @@
 #include "devices/rnh.h"
 #include "rollcontrol.h"
 
+/* Important Stuff for PID loop! */
+
+/* PID gain constants */
+#define Kp 50
+#define Ki .009
+#define Kd 0
+
+/* PID target */
+#define pidTarget 0
+
+/* for clamping integrator term in PID */
+#define integrator_max 500
+#define integrator_min -500
+
+/* global variables needed for PID controller */
+static double lastError;
+static double integrator;
+
+/* End Important Stuff for PID loop! */
+
+
+/* Fin charachterization constants */
+#define FINFIT_A 0.0006
+#define FINFIT_B 0.045
+#define FIN_CBASE 3.2
+#define FIN_AREA 1.13e-3
+#define FIN_ARM 0.085
+#define I_INIT 0.086
+#define I_BO 0.077
+#define EXPECTED_BURN_TIME 5.7
+#define SUBSONIC 265
+#define SUPERSONIC 330
+
+// Converts degrees to radians.
+#define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
+
+// Converts radians to degrees.
+#define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
+
 static int sd;
 
 static bool enable_servo;
