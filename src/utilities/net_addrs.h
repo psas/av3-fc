@@ -51,9 +51,11 @@ extern const struct sockaddr * FC_ADDR;
 #define ADIS_PORT 35020 // ADIS16405
 #define MPU_PORT 35002  // MPU1950
 #define MPL_PORT 35010  // MPL3115A2
+#define BMP_PORT 35011  // BMP180
 extern const struct sockaddr * ADIS_ADDR;
 extern const struct sockaddr * MPU_ADDR;
 extern const struct sockaddr * MPL_ADDR;
+extern const struct sockaddr * BMP_ADDR;
 
 /* Roll Control */
 #define ROLL_PORT 35003    // Servo control

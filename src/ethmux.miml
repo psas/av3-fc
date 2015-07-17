@@ -28,7 +28,13 @@ senders:
   - [timestamp, uint8_t*]
   - [data_length, uint16_t]
   - [data, void*]
-  
+
+  demuxed_BMP:
+  - [ID, const char*]
+  - [timestamp, uint8_t*]
+  - [data_length, uint16_t]
+  - [data, void*]
+ 
   demuxed_RC:
   - [data, unsigned char*]
   - [len, unsigned int]
