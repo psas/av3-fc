@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <netinet/in.h>
@@ -7,9 +8,11 @@
 
 static StateData current_state;
 static double dt = 1/819.2;
+static bool has_launched;
 
 
 void state_init(void) {
+	has_launched = false;
 	current_state.time = 0;
 	current_state.acc_up = 0;
 	current_state.vel_up = 0;
@@ -29,12 +32,18 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 	const double accel = ADIS_GLSB * (int16_t) ntohs(imu->acc_x);
 	const double roll_rate = ADIS_RLSB * (int16_t) ntohs(imu->gyro_x);
 
-	// Integrate sensors
-	current_state.acc_up = accel;
-	current_state.vel_up += accel*dt;
-	current_state.altitude += current_state.vel_up*dt;
-	current_state.roll_rate = roll_rate;
-	current_state.roll_angle += roll_rate*dt;
+	if (fabs(accel) > 40) {
+		has_launched = true;
+	}
+
+	if (has_launched) {
+		// Integrate sensors
+		current_state.acc_up = accel;
+		current_state.vel_up += accel*dt;
+		current_state.altitude += current_state.vel_up*dt;
+		current_state.roll_rate = roll_rate;
+		current_state.roll_angle += roll_rate*dt;
+	}
 
 	// Send data
 	state_send_message("VSTE", timestamp, sizeof(StateData), &current_state);
