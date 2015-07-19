@@ -27,6 +27,9 @@ messages:
   ETH.demuxed_MPL:
     - LOG.log_write
 
+  ETH.demuxed_BMP:
+    - LOG.log_write
+
   ETH.demuxed_RC:
     - RC.rc_raw_testrc
 

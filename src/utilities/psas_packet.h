@@ -607,6 +607,21 @@ typedef struct {
 	MPL3115A2Data data;
 } __attribute__((packed)) MPL3Message;
 
+/*! \typedef
+ * BMP180 Data
+ */
+typedef struct {
+	uint32_t pressure;
+	uint16_t temp;
+} __attribute__((packed)) BMP180Data;
+
+typedef struct {
+	char     ID[4];
+	uint8_t  timestamp[6];
+	uint16_t data_length;
+	BMP180Data data;
+} __attribute__((packed)) BMP1Message;
+
 
 /*! \typedef
  * RNHHealth Data

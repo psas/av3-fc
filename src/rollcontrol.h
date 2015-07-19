@@ -10,7 +10,6 @@
 #define MAX_CANARD_ANGLE 15.0            // Canard position in Degrees
 #define MIN_CANARD_ANGLE -15.0           // Canard position in Degrees
 
-
 void rollcontrol_init(void); // [miml:init]
 void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *buf); // [miml:receiver]
 void rc_receive_arm(const char *); // [miml:receiver]
