@@ -39,13 +39,16 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 		launch_time = from_psas_time(timestamp);
 	}
 
+	/* Unconditionally forward raw measurements because they're just
+	 * as accurate at any phase of the launch. */
+	current_state.acc_up = accel;
+	current_state.roll_rate = roll_rate;
+
 	if (has_launched) {
 		// Integrate sensors
 		current_state.time = (from_psas_time(timestamp) - launch_time) / 1.0e9;
-		current_state.acc_up = accel;
 		current_state.vel_up += accel*dt;
 		current_state.altitude += current_state.vel_up*dt;
-		current_state.roll_rate = roll_rate;
 		current_state.roll_angle += roll_rate*dt;
 	}
 
