@@ -44,6 +44,7 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 	 * as accurate at any phase of the launch. */
 	current_state.acc_up = accel;
 	current_state.roll_rate = roll_rate;
+	current_state.roll_rate = -roll_rate; //Sensor coordinate frame is rotated 180
 
 	if (has_launched) {
 		const double dt = (now - last_time) / 1.0e9;
