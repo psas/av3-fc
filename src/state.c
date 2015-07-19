@@ -8,7 +8,7 @@
 #include "utilities/utils_time.h"
 
 static StateData current_state;
-static double dt = 1/819.2;
+static uint64_t last_time;
 static bool has_launched;
 static uint64_t launch_time;
 
@@ -28,6 +28,7 @@ void state_init(void) {
  * Recieve data from the IMU, and integrate to a state estimation
  */
 void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *buf) {
+	const uint64_t now = from_psas_time(timestamp);
 	ADIS16405Data *imu = buf;
 
 	// Convert raw IMU data to MKS/degrees unit system
@@ -36,7 +37,7 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 
 	if (!has_launched && fabs(accel) > 40) {
 		has_launched = true;
-		launch_time = from_psas_time(timestamp);
+		launch_time = now;
 	}
 
 	/* Unconditionally forward raw measurements because they're just
@@ -45,8 +46,9 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 	current_state.roll_rate = roll_rate;
 
 	if (has_launched) {
+		const double dt = (now - last_time) / 1.0e9;
 		// Integrate sensors
-		current_state.time = (from_psas_time(timestamp) - launch_time) / 1.0e9;
+		current_state.time = (now - launch_time) / 1.0e9;
 		current_state.vel_up += accel*dt;
 		current_state.altitude += current_state.vel_up*dt;
 		current_state.roll_angle += roll_rate*dt;
@@ -54,6 +56,8 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 
 	// Send data
 	state_send_message("VSTE", timestamp, sizeof(StateData), &current_state);
+
+	last_time = now;
 }
 
 
