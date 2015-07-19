@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <netinet/in.h>
-#include "elderberry/fcfutils.h"
 #include "state.h"
+#include "elderberry/fcfutils.h"
+#include "utilities/utils_time.h"
 
 static StateData current_state;
 static double dt = 1/819.2;
 static bool has_launched;
+static uint64_t launch_time;
 
 
 void state_init(void) {
@@ -32,12 +34,14 @@ void state_receive_imu(const char *ID, uint8_t *timestamp, uint16_t len, void *b
 	const double accel = ADIS_GLSB * (int16_t) ntohs(imu->acc_x);
 	const double roll_rate = ADIS_RLSB * (int16_t) ntohs(imu->gyro_x);
 
-	if (fabs(accel) > 40) {
+	if (!has_launched && fabs(accel) > 40) {
 		has_launched = true;
+		launch_time = from_psas_time(timestamp);
 	}
 
 	if (has_launched) {
 		// Integrate sensors
+		current_state.time = (from_psas_time(timestamp) - launch_time) / 1.0e9;
 		current_state.acc_up = accel;
 		current_state.vel_up += accel*dt;
 		current_state.altitude += current_state.vel_up*dt;
