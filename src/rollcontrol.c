@@ -14,8 +14,8 @@
 /* Important Stuff for PID loop! */
 
 /* PID gain constants */
-#define Kp 50
-#define Ki .009
+#define Kp 5.0
+#define Ki 0.01
 #define Kd 0
 
 /* PID target */
