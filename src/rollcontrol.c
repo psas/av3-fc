@@ -22,8 +22,8 @@
 #define pidTarget 0
 
 /* for clamping integrator term in PID */
-#define integrator_max 100
-#define integrator_min -100
+#define integrator_max (100 / Ki)
+#define integrator_min (-100 / Ki)
 
 /* global variables needed for PID controller */
 static double lastError;
@@ -224,14 +224,6 @@ void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *bu
 	/* derivative stage */
 	double derivative = Kd * (error - lastError);
 
-	/* clamp the integrator! */
-	if(integral > integrator_max){
-	  integral = integrator_max;
-	}
-	else if(integral < integrator_min){
-	  integral = integrator_min;
-	}
-
 	/* output of the PID controller */
 	/* sum each stage together */
 	double correction = proportional + integral + derivative;
@@ -241,6 +233,14 @@ void rc_receive_state(const char *ID, uint8_t *timestamp, uint16_t len, void *bu
 
 	/* add the error to the integral stage for next step */
 	integrator += error;
+
+	/* clamp the integrator! */
+	if(integrator > integrator_max){
+	  integrator = integrator_max;
+	}
+	else if(integrator < integrator_min){
+	  integrator = integrator_min;
+	}
 
 	// Look normilized fin angle based on requested angular acceleration
 	double output = estimate_alpha(correction, *state);
