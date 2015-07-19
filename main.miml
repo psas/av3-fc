@@ -51,7 +51,6 @@ messages:
 
   STATE.state_send_message:
     - RC.rc_receive_state
-    - LOG.log_write
 
   GPS.gps_data_out:
     - ARM.arm_receive_gps
