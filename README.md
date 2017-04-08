@@ -7,10 +7,10 @@
 rocket avionics systems. We've been testing ways to fly code on small-ish
 rockets for over 15 years.
 
-This repo contains our current primary flight computer (an Intel Atom processor
+This repo contains our primary flight computer (an Intel Atom processor
 at the heart of a full stack of sensors, batteries, radios, and other electronics. This
-all fits in our 5.5 inch diameter, 12 foot tall, high power rocket that flies
-over straight up over 4 kilometers.
+fits in our 5.5 inch diameter, 12 foot tall, high power rocket that flies
+straight up over 4 kilometers.
 
 We've been refining the code to fly a roll control experiment in July 2014.
 
@@ -21,12 +21,12 @@ We've been refining the code to fly a roll control experiment in July 2014.
 
 # Documentation
 
-The flight code is written in C, and features a generated `main` function and a
+The flight code is written in C. It features a generated `main` function and a
 callback-based event loop. The [event loop code generator was written by a senior
 CS student group in 2013](https://github.com/psas/elderberry).
 
 This abstraction lets us write small pieces of behavior with very little
-boilerplate. The goal is to be able to hand out well defined projects such as
+boilerplate. The goal is to hand out well defined projects such as
 "write the parser for the GPS messages" to members without having to expect them
 to maintain the complicated interconnections to the rest of the system.
 
@@ -61,7 +61,7 @@ Don't forget to initialize your submodules:
 ## Building
 
 Due to the need for user module abstraction, the build process for the framework
-is a little more complicated than that of a typical C application. Here is the
+is a little more complicated than a typical C application. Here is the
 general build process:
 
  1. User module MIML files and the Main.miml file are passed into the code 
@@ -72,7 +72,7 @@ general build process:
  1. The Makefile imports the Miml.mk and should successfully compile, link and
     build the executable "fc."
 
-To help uncomplicate this process, however, the Makefile has been created so
+To help uncomplicate this process, the Makefile has been created so
 that the user only needs to run:
 
     $ make
